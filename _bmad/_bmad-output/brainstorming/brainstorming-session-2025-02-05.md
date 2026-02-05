@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 27
+ideas_generated: 35
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -172,3 +172,39 @@ _Novelty :_ Passage d’un usage “solo arbitrage” à un usage B2B / relation
 **[P4] Source de données pour tiers et monétisation**
 _Concept :_ Servir de source de données pour d’autres (APIs, exports, rapports) et vendre ces données (agrégées, anonymisées ou sous licence) à des acteurs du secteur.
 _Novelty :_ Le produit génère de la valeur non seulement par l’usage interne mais par la revente de données.
+
+#### E — Eliminate (Éliminer)
+
+**[E1] Supprimer les outils annexes**
+_Concept :_ Éliminer tous les outils annexes et se concentrer principalement sur le prix du marché et les sources, avec un rendu simple et rapide.
+_Novelty :_ Produit focalisé sur le cœur de valeur (prix + sources) sans dispersion.
+
+**[E2] Moins d’écrans, UX minimaliste**
+_Concept :_ Moins d’écrans, UX minimaliste, moins chargé : réduire le nombre de vues et d’options pour une prise en main immédiate.
+_Novelty :_ L’essentiel visible sans navigation complexe.
+
+**[E3] Valeurs estimées si pas trouvé**
+_Concept :_ Au lieu d’exiger des données fiables partout, autoriser des valeurs estimées (ex. fourchette, dernière connue) quand une source ne répond pas ou n’a pas la donnée.
+_Novelty :_ Le système reste utilisable même avec des trous ; on affiche “estimé” au lieu de bloquer.
+
+**[E4] Moins d’interconnexions**
+_Concept :_ Réduire les interconnexions entre modules (moins de dépendances, flux plus linéaires) pour simplifier maintenance et évolution.
+_Novelty :_ Architecture plus découplée, moins de couplage fort.
+
+**[E5] Moins de critères de recherche**
+_Concept :_ Réduire le nombre de critères de recherche proposés à l’utilisateur : garder l’indispensable, supprimer le “nice to have” pour éviter la surcharge.
+_Novelty :_ Recherche plus rapide et plus lisible.
+
+#### R — Reverse (Inverser)
+
+**[R1] Liste manuelle de départ + complétion par appels réels**
+_Concept :_ Inverser le flux : partir d’une liste manuelle avec un prix de départ (saisi ou importé), puis compléter par des appels réels (APIs, scraping) pour mettre à jour seulement ce qui manque ou a changé.
+_Novelty :_ L’humain pose la base ; l’automatisation enrichit au lieu de tout générer from scratch.
+
+**[R2] Vérifier les prix nous-mêmes et les renseigner à la main**
+_Concept :_ Inverser la source de vérité : on vérifie les prix nous-mêmes (en magasin, sur un site), on les renseigne à la main dans le système et on informe les autres (communauté, abonnés).
+_Novelty :_ Le produit devient un canal de partage de données “vérifiées humainement” plutôt qu’un pur agrégateur automatique.
+
+**[R3] Demander aux autres de saisir au lieu de récupérer nous-mêmes**
+_Concept :_ Inverser qui alimente les données : l’application sert à demander aux autres (utilisateurs, communauté) de saisir les infos (prix vus, dispo) au lieu de les récupérer nous-mêmes ; on agrège et on présente.
+_Novelty :_ Modèle collaboratif / crowdsourcing plutôt que collecte centralisée automatique.
