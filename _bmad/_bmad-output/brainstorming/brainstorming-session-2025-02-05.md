@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 16
+ideas_generated: 23
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -124,3 +124,33 @@ _Novelty :_ Réutiliser des patterns éprouvés plutôt qu’inventer une approc
 **[A4] Gestion multilingue**
 _Concept :_ Gérer plusieurs langues : sources (sites FR, EN, etc.), interface utilisateur, et éventuellement noms de produits / catégories pour comparer et alerter au-delà d’un seul marché.
 _Novelty :_ Adapter le produit à un usage multi-marchés et multi-langues dès la conception (i18n, normalisation des libellés).
+
+#### M — Modify (Modifier)
+
+**[M1] Fréquence des prix : à terme en live**
+_Concept :_ Modifier la cadence de vérification : viser à terme des prix en temps réel (live) au lieu de chaque jour ou chaque semaine, pour des alertes plus réactives.
+_Novelty :_ Évolution du produit vers du “temps réel” tout en gérant la contrainte technique (rate limits, coût).
+
+**[M2] Réduire la complexité**
+_Concept :_ Modifier l’expérience et l’architecture pour réduire la complexité perçue et réelle : moins d’étapes, moins de réglages, parcours plus directs.
+_Novelty :_ Poke-Radar reste puissant mais plus simple à utiliser et à maintenir.
+
+**[M3] Menus déroulants clairs pour la saisie**
+_Concept :_ Modifier les écrans de saisie avec des menus déroulants clairs (produits, sources, seuils) pour guider l’utilisateur et limiter les erreurs.
+_Novelty :_ Meilleure découvrabilité des options et saisie plus rapide.
+
+**[M4] Éditions et sets préenregistrés**
+_Concept :_ Éditions et sets déjà préenregistrés et bien configurés en base (noms, codes, liens aux sources) pour que la recherche et les alertes s’appuient sur des référentiels stables.
+_Novelty :_ L’utilisateur choisit dans une liste maintenue plutôt que de tout saisir à la main.
+
+**[M5] Export Excel**
+_Concept :_ Rajouter une possibilité d’export Excel (liste de produits, historiques de prix, opportunités) pour analyse côté tableur ou partage.
+_Novelty :_ Poke-Radar reste la source de vérité, Excel devient un canal de sortie pour power users.
+
+**[M6] Favoris et cartes possédées**
+_Concept :_ Rajouter la notion de “like” (liste des favoris) et/ou de cartes possédées pour personnaliser alertes, tris et tableaux de bord (ex. ne montrer que ce que je possède ou que je surveille).
+_Novelty :_ Le produit s’adapte à la collection et aux priorités de l’utilisateur.
+
+**[M7] Tri(s) enrichis**
+_Concept :_ Rajouter des options de tri (prix, date, marge, nom, set, favori, etc.) sur les listes et tableaux pour faciliter le scan et la décision.
+_Novelty :_ L’utilisateur pilote l’ordre d’affichage selon le contexte (arbitrage, collection, veille).
