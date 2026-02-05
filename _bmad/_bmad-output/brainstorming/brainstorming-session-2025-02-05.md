@@ -1,11 +1,13 @@
 ---
-stepsCompleted: [1, 2]
+stepsCompleted: [1, 2, 3, 4]
+session_active: false
+workflow_completed: true
 inputDocuments: ['architecture_technique.md', 'market-Poke-Radar-research.md', 'technical-Poke-Radar-research.md', 'rapport_brainstorming.md']
 session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques, UX, priorités, alternatives, idées décalées)'
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 55
+ideas_generated: 58
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -319,4 +321,74 @@ _Parade :_ Filtres par langue et par marché (A4) ; référentiel sets/blocs mai
 
 #### 4. Légal / éthique
 
-_(Non renseigné pour cette session ; à compléter si besoin.)_
+**[FA13] Sites interdisent, bannissement ou poursuites**
+_Risque :_ Les sites interdisent le scraping, me bannissent (IP, compte) ou me mettent en justice.
+_Parade :_ Privilégier APIs et flux autorisés ; respecter CGU et robots.txt ; réduire la fréquence et identifier clairement (User-Agent, contact) ; avoir un fallback manuel (Excel, saisie).
+
+**[FA14] Pas d’entreprise derrière**
+_Risque :_ Pas d’entité juridique (société, assurance) derrière le produit → responsabilité personnelle, pas de bouclier en cas de litige.
+_Parade :_ Clarifier le statut (projet perso, usage perso) ; éviter de promettre des données “officielles” ; documenter les limites ; créer une structure légale si passage à la revente de données ou usage pro.
+
+**[FA15] Revente de données personnelles**
+_Risque :_ Revente ou partage de données personnelles (utilisateurs, emails, comportements) → RGPD, confiance, réputation.
+_Parade :_ Ne pas revendre de données personnelles ; si monétisation des données, uniquement agrégées et anonymisées ; politique de confidentialité claire et minimisation des données collectées.
+
+---
+
+## Idea Organization and Prioritization
+
+**Session achievement :** 58 idées environ, 3 techniques (SCAMPER, What If Scenarios, Failure Analysis), focus Poke-Radar (tout le projet).
+
+### Organisation thématique
+
+**Thème 1 — Données & sources**  
+APIs vs scraping (S2, FA1), multi-sources et comparaison (C1, S3), référentiels et sets (M4, A2), forums + IA (S4), multilingue (A4), liste manuelle + complétion (R1).  
+*Pattern :* Réduire la dépendance au scraping, diversifier les sources, bien identifier les produits (bloc/série/langue).
+
+**Thème 2 — Simplicité & UX**  
+Moins d’outils annexes (E1), UX minimaliste et moins d’écrans (E2, FA6, FA9), valeurs estimées (E3), moins de critères (E5), menus déroulants (M3), tris (M7), réduction de la complexité (M2).  
+*Pattern :* Un produit focalisé “prix + alertes”, rapide à lire et à configurer.
+
+**Thème 3 — Notifications & canaux**  
+Canal le plus rapide à implémenter (S1), abstraction multi-canaux Discord/Telegram/Mail (C2), pipeline unique sources → alertes (C4).  
+*Pattern :* Une seule logique d’envoi, plusieurs sorties ; priorité au time-to-market des alertes.
+
+**Thème 4 — Fonctionnalités produit**  
+Éditions/sets préenregistrés (M4), export Excel (M5), favoris et cartes possédées (M6), prix en live à terme (M1).  
+*Pattern :* Outil utilisable au quotidien : référentiel, export, personnalisation, réactivité.
+
+**Thème 5 — Fallback & robustesse**  
+Valeurs estimées si pas trouvé (E3), liste manuelle + complétion (R1), saisie manuelle / Excel (WI7, FA5), crowdsourcing (R2, R3).  
+*Pattern :* Si l’automatisation casse, le produit reste utile (manuel, communauté).
+
+**Thème 6 — Stratégie & autres usages**  
+Guide collectionneurs (P1), Lego / autres univers (P2), B2B fournisseurs (P3), monétisation données (P4) ; What If : bourse-like, IA, automatisation A–Z, vitrine (WI1–WI8).  
+*Pattern :* Évolution possible vers place de marché, B2B, ou simple vitrine selon les contraintes.
+
+**Thème 7 — Risques et parades**  
+Failure Analysis (FA1–FA15) : technique (scraping, données, charge), UX (pages, alertes, complexité), marché (sites qui changent, langues), légal (ban, pas d’entreprise, données perso).  
+*Pattern :* Parades = APIs, référentiel, UX minimaliste, fallback manuel, statut et RGPD clairs.
+
+### Priorisation proposée
+
+- **Impact fort + faisable court terme :** Pipeline simple (C4), canal notif le plus rapide (S1), UX minimaliste (E2), référentiel sets/éditions (M4), valeurs estimées (E3).
+- **Quick wins :** Tableau CRUD / Excel manuel (WI7, R1) comme premier livrable ; menus déroulants et moins de critères (M3, E5).
+- **À garder en tête (moyen terme) :** Multi-sources et APIs (S2, S3, C1), favoris / cartes possédées (M6), export Excel (M5), multilingue (A4).
+- **Vision / long terme :** Prix live (M1), analyses IA (WI3), autres univers (P2), B2B ou data (P3, P4).
+
+### Prochaines actions suggérées
+
+1. **Cette semaine :** Définir le MVP “minimum” : une liste (manuelle ou import) + prix (saisie manuelle ou 1–2 sources stables) + 1 canal d’alerte (le plus simple) + écran minimal (tableau + tri).
+2. **Ressources :** Choisir 1 stack “rapide” (ex. Python + SQLite + 1 notif) ou rester sur Tauri/Rust en limitant le scope ; documenter le fallback “tout manuel / Excel”.
+3. **Obstacles :** Scraping fragile (FA1, FA10) → privilégier APIs / Pokecardex-like ; légal (FA13–FA15) → usage perso clair, pas de revente de données perso.
+4. **Succès :** Tu reçois une alerte utile au moins 1 fois ; tu peux enregistrer tes trouvailles sans perdre d’info ; le produit reste utilisable même si une source tombe.
+
+---
+
+## Session Summary and Insights
+
+**Réalisations :** Exploration structurée (SCAMPER complet), scénarios What If (ressources illimitées ↔ tout manuel ↔ vitrine), analyse des échecs avec parades (technique, UX, marché, légal).
+
+**Points forts :** Équilibre entre “automatisation idéale” et “fallback manuel” ; risques identifiés tôt (scraping, légal, complexité) ; idées réutilisables (multi-sources, minimalisme, crowdsourcing).
+
+**Prochaine étape :** Valider le MVP (liste + prix + 1 alerte + UX minimaliste) et le documenter (architecture_technique ou brief produit) ; garder ce fichier comme référence pour les décisions de scope.
