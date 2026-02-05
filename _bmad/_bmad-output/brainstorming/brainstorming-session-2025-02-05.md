@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 23
+ideas_generated: 27
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -154,3 +154,21 @@ _Novelty :_ Le produit s’adapte à la collection et aux priorités de l’util
 **[M7] Tri(s) enrichis**
 _Concept :_ Rajouter des options de tri (prix, date, marge, nom, set, favori, etc.) sur les listes et tableaux pour faciliter le scan et la décision.
 _Novelty :_ L’utilisateur pilote l’ordre d’affichage selon le contexte (arbitrage, collection, veille).
+
+#### P — Put to other uses (Autres usages)
+
+**[P1] Guide pour les collectionneurs**
+_Concept :_ Utiliser Poke-Radar comme guide pour les collectionneurs : suivi de collection, tendances de prix, alertes sur pièces manquantes ou opportunités, sans forcément viser l’arbitrage.
+_Novelty :_ Même moteur (prix, stocks, alertes), usage recentré sur la collection plutôt que la revente.
+
+**[P2] Autres univers : cartes, Lego, même principe**
+_Concept :_ Réutiliser le même principe (surveillance stocks, prix, alertes) pour d’autres types de cartes ou produits (ex. Lego, autres TCG, figurines) : adapter les sources et le référentiel, garder le pipeline.
+_Novelty :_ Poke-Radar devient un “radar” générique pour biens collectionnables / revendables.
+
+**[P3] Outil pro : communiquer avec les fournisseurs**
+_Concept :_ Mettre le produit au service des professionnels pour communiquer avec les fournisseurs : partage de listes, demandes de dispo, suivi des réassorts, voire intégration avec leurs outils.
+_Novelty :_ Passage d’un usage “solo arbitrage” à un usage B2B / relation fournisseur.
+
+**[P4] Source de données pour tiers et monétisation**
+_Concept :_ Servir de source de données pour d’autres (APIs, exports, rapports) et vendre ces données (agrégées, anonymisées ou sous licence) à des acteurs du secteur.
+_Novelty :_ Le produit génère de la valeur non seulement par l’usage interne mais par la revente de données.
