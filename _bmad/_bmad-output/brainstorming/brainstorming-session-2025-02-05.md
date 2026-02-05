@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 35
+ideas_generated: 43
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -217,6 +217,40 @@ _Novelty :_ Modèle collaboratif / crowdsourcing plutôt que collecte centralis�
 
 **Approche :** On enchaîne des “Et si…?” pour faire émerger des idées inattendues ; pas besoin de les juger réalisables tout de suite.
 
-#### Exploration en cours
+#### Et si ressources illimitées ?
 
-_(Idées à capturer au fil des réponses)_
+**[WI1] APIs partout, données précises sans scraping**
+_Concept :_ Avec argent dispo : se connecter à toutes les APIs des sites (retail, marketplaces), données précises sans scraper, moins de latence, plus de données directes.
+_Novelty :_ Fin du scraping ; la qualité et la réactivité viennent des accords API.
+
+**[WI2] Graphiques type bourse, produits en live**
+_Concept :_ Avoir des graphiques proches de la bourse et voir les produits arriver en live (flux temps réel, tendances, volumes).
+_Novelty :_ Expérience “trading” pour le TCG / collectibles.
+
+**[WI3] Analyses IA pour prioriser l’intéressant**
+_Concept :_ Faire des analyses IA approfondies pour présenter les données les plus intéressantes en premier (ce qui se revend le plus, opportunités, signaux).
+_Novelty :_ L’IA trie et met en avant au lieu d’afficher tout à plat.
+
+**[WI4] Automatisation A–Z : panier, achat, livraison**
+_Concept :_ Automatiser tout de A à Z : panier, achat, livraison automatique (intégration aux sites retail / logistique).
+_Novelty :_ Du signal d’alerte à l’exécution complète sans intervention manuelle.
+
+**[WI5] Équipe sur place pour prix justes**
+_Concept :_ Équipe sur place dans tous les magasins ou communautés pour avoir les prix les plus justes du marché (terrain = source de vérité).
+_Novelty :_ Données “terrain” humaines en complément ou en cœur du système.
+
+**[WI6] eBay-like avec enchères live**
+_Concept :_ Faire un eBay-like avec mises aux enchères en live (place de marché intégrée, enchères temps réel).
+_Novelty :_ Poke-Radar ne se contente plus d’alerter, il devient la place de marché.
+
+#### Et si l’inverse : tout manuel
+
+**[WI7] Simple tableau CRUD pour enregistrer les trouvailles**
+_Concept :_ À l’inverse : un simple tableau CRUD pour insérer les valeurs à la main ; l’utilisateur consulte les sites manuellement et utilise l’outil pour enregistrer ses trouvailles.
+_Novelty :_ Pas d’automatisation, outil personnel de suivi et de mémoire.
+
+#### Et si le problème n’existait pas (info parfaite pour tous)
+
+**[WI8] Site vitrine : meilleures ventes, cartes, designs, votes**
+_Concept :_ Si tout le monde avait déjà l’info parfaite : Poke-Radar deviendrait un site vitrine pour exposer les meilleures ventes, cartes, designs, votes, etc. (curation, communauté, inspiration).
+_Novelty :_ La valeur bascule vers la curation et l’exposition plutôt que l’accès à l’info.
