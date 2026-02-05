@@ -254,3 +254,15 @@ _Novelty :_ Pas d’automatisation, outil personnel de suivi et de mémoire.
 **[WI8] Site vitrine : meilleures ventes, cartes, designs, votes**
 _Concept :_ Si tout le monde avait déjà l’info parfaite : Poke-Radar deviendrait un site vitrine pour exposer les meilleures ventes, cartes, designs, votes, etc. (curation, communauté, inspiration).
 _Novelty :_ La valeur bascule vers la curation et l’exposition plutôt que l’accès à l’info.
+
+---
+
+### Technique 3: Failure Analysis
+
+**Objectif :** Identifier ce qui pourrait faire échouer Poke-Radar (technique, produit, adoption, légal, business) et en tirer des parades ou des priorités.
+
+**Approche :** On liste les échecs possibles sans juger ; ensuite on pourra en déduire des actions (à éviter, à sécuriser, à simplifier).
+
+#### Risques et parades
+
+_(À compléter avec tes réponses)_
