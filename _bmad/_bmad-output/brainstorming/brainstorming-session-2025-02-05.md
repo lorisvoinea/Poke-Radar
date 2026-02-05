@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 43
+ideas_generated: 55
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -263,6 +263,60 @@ _Novelty :_ La valeur bascule vers la curation et l’exposition plutôt que l�
 
 **Approche :** On liste les échecs possibles sans juger ; ensuite on pourra en déduire des actions (à éviter, à sécuriser, à simplifier).
 
-#### Risques et parades
+#### 1. Technique / données
 
-_(À compléter avec tes réponses)_
+**[FA1] Scraping interdit ou bloqué**
+_Risque :_ Le plus gros frein : scraping interdit par les sites, données inaccessibles ou illégales.
+_Parade :_ Privilégier APIs / flux officiels ; garder en secours une saisie manuelle ou des sources tierces (Pokecardex, etc.).
+
+**[FA2] Données fausses, lentes ou introuvables**
+_Risque :_ Données fausses, temps de réponse trop lent, infos difficiles à trouver, impossible d’avoir les prix en temps voulu.
+_Parade :_ Indiquer la fraîcheur et la source de chaque prix ; accepter des valeurs estimées (E3) ; limiter le périmètre aux sources les plus stables.
+
+**[FA3] Noms de produits trop vagues, mauvais mapping**
+_Risque :_ Noms de produits trop vastes → impossible d’avoir les prix corrects pour les bons produits ; prix non trouvés ou mal mappés → utilisateur induit en erreur.
+_Parade :_ Référentiel éditions/sets strict (M4) ; identifiants uniques (EAN, id interne) ; validation ou warning si plusieurs produits correspondent.
+
+**[FA4] Charge système, ralentissements**
+_Risque :_ Trop de puissance / charge du système, tout ralentit.
+_Parade :_ Limiter le nombre de sources et de produits en parallèle ; prioriser les APIs ; design “light” (moins d’écrans, moins de calculs en direct).
+
+**[FA5] Intervention manuelle en masse**
+_Risque :_ Besoin d’intervenir manuellement en masse ; l’automatisation ne tient pas la route.
+_Parade :_ Dès que ça casse, fallback assumé : fichier Excel avec entrées à la main (R1, WI7). Ne pas sur-investir dans l’automatisation si les sources sont fragiles.
+
+#### 2. Produit / UX
+
+**[FA6] Trop de pages, info pas rapide**
+_Risque :_ Trop de pages, impossible d’avoir l’info rapidement ; pages qui se chargent trop lentement.
+_Parade :_ UX minimaliste (E2), moins d’écrans ; une vue “essentiel” (prix + alertes) en premier.
+
+**[FA7] Alertes mal configurées**
+_Risque :_ Alertes mal configurées → bruit ou alertes manquées.
+_Parade :_ Paramètres par défaut sensés ; réglages en 1–2 clics ; possibilité de tester une alerte avant de l’activer.
+
+**[FA8] Infos fausses ou incomplètes**
+_Risque :_ Informations fausses ou incomplètes affichées.
+_Parade :_ Afficher clairement “estimé”, “source”, “dernière MAJ” ; éviter de présenter comme certain ce qui ne l’est pas.
+
+**[FA9] Trop compliqué, on ne sait pas où donner de la tête**
+_Risque :_ Trop compliqué, on ne sait pas où donner de la tête.
+_Parade :_ Réduire la complexité (E2, E5) ; parcours guidé ou onboarding court ; un objectif principal par écran.
+
+#### 3. Marché / business
+
+**[FA10] UX des sites change, scraping cassé**
+_Risque :_ L’UX des sites change souvent, le scraping ne fonctionne plus ; infos de prix plus visibles ou consultables.
+_Parade :_ Multi-sources (S3, C1) ; APIs dès que possible ; scénario “tout manuel” viable (WI7, R1).
+
+**[FA11] Prix trop variables, peu de vendeurs, pas en ligne**
+_Risque :_ Prix trop variés ou pas assez de vendeurs ; prix non affichés sur internet (uniquement en magasin physique).
+_Parade :_ Accepter fourchettes et “hors ligne” ; combiner avec saisie manuelle / communauté (R2, R3) pour le physique.
+
+**[FA12] Mélange langues / marchés, blocs et séries flous**
+_Risque :_ Mélange des prix cartes EN/FR/JP sans distinction ; pas d’infos claires sur les sites (bloc/série).
+_Parade :_ Filtres par langue et par marché (A4) ; référentiel sets/blocs maintenu (M4) ; affichage explicite “langue / région” sur chaque prix.
+
+#### 4. Légal / éthique
+
+_(Non renseigné pour cette session ; à compléter si besoin.)_
