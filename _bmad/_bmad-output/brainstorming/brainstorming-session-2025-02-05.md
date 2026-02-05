@@ -208,3 +208,15 @@ _Novelty :_ Le produit devient un canal de partage de données “vérifiées hu
 **[R3] Demander aux autres de saisir au lieu de récupérer nous-mêmes**
 _Concept :_ Inverser qui alimente les données : l’application sert à demander aux autres (utilisateurs, communauté) de saisir les infos (prix vus, dispo) au lieu de les récupérer nous-mêmes ; on agrège et on présente.
 _Novelty :_ Modèle collaboratif / crowdsourcing plutôt que collecte centralisée automatique.
+
+---
+
+### Technique 2: What If Scenarios
+
+**Objectif :** Explorer des possibilités radicales en questionnant contraintes et hypothèses.
+
+**Approche :** On enchaîne des “Et si…?” pour faire émerger des idées inattendues ; pas besoin de les juger réalisables tout de suite.
+
+#### Exploration en cours
+
+_(Idées à capturer au fil des réponses)_
