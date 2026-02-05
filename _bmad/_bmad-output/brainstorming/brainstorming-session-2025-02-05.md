@@ -5,7 +5,7 @@ session_topic: 'Poke-Radar — tout le projet (fonctionnalités, stack, risques,
 session_goals: 'Explorer le maximum d’angles : idées évidentes et moins évidentes, options à prioriser, risques, et pistes inattendues.'
 selected_approach: 'user-selected'
 techniques_used: ['SCAMPER Method', 'What If Scenarios', 'Failure Analysis']
-ideas_generated: 12
+ideas_generated: 16
 context_file: 'architecture_technique, market, technical, rapport_brainstorming'
 ---
 
@@ -106,3 +106,21 @@ _Novelty :_ Réduction du temps de dev et maintenance en composant avec l’exis
 **[C4] Pipeline unique : sources → normalisation → alertes**
 _Concept :_ Combiner toutes les entrées (APIs, fichiers, forums filtrés) dans un pipeline commun (ingestion → normalisation → règles → envoi), puis brancher les canaux (Discord, Telegram, mail) en aval.
 _Novelty :_ Une seule “méthode” de bout en bout, extensible en entrée et en sortie.
+
+#### A — Adapt (Adapter)
+
+**[A1] Outils d’analyse et stats : librairies existantes**
+_Concept :_ Pour l’analyse, les statistiques et les courbes de prix : identifier et utiliser des librairies existantes (graphiques, séries temporelles, agrégation) plutôt que tout développer soi-même.
+_Novelty :_ Adapter l’écosystème “data viz / stats” déjà éprouvé au domaine Pokémon/TCG.
+
+**[A2] Inspi Pokecardex + Cardmarket : mix des deux**
+_Concept :_ S’inspirer de Pokecardex et de Cardmarket (présentation des prix, historiques, tendances) pour faire un mix : ce qui fonctionne bien chez l’un (ex. courbes, filtres) avec les forces de l’autre (ex. marchés, vendeurs).
+_Novelty :_ Adapter des patterns UX et data déjà validés par la communauté.
+
+**[A3] Méthodes d’automatisation et de scraping connues**
+_Concept :_ S’inspirer des méthodes d’automatisation et de scraping déjà connues (tutoriels, Reddit, outils type Playwright/Puppeteer, bonnes pratiques anti-détection) et les adapter au contexte des sites cibles (retail, marketplaces).
+_Novelty :_ Réutiliser des patterns éprouvés plutôt qu’inventer une approche from scratch.
+
+**[A4] Gestion multilingue**
+_Concept :_ Gérer plusieurs langues : sources (sites FR, EN, etc.), interface utilisateur, et éventuellement noms de produits / catégories pour comparer et alerter au-delà d’un seul marché.
+_Novelty :_ Adapter le produit à un usage multi-marchés et multi-langues dès la conception (i18n, normalisation des libellés).
