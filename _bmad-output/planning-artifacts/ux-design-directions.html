@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poke-Radar — UX Design Directions</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; margin:0; padding:24px; background:#0B1020; color:#F5F7FF; }
+    .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; }
+    .card { background:#131A2E; border:1px solid #2A3355; border-radius:14px; padding:16px; }
+    .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+    .a { background:#7B8CDE; color:#0B1020; }
+    .b { background:#2EC4B6; color:#0B1020; }
+    .c { background:#FF9F1C; color:#0B1020; }
+    ul { margin:8px 0 0 18px; }
+  </style>
+</head>
+<body>
+  <h1>Design Directions — Poke-Radar</h1>
+  <div class="cards">
+    <article class="card">
+      <span class="badge a">Direction A</span>
+      <h2>Trading Desk</h2>
+      <ul>
+        <li>Interface dense orientée expert</li>
+        <li>Très rapide en scan multi-lignes</li>
+        <li>Courbe d’apprentissage plus élevée</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="badge b">Direction B (Recommandée)</span>
+      <h2>Decision Assistant</h2>
+      <ul>
+        <li>Équilibre lisibilité / performance</li>
+        <li>Score explicable + actions immédiates</li>
+        <li>Adaptée expert + utilisateur en progression</li>
+      </ul>
+    </article>
+    <article class="card">
+      <span class="badge c">Direction C</span>
+      <h2>Calm Monitor</h2>
+      <ul>
+        <li>Minimalisme fort et réduction du bruit</li>
+        <li>Excellente lecture mono-opportunité</li>
+        <li>Moins efficace en comparaison intensive</li>
+      </ul>
+    </article>
+  </div>
+</body>
+</html>

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Poke-Radar — UX Color Themes</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; background:#0B1020; color:#F5F7FF; margin:0; padding:24px; }
+    h1,h2 { margin:0 0 12px; }
+    .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap:12px; }
+    .swatch { border-radius:12px; padding:14px; min-height:100px; display:flex; flex-direction:column; justify-content:flex-end; box-shadow: 0 2px 8px rgba(0,0,0,.25); }
+    code { font-size:12px; opacity:.9; }
+  </style>
+</head>
+<body>
+  <h1>Palette UX — Poke-Radar</h1>
+  <h2>Signaux et fondations</h2>
+  <div class="grid">
+    <div class="swatch" style="background:#0B1020"><strong>bg.base</strong><code>#0B1020</code></div>
+    <div class="swatch" style="background:#131A2E"><strong>bg.elevated</strong><code>#131A2E</code></div>
+    <div class="swatch" style="background:#FF4D6D"><strong>signal.critical</strong><code>#FF4D6D</code></div>
+    <div class="swatch" style="background:#FF9F1C"><strong>signal.high</strong><code>#FF9F1C</code></div>
+    <div class="swatch" style="background:#2EC4B6"><strong>signal.medium</strong><code>#2EC4B6</code></div>
+    <div class="swatch" style="background:#7B8CDE"><strong>signal.low</strong><code>#7B8CDE</code></div>
+    <div class="swatch" style="background:#35D07F"><strong>success</strong><code>#35D07F</code></div>
+    <div class="swatch" style="background:#A8B0CC; color:#0B1020"><strong>text.secondary</strong><code>#A8B0CC</code></div>
+  </div>
+</body>
+</html>
