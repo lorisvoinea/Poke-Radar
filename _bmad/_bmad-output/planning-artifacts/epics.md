@@ -5,278 +5,264 @@ stepsCompleted:
   - step-03-create-stories
   - step-04-final-validation
 inputDocuments:
-  - _bmad-output/planning-artifacts/prd.md
-  - _bmad-output/planning-artifacts/ux-design-specification.md
-  - architecture_technique.md
+  - _bmad/_bmad-output/planning-artifacts/prd.md
+  - _bmad/_bmad-output/planning-artifacts/architecture.md
+  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
 ---
 
 # Poke-Radar - Epic Breakdown
 
 ## Overview
 
-This document provides the complete epic and story breakdown for Poke-Radar, decomposing the requirements from the PRD, UX Design and architecture requirements into implementable stories.
+Ce document transforme le PRD, l’architecture et la spécification UX en epics et stories prêtes pour l’implémentation.
 
 ## Requirements Inventory
 
 ### Functional Requirements
 
-FR1: Le système doit permettre d’ajouter/modifier/supprimer des produits cibles et leurs métadonnées.
-FR2: Le système doit permettre de configurer les sources retail par produit.
-FR3: Le système doit permettre de définir des seuils de marge et paramètres de frais.
-FR4: Le système doit interroger périodiquement les sources configurées.
-FR5: Le système doit détecter les changements de disponibilité produit.
-FR6: Le système doit conserver l’état de dernière observation par source.
-FR7: Le système doit récupérer des références de prix secondaire (Cardmarket/eBay ou équivalent).
-FR8: Le système doit normaliser les données de prix pour comparabilité.
-FR9: Le système doit horodater chaque donnée de prix collectée.
-FR10: Le système doit calculer une marge nette estimée en intégrant les frais configurés.
-FR11: Le système doit classer/prioriser les opportunités selon rentabilité.
-FR12: Le système doit permettre d’exclure des opportunités sous seuil.
-FR13: Le système doit envoyer une alerte Telegram lorsqu’une opportunité dépasse le seuil défini.
-FR14: L’alerte doit inclure au minimum produit, prix achat, prix revente estimé, marge et source.
-FR15: Le système doit éviter le spam de notifications via règles anti-duplication.
-FR16: Le système doit afficher les opportunités détectées dans un tableau de bord local.
-FR17: Le système doit permettre de consulter l’historique des alertes et signaux.
-FR18: Le système doit afficher l’état courant du moteur (actif, erreur, pause).
-FR19: Le système doit journaliser erreurs de scraping et événements clés.
-FR20: Le système doit appliquer des stratégies de reprise en cas d’échec temporaire.
-FR21: Le système doit supporter la mise à jour des paramètres sans redéploiement complet.
+FR-01: L’utilisateur peut créer/éditer des profils de surveillance (produits, seuils, frais, priorités).
+FR-02: Le système supporte des référentiels préenregistrés (sets/éditions) pour limiter les erreurs de saisie.
+FR-03: Le moteur récupère périodiquement disponibilité et prix des sources activées.
+FR-04: Chaque donnée est horodatée et associée à sa source.
+FR-05: En cas d’échec source, le système marque l’état et bascule en mode dégradé.
+FR-06: Le système calcule une estimation de revente à partir des données disponibles.
+FR-07: L’interface affiche le niveau de confiance (valeur directe vs estimée).
+FR-08: Le système calcule marge brute et nette (achat, frais, commissions, port, coûts transactionnels).
+FR-09: Les règles de scoring sont configurables par utilisateur.
+FR-10: Les opportunités sont triables par rentabilité et urgence.
+FR-11: Le système envoie une notification quand une opportunité dépasse les seuils définis.
+FR-12: La notification inclut produit, prix d’achat, estimation revente, marge nette, source, timestamp.
+FR-13: Vue unique avec état des sources, dernières opportunités, erreurs et actions recommandées.
+FR-14: Historique consultable pour analyser la qualité des alertes et ajuster les seuils.
+FR-15: Journalisation des erreurs de collecte et de calcul.
+FR-16: Mécanisme de retry/backoff sur les sources instables.
+FR-17: Continuité minimale du service via saisie/import manuel.
 
 ### NonFunctional Requirements
 
-NFR1: Le délai détection → alerte doit être inférieur à 60 secondes sur sources prioritaires.
-NFR2: Le cycle de monitoring doit rester stable sous charge MVP définie.
-NFR3: Les secrets (token Telegram, clés éventuelles) doivent être stockés de manière sécurisée localement.
-NFR4: Les logs ne doivent pas exposer de secrets en clair.
-NFR5: L’architecture doit permettre l’ajout de nouvelles sources sans refonte globale.
-NFR6: Le système doit gérer une montée progressive du nombre de produits surveillés.
-NFR7: L’interface doit rester lisible et utilisable pour des sessions longues.
-NFR8: L’intégration Telegram doit être fiable et testable par message de contrôle.
-NFR9: Les connecteurs de sources doivent exposer une interface homogène.
+NFR-01: Latence détection → notification < 60 secondes sur sources prioritaires.
+NFR-02: Uptime monitoring > 95 % sur plages actives.
+NFR-03: Dégradation progressive sans arrêt global.
+NFR-04: Respect RGPD/nLPD et secret management local.
+NFR-05: Pipeline modulaire maintenable et extensible.
+NFR-06: UX orientée décision, lisible et accessible.
 
 ### Additional Requirements
 
-- Initialiser le projet depuis un starter template Tauri v2 + Rust + React + TypeScript + Vite.
-- Implémenter une architecture modulaire avec séparation claire (sourcing, estimation, scoring, alerting, UI).
-- Utiliser SQLite comme stockage local (tables produits, URLs suivies, prix marché, opportunités).
-- Implémenter cadence/jitter/backoff/retry pour respecter les contraintes de scraping.
-- Prévoir rotation d’User-Agents et garde-fous anti-abus pour les connecteurs retail.
-- Mettre en place logs structurés et états de santé du moteur local.
-- Respecter les patterns UX de dashboard décisionnel (table triable, panneau de détail, filtres persistants).
-- Garantir accessibilité (contraste AA, navigation clavier, tailles interactives min 40px).
-- Prioriser desktop >=1280px, avec support minimal laptop/tablet.
-- Fournir des messages explicatifs « pourquoi cette alerte » dans l’UI.
+- Initialiser le socle desktop avec Tauri v2 + Rust + React/TypeScript.
+- Utiliser SQLite local avec migrations versionnées.
+- Isoler les connecteurs source via interface commune et erreurs typées.
+- Centraliser le moteur de scoring/marge côté Rust pour éviter les divergences.
+- Implémenter alerting Telegram asynchrone avec anti-duplication.
+- Exposer la santé des sources et les statuts d’alertes dans l’UI.
+- Respecter les patterns UX du cockpit (table priorisée, panneau détail, filtres persistants).
 
 ### FR Coverage Map
 
-FR1: Epic 1 - Cadrer et piloter la stratégie de sourcing
-FR2: Epic 1 - Cadrer et piloter la stratégie de sourcing
-FR3: Epic 1 - Cadrer et piloter la stratégie de sourcing
-FR4: Epic 2 - Détecter les restocks de façon fiable et exploitable
-FR5: Epic 2 - Détecter les restocks de façon fiable et exploitable
-FR6: Epic 2 - Détecter les restocks de façon fiable et exploitable
-FR7: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR8: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR9: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR10: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR11: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR12: Epic 3 - Évaluer la rentabilité réelle des opportunités
-FR13: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR14: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR15: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR16: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR17: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR18: Epic 4 - Alerter et décider rapidement avec un cockpit actionnable
-FR19: Epic 2 - Détecter les restocks de façon fiable et exploitable
-FR20: Epic 2 - Détecter les restocks de façon fiable et exploitable
-FR21: Epic 1 - Cadrer et piloter la stratégie de sourcing
+FR-01: Epic 1 - Configurer le cockpit de surveillance
+FR-02: Epic 1 - Configurer le cockpit de surveillance
+FR-03: Epic 2 - Orchestrer la collecte fiable multi-sources
+FR-04: Epic 2 - Orchestrer la collecte fiable multi-sources
+FR-05: Epic 2 - Orchestrer la collecte fiable multi-sources
+FR-06: Epic 3 - Transformer les signaux en opportunités rentables
+FR-07: Epic 3 - Transformer les signaux en opportunités rentables
+FR-08: Epic 3 - Transformer les signaux en opportunités rentables
+FR-09: Epic 3 - Transformer les signaux en opportunités rentables
+FR-10: Epic 3 - Transformer les signaux en opportunités rentables
+FR-11: Epic 4 - Alerter et piloter la décision opérationnelle
+FR-12: Epic 4 - Alerter et piloter la décision opérationnelle
+FR-13: Epic 4 - Alerter et piloter la décision opérationnelle
+FR-14: Epic 4 - Alerter et piloter la décision opérationnelle
+FR-15: Epic 2 - Orchestrer la collecte fiable multi-sources
+FR-16: Epic 2 - Orchestrer la collecte fiable multi-sources
+FR-17: Epic 4 - Alerter et piloter la décision opérationnelle
 
 ## Epic List
 
-### Epic 1: Cadrer et piloter la stratégie de sourcing
-Permettre à l’utilisateur de configurer ses produits, sources et paramètres économiques sur une base projet saine, afin de lancer le moteur avec des règles métier maîtrisées.
-**FRs covered:** FR1, FR2, FR3, FR21.
+### Epic 1: Configurer le cockpit de surveillance
+Permettre à l’utilisateur de cadrer son univers de suivi (produits, référentiels, seuils, frais) pour lancer un monitoring pertinent dès le premier cycle.
+**FRs covered:** FR-01, FR-02.
 
-### Epic 2: Détecter les restocks de façon fiable et exploitable
-Permettre à l’utilisateur d’obtenir un flux fiable de détection de disponibilité avec état, observabilité et reprise automatique.
-**FRs covered:** FR4, FR5, FR6, FR19, FR20.
+### Epic 2: Orchestrer la collecte fiable multi-sources
+Fournir un runtime robuste de collecte qui récupère, horodate et sécurise les signaux tout en restant résilient aux pannes partielles.
+**FRs covered:** FR-03, FR-04, FR-05, FR-15, FR-16.
 
-### Epic 3: Évaluer la rentabilité réelle des opportunités
-Permettre à l’utilisateur de transformer un signal de stock en opportunité économique qualifiée (prix marché, marge nette, priorisation).
-**FRs covered:** FR7, FR8, FR9, FR10, FR11, FR12.
+### Epic 3: Transformer les signaux en opportunités rentables
+Convertir les données collectées en opportunités explicables via estimation marché, calcul de marge nette et scoring configurable.
+**FRs covered:** FR-06, FR-07, FR-08, FR-09, FR-10.
 
-### Epic 4: Alerter et décider rapidement avec un cockpit actionnable
-Permettre à l’utilisateur de recevoir des alertes non bruyantes et de décider rapidement via un dashboard local orienté action.
-**FRs covered:** FR13, FR14, FR15, FR16, FR17, FR18.
+### Epic 4: Alerter et piloter la décision opérationnelle
+Distribuer des alertes exploitables et offrir un cockpit local qui soutient la décision et la continuité en mode dégradé.
+**FRs covered:** FR-11, FR-12, FR-13, FR-14, FR-17.
 
-## Epic 1: Cadrer et piloter la stratégie de sourcing
+## Epic 1: Configurer le cockpit de surveillance
 
-Établir une fondation de configuration robuste et exploitable, permettant de gérer les cibles et paramètres métier sans redéploiement.
+Poser des bases produit stables pour que le revendeur paramètre rapidement sa stratégie sans erreur de configuration.
 
-### Story 1.1: Initialiser l’application depuis le starter template Tauri
-
-As a développeur produit,
-I want initialiser le projet avec Tauri v2 + Rust + React/TypeScript,
-So that l’équipe dispose d’un socle exécutable, sécurisé et aligné avec l’architecture cible.
-
-**Acceptance Criteria:**
-
-**Given** un repository vide ou initial
-**When** j’exécute la création du projet depuis le template validé
-**Then** la structure Tauri (backend Rust + frontend React) est opérationnelle localement
-**And** un fichier de configuration d’environnement est prêt pour les secrets non versionnés.
-
-### Story 1.2: Gérer le catalogue produits cibles
+### Story 1.1: Initialiser l’application desktop et la persistance locale
 
 As a revendeur,
-I want ajouter, modifier et supprimer des produits avec leurs métadonnées,
-So that je maîtrise précisément le périmètre de surveillance.
+I want une application desktop installable avec base locale prête,
+So that je peux démarrer ma configuration sans dépendance externe.
 
 **Acceptance Criteria:**
 
-**Given** un utilisateur connecté à l’application locale
-**When** il crée ou modifie une fiche produit
-**Then** les données sont persistées en SQLite avec validation des champs critiques (nom, identifiant, catégorie)
-**And** la liste des produits est immédiatement reflétée dans l’UI sans redémarrage.
+**Given** un poste compatible desktop
+**When** l’application est lancée pour la première fois
+**Then** le socle Tauri + UI React est opérationnel
+**And** SQLite est initialisée avec migrations versionnées sans erreur.
 
-### Story 1.3: Configurer les sources et règles économiques par produit
+### Story 1.2: Configurer produits, profils de surveillance et paramètres économiques
 
 As a revendeur,
-I want associer des sources retail à chaque produit et définir mes seuils de marge/frais,
-So that les calculs de rentabilité utilisent ma réalité opérationnelle.
+I want gérer mes produits cibles, seuils de marge et frais,
+So that le système reflète ma stratégie réelle de revente.
 
 **Acceptance Criteria:**
 
-**Given** un produit existant
-**When** l’utilisateur ajoute/retire une source et met à jour les paramètres de frais/seuils
-**Then** les paramètres sont versionnés localement et applicables au prochain cycle de traitement
-**And** une mise à jour de configuration est prise en compte à chaud sans redéploiement.
+**Given** une application initialisée
+**When** je crée ou modifie un profil de surveillance
+**Then** les paramètres produits/seuils/frais sont persistés localement
+**And** ils sont réutilisés automatiquement au prochain cycle de monitoring.
 
-## Epic 2: Détecter les restocks de façon fiable et exploitable
-
-Fournir un moteur de surveillance résilient qui détecte les variations de disponibilité en continu, tout en restant traçable et robuste.
-
-### Story 2.1: Exécuter un moteur de polling planifié des sources
+### Story 1.3: Exploiter des référentiels préenregistrés pour limiter les erreurs
 
 As a revendeur,
-I want que les sources configurées soient interrogées périodiquement automatiquement,
-So that je n’aie plus à faire de veille manuelle.
+I want sélectionner des sets/éditions depuis un référentiel,
+So that je réduis les erreurs de saisie et les ambiguïtés produit.
 
 **Acceptance Criteria:**
 
-**Given** des produits et sources valides configurés
-**When** le scheduler lance un cycle de monitoring
-**Then** chaque connecteur retail est appelé selon une cadence configurable avec jitter
-**And** le cycle reste stable dans les limites de charge MVP.
+**Given** un référentiel disponible
+**When** je configure un produit suivi
+**Then** je peux choisir un item de référentiel avec métadonnées
+**And** la saisie libre reste possible mais est signalée comme non normalisée.
 
-### Story 2.2: Détecter les changements de disponibilité et mémoriser le dernier état
+## Epic 2: Orchestrer la collecte fiable multi-sources
+
+Mettre en place une collecte continue et résiliente, orientée traçabilité et stabilité opérationnelle.
+
+### Story 2.1: Planifier et exécuter les cycles de collecte multi-sources
 
 As a revendeur,
-I want être notifié uniquement lors d’un vrai changement de statut stock,
-So that je réduis les faux positifs et la fatigue décisionnelle.
+I want que la collecte tourne automatiquement selon une cadence définie,
+So that je n’ai plus à surveiller les boutiques manuellement.
 
 **Acceptance Criteria:**
 
-**Given** un historique d’état par produit/source
-**When** un statut passe de rupture à disponible (ou l’inverse)
-**Then** un événement de changement est généré avec horodatage
-**And** le dernier état observé est persisté pour comparaison au cycle suivant.
+**Given** des sources actives configurées
+**When** le scheduler exécute un cycle
+**Then** chaque connecteur est invoqué selon cadence + jitter
+**And** les résultats sont enregistrés avec timestamp et origine source.
 
-### Story 2.3: Assurer observabilité et reprise automatique du moteur
+### Story 2.2: Surveiller la santé des connecteurs et gérer la dégradation
 
 As a revendeur,
-I want que les erreurs temporaires soient journalisées et auto-récupérées,
-So that le service reste fiable sans supervision continue.
+I want voir les sources instables et conserver un service partiel,
+So that une panne d’une source ne bloque pas tout le radar.
 
 **Acceptance Criteria:**
 
-**Given** une erreur de scraping réseau ou parsing
-**When** l’exécution d’un connecteur échoue
-**Then** l’incident est loggé sans exposer de secret
-**And** une stratégie de retry/backoff redémarre le flux sans interrompre tout le moteur.
+**Given** un échec de connecteur
+**When** le cycle de collecte rencontre une erreur réseau/parsing
+**Then** l’état source passe en warn/down avec détail d’erreur
+**And** le reste des sources continue à fonctionner sans arrêt global.
 
-## Epic 3: Évaluer la rentabilité réelle des opportunités
-
-Transformer les signaux de stock en opportunités priorisées via enrichissement marché, normalisation et calcul de marge nette.
-
-### Story 3.1: Collecter les références de prix du marché secondaire
+### Story 2.3: Journaliser et auto-récupérer les incidents de collecte
 
 As a revendeur,
-I want récupérer des prix eBay/Cardmarket pertinents pour un produit détecté,
-So that je dispose d’un benchmark réaliste de revente.
+I want un moteur qui se rétablit automatiquement sur erreurs temporaires,
+So that je conserve une continuité de détection sans intervention constante.
 
 **Acceptance Criteria:**
 
-**Given** un produit détecté comme disponible
-**When** le module d’estimation interroge les sources marché secondaires
-**Then** des références de prix exploitables sont collectées avec provenance de source
-**And** chaque enregistrement est horodaté pour mesurer la fraîcheur des données.
+**Given** une erreur temporaire sur une source
+**When** la stratégie de retry/backoff est appliquée
+**Then** l’exécution retente selon une politique bornée
+**And** les logs restent exploitables sans exposer de secrets.
 
-### Story 3.2: Normaliser les données et calculer la marge nette estimée
+## Epic 3: Transformer les signaux en opportunités rentables
+
+Produire un score économique fiable et explicable pour guider des décisions rapides.
+
+### Story 3.1: Enrichir les signaux avec des références de marché secondaire
 
 As a revendeur,
-I want convertir des données hétérogènes en une marge nette comparable,
-So that je puisse décider sur des chiffres cohérents.
+I want compléter les prix retail avec des références marché,
+So that l’estimation de revente soit crédible et actionnable.
 
 **Acceptance Criteria:**
 
-**Given** des prix d’achat retail et des prix de revente collectés
-**When** le moteur applique les règles de normalisation et les frais configurés
-**Then** une marge nette estimée est calculée de façon explicable
-**And** les hypothèses de calcul sont traçables (frais, commissions, timestamp, source).
+**Given** un signal retail valide
+**When** le module d’estimation collecte des références secondaires
+**Then** des points de comparaison exploitables sont stockés
+**And** chaque référence inclut source, fraîcheur et niveau de fiabilité.
 
-### Story 3.3: Prioriser et filtrer les opportunités selon la rentabilité
+### Story 3.2: Calculer la marge brute/nette avec explication des hypothèses
 
 As a revendeur,
-I want voir uniquement les opportunités au-dessus de mon seuil et classées par valeur,
-So that je concentre mon temps sur les meilleures décisions.
+I want comprendre exactement comment la marge est calculée,
+So that je décide en confiance sur chaque opportunité.
 
 **Acceptance Criteria:**
 
-**Given** un ensemble d’opportunités calculées
-**When** le module de scoring applique le seuil utilisateur
+**Given** un prix d’achat et une estimation de revente
+**When** le moteur de scoring exécute le calcul économique
+**Then** la marge brute et nette sont calculées côté Rust
+**And** le détail des hypothèses (frais, commissions, port) est persisté.
+
+### Story 3.3: Classer et filtrer les opportunités selon stratégie utilisateur
+
+As a revendeur,
+I want prioriser les signaux selon mes seuils,
+So that je traite d’abord les opportunités à meilleure valeur.
+
+**Acceptance Criteria:**
+
+**Given** une liste d’opportunités évaluées
+**When** les règles de scoring utilisateur sont appliquées
 **Then** les opportunités sous seuil sont exclues
-**And** le reste est trié selon un score de rentabilité priorisé.
+**And** la liste restante est triée par rentabilité/urgence avec niveau de confiance.
 
-## Epic 4: Alerter et décider rapidement avec un cockpit actionnable
+## Epic 4: Alerter et piloter la décision opérationnelle
 
-Orchestrer la diffusion d’alertes et l’aide à la décision via un dashboard clair, réactif et orienté exécution.
+Fournir un canal d’alerte fiable et un cockpit local permettant d’agir, d’analyser et de continuer en mode dégradé.
 
-### Story 4.1: Envoyer des alertes Telegram riches et testables
+### Story 4.1: Envoyer des alertes Telegram exploitables et non bloquantes
 
 As a revendeur,
-I want recevoir une alerte Telegram complète dès qu’une opportunité rentable apparaît,
-So that je peux agir en moins de 5 minutes.
+I want recevoir des alertes complètes dès qu’une opportunité est qualifiée,
+So that je peux agir rapidement sur les meilleures fenêtres d’achat.
 
 **Acceptance Criteria:**
 
-**Given** une opportunité dont le score dépasse le seuil configuré
-**When** le module d’alerting déclenche une notification
-**Then** le message inclut produit, source, prix achat, prix revente estimé et marge
-**And** un message de contrôle permet de valider la fiabilité de l’intégration Telegram.
+**Given** une opportunité au-dessus du seuil
+**When** le dispatcher d’alertes traite l’événement
+**Then** un message Telegram contient produit, prix achat/revente, marge nette, source et timestamp
+**And** l’envoi est asynchrone pour ne pas bloquer le pipeline principal.
 
-### Story 4.2: Réduire le bruit avec anti-duplication et état d’alerte
+### Story 4.2: Réduire le bruit grâce à la déduplication et à l’historisation des statuts
 
 As a revendeur,
-I want éviter les notifications répétitives pour le même signal,
-So that je garde un canal d’alerte exploitable.
+I want éviter les alertes répétées pour un même signal,
+So that mon canal reste utile et actionnable.
 
 **Acceptance Criteria:**
 
-**Given** plusieurs détections proches pour une même opportunité
-**When** la règle anti-duplication s’applique
-**Then** une seule alerte pertinente est envoyée dans la fenêtre de déduplication
-**And** l’historique conserve l’état (envoyée, ignorée, traitée) pour audit.
+**Given** plusieurs événements proches pour une même opportunité
+**When** la règle de déduplication est évaluée
+**Then** une seule alerte est envoyée dans la fenêtre définie
+**And** le statut d’alerte (sent/failed/suppressed) est historisé.
 
-### Story 4.3: Exploiter un dashboard local orienté décision
+### Story 4.3: Exploiter un dashboard décisionnel avec fallback manuel
 
 As a revendeur,
-I want visualiser les opportunités, l’historique et l’état moteur dans une UI lisible,
-So that je décide vite tout en gardant une vision globale de mon activité.
+I want une vue unifiée opportunités + santé sources + historique,
+So that je peux décider vite et continuer même si une source tombe.
 
 **Acceptance Criteria:**
 
-**Given** des opportunités et événements déjà collectés
-**When** l’utilisateur ouvre l’application desktop
-**Then** un tableau triable affiche opportunités, score, marge nette et fraîcheur
-**And** l’interface respecte les contraintes UX d’accessibilité (contraste, navigation clavier, lisibilité longue session).
+**Given** des opportunités et états source persistés
+**When** j’ouvre le cockpit desktop
+**Then** je vois un tableau priorisé, l’état des sources et l’historique des alertes
+**And** un mode saisie/import manuel est disponible quand une source est indisponible.
