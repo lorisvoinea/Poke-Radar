@@ -1,9 +1,8 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6]
 inputDocuments:
-  - technical-Poke-Radar-research.md
-  - market-Poke-Radar-research.md
-  - rapport_brainstorming.md
+  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad/_bmad-output/brainstorming/brainstorming-session-2025-02-05.md
 date: 2026-02-18
 author: Loris
 ---
@@ -12,9 +11,9 @@ author: Loris
 
 ## Executive Summary
 
-Poke-Radar est un assistant desktop qui surveille automatiquement le marché Pokémon pour identifier des opportunités de revente rentables, puis alerte l’utilisateur en temps réel. Le produit vise à remplacer une veille manuelle chronophage par un système décisionnel basé sur des données de stock et de prix vérifiées.
+Poke-Radar est un produit de veille et d’aide à la décision pour la revente Pokémon TCG. Le besoin principal est de passer d’une veille manuelle lente à une détection d’opportunités exploitable rapidement, avec un focus sur la rentabilité réelle plutôt que sur le simple signal de disponibilité.
 
-L’objectif est de transformer une activité limitée par la logistique (volume de colis, stockage, temps opérationnel) en activité pilotée par l’information et la rapidité d’exécution.
+Ce brief est régénéré uniquement depuis les artefacts de brainstorming et de research, pour rester fidèle à l’exploration marché/produit actuelle.
 
 ---
 
@@ -22,115 +21,115 @@ L’objectif est de transformer une activité limitée par la logistique (volume
 
 ### Problem Statement
 
-Les revendeurs indépendants Pokémon perdent des opportunités car ils doivent surveiller manuellement plusieurs boutiques, comparer les prix à la main, et décider trop tard quand les produits disparaissent rapidement.
+Les revendeurs Pokémon indépendants perdent des opportunités car ils doivent surveiller de multiples sources, comparer manuellement les prix, et arbitrer trop tard dans un marché volatil.
 
 ### Problem Impact
 
-- Temps perdu en rafraîchissement manuel des pages.
-- Opportunités manquées sur les restocks “hype”.
-- Risque d’acheter des produits non rentables faute d’analyse nette (frais + commissions).
-- Limite de croissance à cause de la charge opérationnelle.
+- Charge mentale et temps élevés liés à la veille manuelle.
+- Opportunités manquées sur des fenêtres de restock très courtes.
+- Décisions d’achat biaisées par des données incomplètes (frais, liquidité, fraîcheur du prix).
+- Difficulté à scaler l’activité sans augmenter fortement la charge opérationnelle.
 
 ### Why Existing Solutions Fall Short
 
-- Les outils existants signalent parfois la disponibilité, mais rarement la rentabilité réelle.
-- Peu de solutions orientées arbitrage local (achat retail FR/EU + revente secondaire).
-- Les workflows restent fragmentés (alerte d’un côté, analyse de marge de l’autre).
+- La plupart des outils se concentrent sur un seul maillon (stock, prix ou alerte), rarement sur la chaîne complète de décision.
+- La comparaison des prix détaillants FR/EU reste partiellement couverte.
+- La fraîcheur des données et la transparence de source ne sont pas toujours explicites.
 
 ### Proposed Solution
 
-Un outil desktop local (Rust + Tauri + React + SQLite) qui:
+Un assistant de décision qui:
 
-1. Scrape des sources retail ciblées pour détecter les disponibilités.
-2. Croise les prix d’achat avec des références marché secondaire.
-3. Calcule une marge nette estimée après frais.
-4. Envoie une alerte Telegram uniquement si le seuil de rentabilité est atteint.
+1. Agrège des signaux de disponibilité produits depuis des sources retail ciblées.
+2. Enrichit chaque signal avec des références de marché secondaire.
+3. Estime la marge nette en tenant compte des paramètres économiques réels.
+4. Priorise les opportunités et réduit le bruit de notification.
+5. Fournit une traçabilité claire (source, timestamp, hypothèses de calcul).
 
 ### Key Differentiators
 
-- Décision orientée marge nette, pas simple disponibilité.
-- Exécution locale “privacy by design” (données utilisateur non externalisées).
-- Stack performante et légère adaptée à un usage 24/7.
-- Ciblage métier très spécialisé (trading Pokémon).
+- Positionnement centré sur la **qualité décisionnelle** (actionnable vs bruit).
+- Approche **multi-sources** (retail + secondaire) pour limiter la dépendance à un acteur unique.
+- Logique métier orientée **profit net**, pas seulement vitesse d’alerte.
+- Alignement avec les bonnes pratiques marché: transparence source/prix/date.
 
 ## Target Users
 
 ### Primary Users
 
-1. **Revendeur indépendant Pokémon (persona: Alex, 28 ans)**
-   - Gère achat/revente en parallèle d’une activité principale.
-   - Douleur: manque de réactivité sur les restocks et incertitude sur les marges.
-   - Objectif: augmenter son profit mensuel sans multiplier la charge logistique.
+1. **Revendeur indépendant Pokémon (persona Alex, 28 ans)**
+   - Activité d’achat/revente en parallèle.
+   - Objectif: gagner du temps et fiabiliser les arbitrages d’achat.
 
-2. **Flipper orienté cartes à forte valeur (persona: Sam, 33 ans)**
-   - Se concentre sur la densification de valeur (cartes/unités premium).
-   - Douleur: sourcing dispersé et difficile à prioriser.
-   - Objectif: détecter des deals à fort ROI rapidement.
+2. **Flipper premium (persona Sam, 33 ans)**
+   - Vise des opportunités moins fréquentes mais plus rentables.
+   - Objectif: filtrer fortement les signaux et prioriser le ROI.
 
 ### Secondary Users
 
-- **Partenaire opérationnel/familial** qui peut aider sur la logistique et a besoin de visibilité sur les décisions d’achat.
-- **Collaborateur occasionnel** qui exécute les commandes selon des signaux prédéfinis.
+- **Partenaire logistique** qui exécute des achats selon des critères définis.
+- **Collaborateur occasionnel** qui a besoin de signaux clairs et contextualisés.
 
 ### User Journey
 
-1. **Découverte**: l’utilisateur comprend que la veille manuelle ne scale plus.
-2. **Onboarding**: configuration des produits cibles, seuils de marge, canaux d’alerte.
-3. **Usage quotidien**: réception d’alertes filtrées et priorisées.
-4. **Moment “aha”**: opportunité rentable captée avant rupture, avec décision rapide et sûre.
-5. **Habitude long terme**: Poke-Radar devient la couche de veille par défaut pour toutes les décisions d’achat.
+1. **Paramétrage initial**: produits cibles, sources, règles économiques.
+2. **Veille continue**: collecte de signaux et actualisation des données de prix.
+3. **Qualification**: calcul net, scoring, priorisation.
+4. **Décision**: réception d’une alerte contextualisée et action rapide.
+5. **Amélioration**: ajustement des règles selon résultats observés.
 
 ## Success Metrics
 
 ### User Success Metrics
 
 - Réduction du temps de veille manuelle: **-70%** sous 30 jours.
-- Délai moyen entre restock et décision d’achat: **< 5 minutes**.
-- Taux d’alertes jugées “actionnables” par l’utilisateur: **> 60%**.
+- Délai décisionnel après détection d’un signal prioritaire: **< 5 minutes**.
+- Taux d’alertes perçues comme réellement actionnables: **> 60%**.
 
 ### Business Objectives
 
-- Atteindre un moteur de sourcing stable qui supporte l’objectif de revenus mensuels ciblés.
-- Réduire les achats non rentables grâce à une validation systématique de marge.
-- Augmenter le nombre d’opportunités exploitables sans augmenter la charge logistique.
+- Améliorer la marge nette moyenne des opérations de revente.
+- Augmenter le nombre d’opportunités exploitables sans surcharge logistique.
+- Stabiliser une routine de décision reproductible et pilotée par la donnée.
 
 ### Key Performance Indicators
 
-- **Precision d’alerte rentable** = alertes profitables / alertes totales.
-- **Opportunités captées** par semaine (avec preuve de marge).
+- **Précision d’alerte rentable** = alertes rentables / alertes totales.
+- **Latence signal → notification** sur le périmètre MVP.
+- **Fraîcheur des données prix** (écart entre capture et décision).
 - **Marge nette moyenne** par opportunité exécutée.
-- **Disponibilité du moteur de monitoring** (uptime local).
-- **Latence de notification** entre détection et envoi Telegram.
+- **Taux de faux positifs** (opportunités non exécutables après vérification).
 
 ## MVP Scope
 
 ### Core Features
 
-1. Catalogue de produits cibles configurable.
-2. Surveillance automatique des sources retail prioritaires.
-3. Normalisation et comparaison des prix avec références secondaires.
-4. Calcul de marge nette estimée (frais paramétrables).
-5. Alertes Telegram filtrées par seuil.
-6. Dashboard local de suivi des opportunités.
+1. Définition d’un catalogue de produits cibles.
+2. Configuration de sources retail prioritaires.
+3. Agrégation de références de prix secondaire.
+4. Calcul de marge nette avec paramètres de frais.
+5. Priorisation et filtrage des opportunités.
+6. Notification rapide sur opportunités qualifiées.
+7. Historique des signaux et décisions pour apprentissage.
 
 ### Out of Scope for MVP
 
-- Automatisation d’achat (“auto-checkout”).
-- Multi-utilisateur cloud/SaaS.
-- Couverture exhaustive de tous marchés internationaux.
-- Modèles IA avancés de prédiction de prix long terme.
+- Achat automatisé (auto-checkout).
+- Couverture exhaustive de tous les marchés et toutes les catégories.
+- Prédiction avancée de prix long terme par IA.
+- Fonctions collaboratives complexes.
 
 ### MVP Success Criteria
 
-- Le système détecte et alerte de façon fiable sur un périmètre initial de produits/sources.
-- L’utilisateur confirme une amélioration nette de réactivité et de qualité de décision.
-- Les métriques clés (latence, précision, actionnabilité) atteignent les seuils définis.
+- Le flux complet signal → qualification → alerte est stable sur un périmètre limité.
+- Les utilisateurs confirment une amélioration mesurable de la réactivité et de la qualité de décision.
+- Les KPI critiques (actionnabilité, latence, faux positifs) atteignent les seuils cibles.
 
 ### Future Vision
 
-- Extension vers plus de marketplaces et catégories (scellé, singles, gradées).
-- Scoring d’opportunité avancé (liquidité, volatilité, profondeur de marché).
-- Scénarios semi-automatisés d’exécution assistée.
+- Extension progressive des sources FR/EU et catégories produits.
+- Scoring avancé intégrant liquidité, volatilité et confiance multi-source.
+- Recommandations d’exécution semi-assistée selon profil de risque.
 
 ---
 
