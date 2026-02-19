@@ -1,6 +1,6 @@
 # Story 1.1: Initialiser l’application desktop et la persistance locale
 
-Status: ready-for-dev
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -105,10 +105,32 @@ GPT-5.2-Codex
 
 ### Completion Notes List
 
-- Story préparée en mode ready-for-dev avec contexte technique renforcé (stack, persistance, structure, tests).
-- Epic 1 doit passer en `in-progress` au premier story contexté.
+- Squelette initial créé: modules Rust `app` + `infrastructure/db`, commande Tauri `app_ready`, écran React de boot minimal.
+- Runner de migrations SQLite ajouté avec migration `001_initial_schema.sql` et séquence de boot bloquante/actionnable en cas d'échec critique.
+- Tests ajoutés: unitaires Rust (succès/SQL invalide/base verrouillée), intégration premier lancement, smoke test UI.
+- Exécution des tests bloquée par la politique réseau du conteneur (403 sur crates.io et npmjs), validation complète en attente d'accès dépendances.
 
 ### File List
 
 - _bmad-output/implementation-artifacts/1-1-initialiser-lapplication-desktop-et-la-persistance-locale.md
 - _bmad-output/implementation-artifacts/sprint-status.yaml
+- src-tauri/Cargo.toml
+- src-tauri/src/lib.rs
+- src-tauri/src/app/mod.rs
+- src-tauri/src/app/commands.rs
+- src-tauri/src/app/bootstrap.rs
+- src-tauri/src/infrastructure/mod.rs
+- src-tauri/src/infrastructure/db/mod.rs
+- src-tauri/src/infrastructure/db/migrations/001_initial_schema.sql
+- src-tauri/tests/first_launch.rs
+- ui/package.json
+- ui/tsconfig.json
+- ui/vitest.config.ts
+- ui/src/main.tsx
+- ui/src/pages/BootPage.tsx
+- ui/src/__tests__/boot-page.test.tsx
+- ui/src/test-setup.ts
+
+### Change Log
+
+- 2026-02-19: Démarrage implémentation Story 1.1 (squelette app + persistance SQLite + tests ajoutés, exécution tests bloquée par accès registre dépendances).

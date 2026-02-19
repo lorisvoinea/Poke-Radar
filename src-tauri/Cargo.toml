@@ -1,0 +1,13 @@
+[package]
+name = "poke_radar_tauri"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+log = "0.4"
+rusqlite = { version = "0.33", features = ["bundled"] }
+thiserror = "2"
+tauri = { version = "2", default-features = false }
+
+[dev-dependencies]
+tempfile = "3"
