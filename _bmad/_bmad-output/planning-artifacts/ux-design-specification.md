@@ -2,11 +2,11 @@
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]
 lastStep: 14
 inputDocuments:
-  - _bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
-  - _bmad-output/planning-artifacts/prd.md
-  - market-Poke-Radar-research.md
-  - technical-Poke-Radar-research.md
-date: 2026-02-18
+  - _bmad/_bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
+  - _bmad/_bmad-output/planning-artifacts/prd.md
+  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad/_bmad-output/brainstorming/brainstorming-session-2025-02-05.md
+date: 2026-02-19
 author: Loris
 project: Poke-Radar
 ---
@@ -15,284 +15,285 @@ project: Poke-Radar
 
 ## 1) Executive summary et objectif UX
 
-Poke-Radar doit permettre à un revendeur Pokémon de **prendre une décision d’achat exploitable en moins de 2 minutes** à partir d’un signal (restock + rentabilité nette) au lieu de consulter manuellement plusieurs sources.
+Poke-Radar doit transformer une veille marché lourde en décisions d’achat **rapides, fiables et traçables**. L’objectif UX MVP est de permettre à un revendeur de passer d’un signal à une décision en **moins de 5 minutes**, avec un contexte suffisant pour agir sans ouvrir 10 onglets.
 
-Objectifs UX centraux :
+Objectifs UX prioritaires :
 
-- Réduire la charge mentale (trop de signaux, peu de décisions claires).
-- Maximiser la vitesse de décision (priorisation visuelle immédiate).
-- Rendre la confiance mesurable (score + détail de calcul de marge).
-- Assurer une utilisation 24/7 sans friction (desktop, notifications Telegram).
+- Réduire la charge cognitive de surveillance multi-sources.
+- Élever l’actionnabilité des alertes (qualité > quantité).
+- Rendre la rentabilité nette explicable et vérifiable.
+- Maintenir l’utilisabilité en mode dégradé (source indisponible / saisie manuelle).
 
 ## 2) Discovery utilisateur et contexte produit
 
-### Personas UX opérationnels
+### Personas opérationnels
 
-1. **Revendeur indépendant (primaire)**
-   - Recherche des opportunités fiables en flux continu.
-   - Tolère peu les faux positifs.
-2. **Flipper premium (primaire)**
-   - Privilégie le ROI unitaire élevé.
-   - Veut des filtres de sévérité et de liquidité.
-3. **Assistant logistique (secondaire)**
-   - Besoin d’une lecture simple des priorités à traiter.
+1. **Alex — Revendeur indépendant (primaire)**
+   - Besoin d’aller vite avec risque contrôlé.
+   - Veut une vue triée par opportunité nette.
+2. **Sam — Flipper premium (primaire)**
+   - Préfère peu d’alertes mais à forte conviction.
+   - Exige des filtres fins (marge, risque, fraîcheur).
+3. **Opérateur logistique (secondaire)**
+   - Exécute des actions simples sur consignes claires.
 
 ### Jobs to be done
 
-- "Quand un restock rentable apparaît, je veux savoir **immédiatement** si je dois acheter, afin de ne pas rater la fenêtre de marché."
-- "Quand je compare plusieurs opportunités, je veux une **priorisation claire**, afin d’éviter les achats sous-optimaux."
-- "Quand j’agis sur une alerte, je veux comprendre le **calcul net**, afin d’avoir confiance dans la décision."
+- « Quand une opportunité sort, je veux savoir vite si elle est exploitable. »
+- « Quand une source est instable, je veux un fallback explicite pour continuer. »
+- « Quand je reçois une alerte, je veux comprendre la marge nette et son niveau de confiance. »
+
+### Contraintes UX issues du contexte
+
+- Stack desktop orientée usage opérationnel continu.
+- Nécessité de transparence des sources et timestamps.
+- Priorité MVP : Telegram + tableau décisionnel central.
 
 ## 3) Core experience (expérience cœur)
 
 ### Promesse d’expérience
 
-> "Voir moins d’alertes, mais mieux décidées."
+> « Recevoir moins de bruit, plus de décisions exploitables. »
 
 ### Boucle produit principale
 
-1. Le moteur détecte un changement stock/prix.
-2. Le système calcule la marge nette estimée.
-3. L’opportunité est scorée (rentabilité, vitesse, risque).
-4. L’utilisateur reçoit un signal priorisé.
-5. L’utilisateur décide (agir / ignorer / suivre).
-6. Le système conserve l’historique pour calibration.
+1. Collecte disponibilité/prix sur sources activées.
+2. Normalisation + calcul marge nette.
+3. Scoring configurable (rentabilité, urgence, confiance).
+4. Notification sur seuil.
+5. Décision utilisateur (agir / ignorer / suivre).
+6. Historisation pour calibration hebdomadaire.
 
-### North-star UX metric
+### UX North-star metrics
 
-- **Decision-ready rate** : pourcentage d’alertes jugées immédiatement actionnables.
+- **Decision-ready rate** (cible > 60 %)
+- **Signal → décision** (cible < 5 min)
+- **Signal → notification** (cible technique < 60 sec)
 
 ## 4) Emotional response design
 
-Émotions visées dans l’interface :
+Émotions recherchées :
 
-- **Contrôle** : l’utilisateur pilote ses seuils, pas l’inverse.
-- **Confiance** : chaque score est explicable (marge, frais, commissions).
-- **Calme** : éviter le "panic trading" via hiérarchie visuelle claire.
-- **Momentum** : sentiment de progression avec suivi d’impact hebdomadaire.
+- **Confiance** : chaque chiffre clé est justifié.
+- **Contrôle** : l’utilisateur règle ses seuils, ses priorités et son risque.
+- **Calme opérationnel** : hiérarchie claire, pas de surcharge visuelle.
+- **Momentum** : perception de progression via revue des décisions.
 
-Principes de ton UX :
+Principes rédactionnels UX :
 
-- Décisionnel, sobre, orienté action.
-- Peu de bruit rédactionnel.
-- Toujours expliciter "Pourquoi cette alerte ?".
+- Écriture orientée décision (verbes d’action, pas de jargon inutile).
+- Toujours répondre à « Pourquoi cette alerte ? ».
+- Afficher l’incertitude explicitement (estimé vs confirmé).
 
 ## 5) Inspiration et patterns UX de référence
 
-Patterns retenus (adaptés au contexte Poke-Radar) :
+Patterns retenus :
 
-- **Tableau de tri prioritaire** (type trading dashboard) pour scanner vite.
-- **Card detail latérale** pour expliquer une opportunité sans quitter la liste.
-- **Filtres persistants** (seuil marge, source, catégorie, risque).
-- **Feedback de confiance** (badge qualité donnée + fraîcheur).
-- **Mode focus** pour les périodes de drop/restock intense.
+- **Table priorisée** (scan rapide multi-opportunités).
+- **Panneau détail contextualisé** sans changer de page.
+- **Filtres persistants** et presets de stratégie.
+- **État source visible** (OK / instable / indisponible).
+- **Mode dégradé explicite** avec actions alternatives.
 
-Patterns explicitement évités :
+Patterns à éviter :
 
-- Timeline dense sans score explicite.
-- Multiplication des KPI non actionnables.
-- Couleurs agressives permanentes (fatigue cognitive).
+- KPI décoratifs sans action associée.
+- Mur de données sans score unifié.
+- Couleurs d’alerte omniprésentes (fatigue).
 
 ## 6) Design system strategy
 
 ### Approche
 
-- Base design system légère, orientée B2B opérationnel.
-- Composants unifiés React + tokens (couleurs, espacements, typographie).
-- États normalisés (default/hover/focus/error/success/warning).
+- Design system léger orienté B2B desktop.
+- Composants React réutilisables, tokens centralisés.
+- États standards : default / hover / focus / success / warning / error / disabled.
 
-### Design tokens (naming)
+### Tokens recommandés
 
-- `color.bg.base`, `color.bg.elevated`, `color.text.primary`
-- `color.signal.critical`, `color.signal.high`, `color.signal.medium`, `color.signal.low`
-- `space.2`, `space.4`, `space.8`, `space.12`, `space.16`
-- `radius.sm`, `radius.md`, `radius.lg`
+- Couleurs : `color.bg.*`, `color.text.*`, `color.signal.*`, `color.state.*`
+- Espacement : `space.4` à `space.24`
+- Rayons : `radius.sm|md|lg`
+- Typo : `font.size.12|14|16|20|24|32`
 
 ### Accessibilité système
 
-- Contraste AA minimum pour tous les textes clés.
-- Taille interactive min 40px.
-- États focus visibles clavier.
+- Contraste AA minimum ; KPI critiques ciblent AAA.
+- Focus clavier visible sur tout élément interactif.
+- Zone cliquable min 40x40.
 
 ## 7) Définition de l’expérience et mécaniques principales
 
-### Écran 1 — Radar (priorité temps réel)
+### Écran 1 — Radar (vue principale)
 
-- Liste d’opportunités triée par score.
-- Colonnes minimales : produit, source, prix achat, prix revente estimé, marge nette, score, fraîcheur.
-- Actions rapides : `Voir détail`, `Marquer traité`, `Ignorer`.
+- Tableau trié par score d’opportunité.
+- Colonnes MVP : produit, source, prix achat, estimation revente, marge nette, confiance, fraîcheur, statut.
+- Actions : `Voir détail`, `Ouvrir source`, `Marquer traité`, `Ignorer`.
 
 ### Écran 2 — Détail opportunité
 
-- Décomposition du calcul de marge.
-- Coûts inclus (frais plateforme, expédition, commissions).
-- Indicateur de risque (volatilité / liquidité si disponible).
+- Décomposition marge (frais, commission, port).
+- Justification du score et niveau de confiance.
+- Historique court des variations si disponible.
 - CTA principal : `Ouvrir source d’achat`.
 
-### Écran 3 — Paramètres stratégie
+### Écran 3 — Stratégie & paramètres
 
-- Seuils de marge/ROI.
-- Pondération du score.
-- Paramètres alertes Telegram (fréquence, mode urgence).
+- Seuils (marge/ROI/risque).
+- Poids du scoring.
+- Paramétrage des notifications Telegram.
+- Référentiels (sets/produits) pour limiter la saisie libre.
+
+### Écran 4 — Santé des sources & fallback
+
+- État de collecte par source + dernière synchro.
+- Journal erreurs simplifié orienté action.
+- Entrée manuelle/import minimal quand une source tombe.
 
 ## 8) Visual foundation
 
-### Palette (mode sombre par défaut)
+### Palette (dark desktop-first)
 
-- Fond principal: `#0B1020`
-- Surface: `#131A2E`
-- Texte principal: `#F5F7FF`
-- Texte secondaire: `#A8B0CC`
-- Signal critique: `#FF4D6D`
-- Signal élevé: `#FF9F1C`
-- Signal moyen: `#2EC4B6`
-- Signal faible: `#7B8CDE`
-- Succès: `#35D07F`
+- Fond app : `#0B1020`
+- Surface : `#131A2E`
+- Texte principal : `#F5F7FF`
+- Texte secondaire : `#A8B0CC`
+- Info : `#7B8CDE`
+- Success : `#35D07F`
+- Warning : `#FF9F1C`
+- Critical : `#FF4D6D`
 
 ### Typographie
 
-- Inter (UI)
-- Échelle : 12 / 14 / 16 / 20 / 24 / 32
-- Densité élevée mais lisible (table-centric)
+- Inter (UI) / fallback système sans-serif.
+- Priorité lisibilité des chiffres (alignement tabulaire).
+- Hiérarchie compacte : H1/H2 lisibles + densité table élevée.
 
-### Spacing et structure
+### Mise en page
 
-- Layout en grille 12 colonnes (desktop).
-- Cartes/sections avec respiration `16–24px`.
-- Priorité à la lisibilité des nombres (alignement décimal).
+- Grille 12 colonnes desktop.
+- Densité ajustable (normal / expert).
+- Marges internes 16–24 px.
 
 ## 9) Design directions (concepts)
 
-### Direction A — "Trading Desk"
+### Direction A — Trading Desk
 
-- Dense, orientée vitesse.
-- Idéale pour utilisateurs experts.
-- Risque : intimidation des nouveaux utilisateurs.
+- Densité élevée, performance de scan maximale.
+- Adaptée aux experts habitués aux dashboards financiers.
+- Risque : intimidation au premier usage.
 
-### Direction B — "Decision Assistant" (recommandée)
+### Direction B — Decision Assistant (recommandée MVP)
 
-- Équilibre entre clarté et puissance.
-- Score + explication + action rapide.
-- Compatible montée en compétence progressive.
+- Équilibre lisibilité et puissance.
+- Focus sur justification du score + actions immédiates.
+- Convient aux personas Alex et Sam.
 
-### Direction C — "Calm Monitor"
+### Direction C — Calm Monitor
 
-- Très minimaliste.
-- Bonne lisibilité globale.
-- Peut ralentir la comparaison multi-opportunités.
+- Minimalisme fort, charge visuelle très faible.
+- Excellente pour supervision continue.
+- Limites sur comparaison massive rapide.
 
-**Choix recommandé : Direction B**, avec mode "densité expert" activable.
+**Recommandation : Direction B + option “densité expert” activable.**
 
 ## 10) User journeys clés
 
-### Journey 1 — Détection et décision rapide
+### Journey 1 — Signal prioritaire vers décision
 
-1. Notification Telegram reçue.
-2. Ouverture du dashboard Radar.
-3. Vérification du score et de la marge nette.
-4. Ouverture du détail puis du lien source.
-5. Décision d’achat.
-6. Marquage "traité".
+1. Réception Telegram.
+2. Ouverture Radar filtré sur alertes critiques.
+3. Vérification marge nette + confiance + fraîcheur.
+4. Ouverture détail et source.
+5. Décision (agir/ignorer), marquage du statut.
 
-**Critère UX** : < 120 secondes du signal à la décision.
+**Critère UX :** décision en moins de 5 minutes.
 
-### Journey 2 — Calibration hebdomadaire
+### Journey 2 — Recalibrage hebdomadaire
 
-1. Accès écran stratégie.
-2. Analyse historique alertes (actionnées vs ignorées).
-3. Ajustement seuil marge et risque.
-4. Validation et sauvegarde.
+1. Consultation de l’historique décisions.
+2. Analyse faux positifs / opportunités manquées.
+3. Ajustement seuils et poids de scoring.
+4. Sauvegarde preset de stratégie.
 
-**Critère UX** : session de calibration < 10 minutes.
+**Critère UX :** session < 10 minutes.
+
+### Journey 3 — Source indisponible
+
+1. Détection automatique d’échec source.
+2. Passage en mode dégradé visible.
+3. Utilisation fallback manuel/import.
+4. Reprise automatique lorsque source rétablie.
+
+**Critère UX :** pas de blocage complet du flux décisionnel.
 
 ## 11) Component strategy
 
-### Composants cœur
+Composants cœur :
 
 - `OpportunityTable`
 - `OpportunityRow`
 - `SignalBadge`
-- `ConfidenceMeter`
-- `MarginBreakdownCard`
-- `StrategyFilterPanel`
-- `AlertPreviewPanel`
+- `ConfidenceBadge`
+- `MarginBreakdown`
+- `SourceHealthPanel`
+- `StrategyPresetPanel`
+- `NotificationPreview`
 
-### Règles de composition
+Règles de composition :
 
-- Tous les composants décisionnels doivent afficher : valeur, contexte, action.
-- Les badges de sévérité ont une forme/couleur + libellé (pas couleur seule).
-- Les tableaux supportent tri, recherche, et navigation clavier.
+- Toute carte décisionnelle expose : **valeur + contexte + action**.
+- Les statuts critiques combinent couleur + icône + libellé.
+- Les tableaux supportent tri, recherche, focus clavier.
 
-## 12) UX patterns de cohérence
+## 12) UX consistency patterns
 
-### Patterns transverses
+Patterns transverses :
 
-- **Pattern d’alerte** : titre clair + marge nette + raison du score.
-- **Pattern d’erreur source** : état dégradé explicite (ne pas masquer).
-- **Pattern de confirmation** : actions irréversibles avec confirm modal.
-- **Pattern de données absentes** : skeleton puis message d’état utile.
+- **Alerte** : titre + marge nette + raison + fraîcheur.
+- **Erreur source** : message explicite + prochaine action recommandée.
+- **Donnée estimée** : badge “estimé” + niveau de confiance.
+- **Confirmation action** : modale seulement pour actions irréversibles.
 
-### Micro-interactions
+Micro-interactions :
 
-- Pulse discret pour nouvelle opportunité prioritaire.
-- Transition 150–200ms pour feedback sans ralentir la lecture.
-- Snackbars non bloquants pour actions de gestion.
+- Pulse léger sur nouvelle alerte prioritaire.
+- Transition 150–200ms.
+- Feedback non bloquant (snackbar discret).
 
 ## 13) Responsive & accessibility strategy
 
-### Breakpoints
+### Responsive
 
 - Desktop prioritaire : `>= 1280px`
 - Laptop : `1024–1279px`
-- Tablet support minimal : `768–1023px` (lecture + actions clés)
+- Tablet : `768–1023px` en consultation + actions critiques
 
 ### Accessibilité
 
-- Navigation clavier complète sur tableau et filtres.
-- Libellés explicites pour icônes et états.
-- Vérification contraste AA (minimum) / AAA pour KPI critiques.
-- Support réduction d’animations (`prefers-reduced-motion`).
+- Navigation clavier complète.
+- Labels explicites pour icônes et badges.
+- Support `prefers-reduced-motion`.
+- Vérification contraste automatisée en CI design.
 
-### Internationalisation
+### Langue et formats
 
 - Français par défaut.
-- Préparer extraction des chaînes pour futur multilingue.
+- Architecture i18n prête pour extension future.
+- Formats monétaires et dates cohérents FR/CH.
 
-## 14) Plan d’implémentation UX (handoff)
+## 14) Conclusion UX et plan d’alignement implémentation
 
-### Sprint design recommandé
+La stratégie UX retenue vise un produit **décisionnel, sobre et robuste** :
 
-1. **Sprint UX-1** : wireframes direction B + parcours Journey 1.
-2. **Sprint UX-2** : UI kit tokens + composants cœur.
-3. **Sprint UX-3** : prototype interactif + tests utilisateurs (5 profils).
-4. **Sprint UX-4** : ajustements accessibilité + handoff dev complet.
+- MVP centré sur l’actionnabilité des alertes.
+- Transparence du calcul de rentabilité.
+- Résilience UX (mode dégradé explicite).
+- Base de composants compatible avec la roadmap technique.
 
-### DoD UX
+### Livrables de continuité recommandés
 
-- Tous les écrans clés couverts par specs d’états.
-- Tous les composants critiques documentés.
-- Tous les parcours clés testés sur cas réel.
-- Décisions de design tracées dans ce document.
-
----
-
-## Annexes
-
-### A. KPI UX à suivre après lancement
-
-- Taux d’alertes actionnées.
-- Temps médian signal → décision.
-- Taux d’erreurs perçues sur calcul marge.
-- Taux d’utilisation des filtres stratégiques.
-- Satisfaction perçue "confiance dans le signal".
-
-### B. Risques UX majeurs
-
-- Sur-optimisation densité au détriment de lisibilité.
-- Faux positifs entraînant perte de confiance.
-- Friction setup initial (seuils mal configurés).
-
-### C. Décision finale workflow
-
-Le workflow **/bmad-bmm-create-ux-design** est exécuté et finalisé.
-Le livrable principal est prêt pour wireframing, prototypage et implémentation.
+1. Wireframes low-fi des 4 écrans cœur.
+2. Spécification d’états (source, confiance, erreur, estimé).
+3. Scénarios de tests UX sur journeys 1/2/3.
+4. Checklist d’implémentation UX pour l’équipe dev.
