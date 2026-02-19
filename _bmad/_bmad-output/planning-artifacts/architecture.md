@@ -1,188 +1,253 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputDocuments:
-  - architecture_technique.md
-  - rapport_brainstorming.md
-  - technical-Poke-Radar-research.md
-  - market-Poke-Radar-research.md
+  - _bmad/_bmad-output/planning-artifacts/prd.md
+  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad/_bmad-output/planning-artifacts/epics.md
   - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
 workflowType: 'architecture'
-project_name: 'bmad'
+project_name: 'Poke-Radar'
 user_name: 'Loris'
-date: '2026-02-18'
+date: '2026-02-19'
 lastStep: 8
 status: 'complete'
-completedAt: '2026-02-18'
+completedAt: '2026-02-19'
 ---
 
-# Document de Décision d’Architecture — Poke-Radar
+# Architecture Decision Document — Poke-Radar
 
-## 1) Contexte projet et contraintes
+## 1) Contexte et cadre de décision
 
-Poke-Radar est une application desktop orientée opportunités d’arbitrage Pokémon TCG : détection stock retail (Fnac/Cultura/Pokémon Center), estimation de revente (Cardmarket/eBay), puis alerte temps réel (Telegram).
+Cette architecture est alignée sur les artefacts actifs du projet (PRD, UX spec, epics) et vise un MVP desktop orienté décision pour revendeurs Pokémon.
 
-### Contraintes clés
-- Exécution continue en local avec faible empreinte mémoire.
-- Scraping de sites dynamiques (anti-bot, changements DOM).
-- Calcul de marge traçable et reproductible.
-- Time-to-market rapide malgré une stack moderne.
+### Objectifs techniques prioritaires
+- Boucle **détection → scoring → notification** en quasi temps réel.
+- Signal d’opportunité **actionnable** (marge nette explicable + confiance).
+- Résilience opérationnelle (sources instables, mode dégradé, reprise automatique).
+- Extensibilité progressive (nouvelles sources, nouveaux canaux de notification).
 
-## 2) Décisions d’architecture (ADR synthétiques)
+### Contraintes structurantes
+- Exécution locale desktop continue avec empreinte maîtrisée.
+- Intégration de connecteurs hétérogènes (retail + marché secondaire).
+- Conformité opérationnelle (secret management local, logs sans fuite, garde-fous scraping).
+- UX décisionnelle (lisibilité, tri, filtres persistants, accessibilité clavier/contraste).
 
-### ADR-001 — Architecture desktop hybride (Tauri v2 + Rust + React)
-**Décision :** adopter Tauri v2 avec backend Rust et frontend React/TypeScript.
+## 2) Décisions d’architecture (ADRs)
 
-**Pourquoi :**
-- Performance et empreinte RAM nettement meilleures qu’Electron.
-- Rust adapté aux workers concurrents et à la robustesse long-terme.
-- React/Vite accélère l’itération UI.
+### ADR-001 — Stack desktop hybride Tauri v2 + Rust + React/TypeScript
+**Décision**
+Adopter une application desktop Tauri v2 avec backend Rust (orchestration, domaine, persistance) et frontend React/TypeScript (cockpit décisionnel).
 
-**Conséquence :** séparation nette “core métier Rust” vs “présentation React”, communication via commandes Tauri.
+**Rationale**
+- Tauri minimise empreinte mémoire et distribution locale.
+- Rust apporte robustesse pour scheduler, connecteurs et pipeline concurrent.
+- React/TS accélère l’itération UX sur table priorisée et panneaux de détail.
 
-### ADR-002 — Persistance locale SQLite
-**Décision :** base SQLite locale, migrations versionnées, accès via `sqlx`.
+**Conséquences**
+- Contrat API interne explicite via commandes Tauri.
+- Séparation stricte: logique métier en Rust, UI en TypeScript.
 
-**Pourquoi :**
-- Zéro infra côté utilisateur.
-- Requêtes analytiques simples pour historique prix et opportunités.
+### ADR-002 — Architecture pipeline modulaire (ingestion → normalisation → scoring → alerting)
+**Décision**
+Implémenter un pipeline déterministe en étapes isolées, chacune testable indépendamment.
 
-**Conséquence :** un schéma minimal mais extensible (produits, sources, snapshots prix, opportunités, alertes).
+**Rationale**
+- Réduction des conflits d’implémentation entre agents/modules.
+- Observabilité plus fine (latence et erreurs par étape).
 
-### ADR-003 — Scraping multi-source orienté résilience
-**Décision :** stratégie mixte HTTP parsing + navigateur headless selon source.
+**Conséquences**
+- Interfaces de données stables entre étapes.
+- Possibilité de fallback étape par étape (ex: estimation indisponible mais collecte stock valide).
 
-**Pourquoi :**
-- Réduire coût CPU lorsque HTML statique suffit.
-- Garder headless pour pages JS/anti-bot.
+### ADR-003 — Persistance locale SQLite + migrations versionnées
+**Décision**
+Utiliser SQLite pour stocker configurations, snapshots de collecte, opportunités et historique alertes.
 
-**Conséquence :** adaptateurs par site, sélecteurs versionnés, mécanisme de fallback et scoring de confiance.
+**Rationale**
+- Zéro dépendance infra côté utilisateur.
+- Bonne adéquation MVP desktop + besoin de traçabilité historique.
 
-### ADR-004 — Moteur de pricing et arbitrage centralisé
-**Décision :** calcul de marge centralisé dans un service Rust unique.
+**Conséquences**
+- Migrations obligatoires pour évolution de schéma.
+- Indexation ciblée pour requêtes dashboard et déduplication d’alertes.
 
-**Pourquoi :**
-- Empêcher divergence de logique entre UI, alerting et exports.
-- Faciliter tests unitaires sur règles business.
+### ADR-004 — Connecteurs par source avec stratégie de résilience unifiée
+**Décision**
+Chaque source (retail ou marché) est un adaptateur implémentant une interface commune: collecte, mapping, health status, erreurs typées.
 
-**Conséquence :** formule de marge normalisée, simulation “what-if”, traçabilité par exécution.
+**Rationale**
+- Ajouter/supprimer une source sans refonte globale.
+- Harmoniser retry/backoff/jitter et règles anti-abus.
 
-### ADR-005 — Notification asynchrone Telegram
-**Décision :** pipeline d’alertes découplé (queue interne + worker notification).
+**Conséquences**
+- Contrat commun `Connector` + policy runtime partagée.
+- Suivi de santé par source pour alimenter l’écran "Santé des sources & fallback".
 
-**Pourquoi :**
-- Éviter que latence API Telegram bloque le scraping.
-- Gérer retry/backoff et déduplication.
+### ADR-005 — Moteur de marge nette centralisé et explicable
+**Décision**
+Centraliser le calcul économique (frais, commissions, port, hypothèses) dans un service Rust unique.
 
-**Conséquence :** meilleure fiabilité et suppression des notifications spam.
+**Rationale**
+- Éviter toute divergence entre UI, alertes Telegram et exports futurs.
+- Garantir le "Pourquoi cette alerte ?" demandé par l’UX.
 
-## 3) Vue logique des composants
+**Conséquences**
+- Détail de calcul persisté avec chaque opportunité.
+- Jeux de tests unitaires sur scénarios nominal/outliers.
 
-1. **Scheduler**: planifie les scans par source/produit.
-2. **Source Connectors**: modules Fnac/Cultura/PokémonCenter/eBay/Cardmarket.
-3. **Normalizer**: harmonise nommage produit, devise, frais et qualité de signal.
-4. **Pricing Engine**: calcule prix de revente net et marge estimée.
-5. **Opportunity Evaluator**: applique seuils, règles de risque et déduplication.
-6. **Alert Dispatcher**: envoie Telegram + journalise état.
-7. **Desktop UI**: dashboard statut, historique et configuration.
+### ADR-006 — Alerting asynchrone Telegram avec anti-duplication
+**Décision**
+Découpler l’émission d’alertes du pipeline principal via file interne et worker dédié.
 
-## 4) Modèle de données cible (v1)
+**Rationale**
+- Le délai API Telegram ne doit pas bloquer la détection.
+- Le bruit d’alertes doit être maîtrisé par règles de déduplication.
 
-- `products(id, name, set_code, language, rarity, ean, created_at)`
-- `sources(id, name, type, reliability_score)`
-- `listings(id, source_id, product_id, url, price_gross, shipping, currency, status, captured_at)`
-- `market_snapshots(id, source_id, product_id, sold_median, sold_p25, sold_p75, sample_size, captured_at)`
-- `opportunities(id, product_id, buy_listing_id, expected_sell_net, estimated_margin, margin_pct, confidence, detected_at)`
-- `alerts(id, opportunity_id, channel, status, sent_at, error_message)`
-- `settings(id, alert_margin_min, confidence_min, scan_interval_sec, telegram_chat_id, updated_at)`
+**Conséquences**
+- Gestion de retry/backoff par canal.
+- Journalisation explicite des statuts d’envoi (pending/sent/failed/suppressed).
 
-## 5) Patterns d’implémentation pour éviter les conflits d’agents
+## 3) Architecture logique cible
 
-- **Naming convention**: snake_case Rust, camelCase côté front TypeScript.
-- **Boundaries**: aucune règle métier dans React (UI only).
-- **Errors**: erreurs typées Rust (`thiserror`) + mapping unifié vers messages UI.
-- **Time**: stocker toutes les dates en UTC ISO-8601.
-- **Money**: calculs en centimes (`i64`) pour éviter les flottants.
-- **Observability**: logs structurés (`tracing`) avec correlation id par scan.
+1. **Scheduler Service**
+   - Lance les cycles selon cadence configurable.
+   - Applique jitter et quotas par source.
 
-## 6) Structure projet recommandée
+2. **Connector Runtime**
+   - Exécute les connecteurs retail/market.
+   - Convertit les réponses en événements normalisés.
+
+3. **Normalization Service**
+   - Harmonise devises, format produit, granularité temporelle.
+   - Ajoute métadonnées de confiance.
+
+4. **Pricing & Scoring Engine**
+   - Calcule marge brute/nette et score priorisé.
+   - Filtre selon seuils utilisateur.
+
+5. **Opportunity Store**
+   - Persiste snapshots, opportunités, historiques d’état.
+   - Expose des lectures optimisées dashboard.
+
+6. **Alert Dispatcher**
+   - Déduplique puis envoie via Telegram.
+   - Émet événements d’observabilité.
+
+7. **Desktop UI**
+   - Radar (table priorisée), détail opportunité, stratégie, santé sources.
+   - Actions décisionnelles rapides (traiter/ignorer/ouvrir source).
+
+## 4) Modèle de données v1
+
+### Entités principales
+- `products`: périmètre surveillé (identifiants, set, langue, statut).
+- `sources`: configuration source + type + paramètres runtime.
+- `monitor_profiles`: paramètres économiques (seuils, frais, priorités).
+- `listing_snapshots`: observations retail horodatées.
+- `market_snapshots`: références marché secondaire horodatées.
+- `opportunities`: résultat scoring + score confiance + explication.
+- `alerts`: statut émission Telegram + motif suppression/dédoublonnage.
+- `connector_health`: état runtime par source (ok/warn/down, dernier incident).
+
+### Règles de persistance
+- Timestamps en UTC ISO-8601.
+- Montants stockés en centimes entiers (`i64`).
+- Conservation d’un audit minimal de calcul pour explicabilité.
+
+## 5) Contrats d’intégration internes
+
+### Contrat Connecteur
+Entrée: cible de collecte + configuration source.
+Sortie: `ConnectorResult { snapshots, status, errors, collected_at }`.
+
+### Contrat Scoring
+Entrée: snapshot retail + références marché + profil utilisateur.
+Sortie: `OpportunityEvaluation { margin_net, confidence, reasons[], should_alert }`.
+
+### Contrat Alerting
+Entrée: opportunité qualifiée.
+Sortie: `AlertDelivery { channel, status, dedupe_key, sent_at, error? }`.
+
+## 6) Patterns d’implémentation anti-conflits (agents/dev)
+
+- **Single source of truth métier**: toute règle économique vit côté Rust domaine.
+- **UI = présentation + interactions**: pas de calcul de marge en TypeScript.
+- **Error taxonomy unique**: erreurs domaine/infrastructure normalisées avant affichage.
+- **Config hot-reload maîtrisé**: changements de seuils pris en compte au cycle suivant.
+- **Observabilité systématique**: correlation_id par cycle et par opportunité.
+- **Nommage**: snake_case Rust, camelCase TS, schéma SQL explicite.
+- **Feature toggles MVP**: connecteurs non stabilisés derrière flags.
+
+## 7) Structure projet recommandée
 
 ```text
 src-tauri/
   src/
     app/
-      mod.rs
       commands.rs
+      state.rs
     domain/
-      product.rs
-      pricing.rs
-      opportunity.rs
-    infra/
+      models/
+      services/
+      policies/
+    connectors/
+      retail/
+      market/
+      runtime.rs
+    workflows/
+      monitor_cycle.rs
+      scoring_cycle.rs
+      alert_cycle.rs
+    infrastructure/
       db/
         migrations/
-        repository.rs
-      scraping/
-        connectors/
-          fnac.rs
-          cultura.rs
-          pokemon_center.rs
-          ebay.rs
-          cardmarket.rs
-        anti_bot.rs
+        repositories/
+      telemetry/
+      secrets/
       notifications/
         telegram.rs
-    workflows/
-      scheduler.rs
-      scan_pipeline.rs
-      alert_pipeline.rs
 
 ui/
   src/
     pages/
+      radar/
+      opportunity-detail/
+      strategy/
+      source-health/
     components/
     stores/
     services/
+    design-system/
 ```
 
-## 7) Validation de cohérence
+## 8) Qualité, sécurité, conformité
 
-### Cohérence des décisions ✅
-- Les choix techniques sont alignés avec les contraintes de performance desktop.
-- Le découplage scraping/pricing/alerting réduit le risque de régressions croisées.
+### Qualité runtime
+- Retry/backoff bornés + circuit breaker léger par source.
+- Dégradation progressive: source KO ≠ arrêt global.
+- Protection contre spam (fenêtre temporelle + signature opportunité).
 
-### Couverture des besoins ✅
-- Détection stock : couverte via connecteurs spécialisés.
-- Estimation revente : couverte via snapshots marché + moteur de pricing.
-- Alerting temps réel : couvert via dispatcher asynchrone.
+### Sécurité locale
+- Secrets Telegram stockés hors logs et hors VCS.
+- Nettoyage systématique des données sensibles en télémétrie.
 
-### Readiness d’implémentation ✅
-- Composants, schéma de données, conventions et structure de dossiers sont définis.
-- Les points à risque (anti-bot, drift des sélecteurs, bruit des prix) ont une stratégie explicite.
+### Conformité scraping
+- Politique source-by-source documentée (cadence, limites, fallback).
+- Priorisation API/flux autorisés quand disponibles.
 
-## 8) Risques et mitigations
-
-- **Risque anti-bot élevé** → jitter, rotation user-agent, backoff, quotas par domaine.
-- **Risque qualité donnée marché** → médianes, exclusion outliers, score de confiance.
-- **Risque dette technique rapide** → ADRs versionnés et tests de régression parsing.
-
-## 9) Prochaines actions recommandées
-
-1. Implémenter une première tranche verticale: Fnac → SQLite → Dashboard → Telegram.
-2. Ajouter tests unitaires du moteur de marge (cas nominal + frais + outliers).
-3. Mettre en place snapshots DOM pour détecter la casse des sélecteurs.
-4. Étendre aux sources Cardmarket/eBay avec normalisation commune.
-
-## Architecture Validation Results
+## 9) Validation finale d’alignement
 
 ### Coherence Validation ✅
-Décisions compatibles entre elles, aucun conflit structurel détecté.
+Les ADRs sont cohérents entre eux: stack, pipeline, persistance et UX cockpit convergent vers un MVP desktop décisionnel.
 
 ### Requirements Coverage Validation ✅
-Les capacités métier essentielles sont couvertes avec traçabilité des calculs.
+- FRs couverts via configuration, collecte, scoring, alerting, dashboard et résilience.
+- NFRs couverts via modularité, observabilité, sécurité locale et performance de boucle.
 
 ### Implementation Readiness Validation ✅
-Le système est prêt pour lancer l’implémentation en stories techniques.
+La structure cible, les contrats internes, les patterns anti-conflits et le modèle de données fournissent un cadre exécutable pour lancer les stories techniques.
 
 ### Gap Analysis Results
-- **Critique**: absence actuelle de PRD formalisé (à compléter pour priorisation produit).
-- **Important**: politique de conformité légale scraping à formaliser par source.
-- **Optionnel**: stratégie d’auto-update signée (Tauri updater) pour v1.1.
+- **Critique**: formaliser la matrice légale/source (CGU, fréquence autorisée, stratégie fallback).
+- **Important**: définir les seuils de confiance initiaux par famille de produits.
+- **Optionnel**: préparer abstraction multi-canaux notification (Discord/mail) pour post-MVP.
