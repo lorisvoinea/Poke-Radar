@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it } from "vitest";
 import { BootPage } from "../pages/BootPage";
 
 describe("BootPage", () => {
