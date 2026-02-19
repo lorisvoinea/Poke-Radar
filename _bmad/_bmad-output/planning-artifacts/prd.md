@@ -15,217 +15,167 @@ stepsCompleted:
   - step-11-polish
   - step-12-complete
 inputDocuments:
-  - _bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
-  - market-Poke-Radar-research.md
-  - technical-Poke-Radar-research.md
-  - rapport_brainstorming.md
-  - architecture_technique.md
+  - _bmad/_bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
+  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad/_bmad-output/brainstorming/brainstorming-session-2025-02-05.md
 workflowType: 'prd'
 projectClassification: 'brownfield'
-projectType: 'Desktop application de market intelligence (B2C niche revendeurs)'
+projectType: 'Application desktop de market intelligence (revendeurs Pokémon)'
 domainComplexity: 'medium'
 documentCounts:
   briefCount: 1
-  researchCount: 2
+  researchCount: 1
   brainstormingCount: 1
-  projectDocsCount: 1
-lastUpdated: '2026-02-18'
+  projectDocsCount: 0
+lastUpdated: '2026-02-19'
 ---
 
 # Product Requirements Document - Poke-Radar
 
 **Auteur :** Loris  
-**Date :** 2026-02-18
+**Date :** 2026-02-19
 
 ## Executive Summary
-Poke-Radar est une application desktop orientée décision qui automatise la veille de stocks Pokémon, évalue la rentabilité de revente et envoie des alertes actionnables en temps réel. Le cœur du produit n’est pas la détection de stock seule, mais la priorisation des opportunités selon la marge nette après frais.
+Poke-Radar est une application desktop qui transforme une veille Pokémon manuelle et lente en décisions d’achat rapides, traçables et rentables. Le produit combine surveillance de disponibilité, estimation de valeur marché et filtrage par marge nette afin d’émettre des alertes réellement exploitables.
 
-### What Makes This Special
-La proposition de valeur repose sur la combinaison de trois briques rarement réunies dans les outils existants : détection retail rapide, estimation marché secondaire crédible, et filtrage par profit net configurable. Cette approche réduit le bruit opérationnel et améliore la qualité des décisions d’achat.
+### Ce qui différencie Poke-Radar
+- **Signal orienté décision** : priorité aux opportunités filtrées par profit net, pas à la simple détection de stock.
+- **Approche pragmatique** : MVP utilisable même en mode dégradé (saisie manuelle / fallback).
+- **Vitesse opérationnelle** : boucle courte _détection → qualification → notification_.
 
-## Project Classification
-- **Contexte :** Brownfield (base de réflexion déjà existante via brief, recherches et architecture)
-- **Type de produit :** Application desktop locale (Tauri + Rust + React)
-- **Marché cible :** Revendeurs Pokémon indépendants
-- **Niveau de complexité :** Moyen (scraping multi-sources + calculs économiques + alerting temps réel)
+## Contexte et classification projet
+- **Contexte** : brownfield piloté à partir d’un product brief, d’une recherche domaine et d’un brainstorming consolidés.
+- **Type produit** : application desktop locale (architecture Tauri + Rust + React visée).
+- **Cible principale** : revendeurs Pokémon indépendants (France/Suisse en priorité).
+- **Complexité** : moyenne (multi-sources, calcul économique, robustesse données, alerting).
 
-## Success Criteria
+## Objectifs et métriques de succès
 
 ### User Success
-- Réduire de 70 % le temps de veille manuelle dans les 30 jours.
-- Permettre une prise de décision en moins de 5 minutes après détection d’un restock.
-- Atteindre >60 % d’alertes jugées réellement actionnables.
-- Diminuer les achats non rentables grâce au filtrage par marge nette.
+- Réduire le temps de veille manuelle de **~70 %** sur 30 jours.
+- Atteindre un délai de décision **< 5 min** après réception d’une alerte prioritaire.
+- Obtenir **> 60 %** d’alertes jugées actionnables par l’utilisateur.
 
 ### Business Success
-- Augmenter la marge nette moyenne mensuelle sur les opérations de revente.
-- Augmenter le nombre d’opportunités exécutées sans augmenter proportionnellement la charge logistique.
-- Stabiliser un moteur de sourcing utilisable en continu (24/7) sur un périmètre produit initial.
+- Améliorer la marge nette moyenne mensuelle sur les opérations de revente.
+- Augmenter le volume d’opportunités exécutées sans explosion de charge opérationnelle.
+- Valider une base produit suffisamment fiable pour l’extension à d’autres sources et pays.
 
 ### Technical Success
-- Latence d’alerte (détection → Telegram) <60 secondes sur les sources prioritaires.
-- Uptime du moteur local de monitoring >95 % sur les périodes actives.
-- Taux d’erreurs critiques de scraping sous seuil opérationnel acceptable avec mécanismes de reprise.
+- Latence détection → notification < **60 secondes** sur les sources prioritaires.
+- Uptime monitoring > **95 %** sur plages actives.
+- Taux d’échec critique de collecte sous seuil d’alerte défini, avec reprise automatique.
 
-## User Journeys
+## Personas & User Journeys
 
-### Revendeur indépendant (persona Alex)
-1. Configure produits, seuil de marge et canaux d’alerte.
-2. Reçoit une alerte « rentable » avec contexte prix achat / prix revente estimé.
-3. Vérifie rapidement le signal et exécute l’achat.
-4. Suit les opportunités dans le dashboard pour affiner ses seuils.
+### Persona 1 — Revendeur indépendant (Alex)
+1. Configure produits ciblés, seuil de marge, frais et canal de notification.
+2. Reçoit des alertes avec contexte complet (prix achat, estimation revente, marge nette).
+3. Décide rapidement d’acheter ou d’ignorer selon ROI et liquidité.
+4. Consulte l’historique pour recalibrer ses paramètres.
 
-### Flipper premium (persona Sam)
-1. Cible des produits à forte valeur potentielle.
-2. Reçoit moins d’alertes mais plus qualifiées (ROI élevé).
-3. Priorise les signaux selon la liquidité et le niveau de marge.
-4. Consolide une stratégie d’achat sélective à forte rentabilité.
+### Persona 2 — Flipper premium (Sam)
+1. Paramètre des critères plus stricts (risque faible, marge plus haute).
+2. Reçoit moins d’alertes, mais fortement qualifiées.
+3. Priorise les signaux à meilleure exécution potentielle.
+4. Suit la performance des décisions prises.
 
-### Journey Requirements Summary
-- Onboarding simple et rapide.
-- Signaux compréhensibles et immédiatement exploitables.
-- Historique des opportunités pour ajuster la stratégie.
-- Contrôle utilisateur fort sur les paramètres de risque.
+### Exigences parcours utilisateur
+- Onboarding court et guidé.
+- Alertes lisibles, comparables, directement exploitables.
+- Contrôle fin des paramètres de risque et de rentabilité.
+- Possibilité de fonctionnement manuel si une source est indisponible.
 
-## Domain-Specific Requirements
-- Respect des conditions d’utilisation des sites scrappés et implémentation de garde-fous anti-abus (cadence, jitter, backoff).
-- Prise en compte des frais réels (port, commissions marketplace, coûts transactionnels) dans le calcul de marge.
-- Traçabilité des hypothèses de prix (source, timestamp, méthode d’estimation).
-- Gestion du risque de faux positifs (stocks volatils, pages dynamiques, disponibilité temporaire).
+## Scope produit
 
-## Innovation & Novel Patterns
+### MVP (Phase 1)
+1. **Catalogue ciblé** : gestion d’une liste de produits/cartes surveillés.
+2. **Collecte prix/disponibilité** : 1–2 sources stables au départ.
+3. **Calcul d’opportunité** : marge nette avec frais configurables.
+4. **Alerting** : un canal prioritaire (Telegram) pour time-to-market.
+5. **UI minimale** : tableau principal (tri, statut, dernière mise à jour).
+6. **Fallback manuel** : saisie / import simple pour conserver la continuité de service.
 
-### Detected Innovation Areas
-- **Filtrage par profit net** plutôt que signal de disponibilité brut.
-- **Décision assistée locale** pour un cas d’usage ultra-spécifique (arbitrage Pokémon).
-- **Boucle signal → décision** optimisée pour contrainte de temps.
+### Hors scope MVP
+- Auto-buy / exécution automatique d’achat.
+- Multi-canaux complets (Discord, mail, push natif) dès V1.
+- Couverture mondiale exhaustive des retailers.
+- Fonctions communautaires (crowdsourcing, partage public des données).
 
-### Market Context & Competitive Landscape
-Le marché propose surtout des outils de monitoring stock ou de suivi prix séparés. Poke-Radar se différencie par une couche décisionnelle orientée exécution rentable, adaptée au contexte retail FR/EU + secondaire.
+### Post-MVP
+- Abstraction multi-canaux de notification.
+- Extension multi-sources API-first.
+- Favoris / cartes possédées.
+- Export Excel.
+- Extension à d’autres univers (autres TCG, collectibles).
 
-### Validation Approach
-- Comparer performance utilisateur avant/après usage (temps de veille, qualité des décisions).
-- Mesurer la précision des alertes et la marge nette observée.
-- Valider sur un périmètre MVP réduit avant extension de couverture.
+## Exigences fonctionnelles
 
-### Risk Mitigation
-- Commencer avec un petit set de sources fiables.
-- Journaliser les erreurs de scraping et appliquer des stratégies de fallback.
-- Prévoir une calibration continue des règles de marge et de scoring.
+### FR-01 Configuration & référentiels
+- L’utilisateur peut créer/éditer des profils de surveillance (produits, seuils, frais, priorités).
+- Le système supporte des référentiels préenregistrés (sets/éditions) pour limiter les erreurs de saisie.
 
-## Desktop Application Specific Requirements
+### FR-02 Collecte de données
+- Le moteur récupère périodiquement disponibilité et prix des sources activées.
+- Chaque donnée est horodatée et associée à sa source.
+- En cas d’échec source, le système marque l’état et bascule en mode dégradé.
 
-### Project-Type Overview
-Application locale légère, orientée monitoring continu et visualisation opérationnelle rapide. Le choix desktop favorise performance, autonomie et confidentialité.
+### FR-03 Estimation marché
+- Le système calcule une estimation de revente à partir des données disponibles.
+- L’interface affiche le niveau de confiance (valeur directe vs estimée).
 
-### Technical Architecture Considerations
-- Processus backend Rust asynchrone pour collecte/normalisation/calcul.
-- Frontend React pour visualisation et configuration.
-- SQLite locale pour persistance des produits, prix et opportunités.
-- Notification Telegram via API HTTP.
+### FR-04 Scoring d’opportunité
+- Le système calcule marge brute et nette (achat, frais, commissions, port, coûts transactionnels).
+- Les règles de scoring sont configurables par utilisateur.
+- Les opportunités sont triables par rentabilité et urgence.
 
-### Implementation Considerations
-- Résilience aux changements de DOM.
-- Politique de scheduling et de priorité des sources.
-- Modularité des connecteurs de scraping.
-- Observabilité locale (logs, métriques, états d’exécution).
+### FR-05 Notification
+- Le système envoie une notification quand une opportunité dépasse les seuils définis.
+- La notification inclut : produit, prix d’achat, estimation revente, marge nette, source, timestamp.
 
-## Project Scoping & Phased Development
+### FR-06 Tableau de bord opérationnel
+- Vue unique avec état des sources, dernières opportunités, erreurs et actions recommandées.
+- Historique consultable pour analyser la qualité des alertes et ajuster les seuils.
 
-### MVP Strategy & Philosophy
-**Approche MVP :** valider rapidement la thèse « moins d’alertes, mais des alertes rentables ».  
-**Ressources minimales :** 1 dev fullstack (Rust/React) + support ponctuel produit/data.
+### FR-07 Résilience opérationnelle
+- Journalisation des erreurs de collecte et de calcul.
+- Mécanisme de retry/backoff sur les sources instables.
+- Continuité minimale du service via saisie/import manuel.
 
-### MVP Feature Set (Phase 1)
-**Core User Journeys Supported:**
-- Configuration des produits/sources/seuils.
-- Détection de stock sur sources clés.
-- Estimation prix secondaire et calcul marge nette.
-- Alerte Telegram conditionnée à la rentabilité.
-- Dashboard opportunités (historique + statut).
+## Exigences non fonctionnelles
 
-**Must-Have Capabilities:**
-- Monitoring périodique fiable.
-- Moteur de pricing minimum viable.
-- Paramétrage frais et seuils.
-- Logs d’exécution lisibles.
+### NFR-01 Performance
+- Rafraîchissement source selon cadence configurable.
+- Temps d’évaluation d’une opportunité compatible usage temps quasi réel.
 
-### Post-MVP Features
-**Phase 2 (Growth):**
-- Extension des sources et catégories produits.
-- Scoring avancé (liquidité, volatilité).
-- Segmentation des alertes par profil risque.
+### NFR-02 Fiabilité
+- Dégradation progressive plutôt qu’arrêt global en cas de source indisponible.
+- Vérification de cohérence des données avant génération d’alerte.
 
-**Phase 3 (Expansion):**
-- Automatisation assistée d’exécution (semi-auto).
-- Stratégies multi-marchés internationales.
-- Capacités collaboratives/multi-opérateurs.
+### NFR-03 Sécurité & conformité
+- Respect RGPD/nLPD pour les données utilisateur.
+- Respect des CGU, robots.txt et pratiques anti-abus pour la collecte.
+- Secret management local pour tokens/API keys.
 
-### Risk Mitigation Strategy
-**Risques techniques :** instabilité scraping, latence variable, données marché bruitées.  
-**Réponse :** architecture modulaire, retries intelligents, validation multi-sources.  
-**Risques marché :** variation rapide des prix, hype cyclique.  
-**Réponse :** seuils dynamiques et feedback utilisateur continu.  
-**Risques ressources :** disponibilité limitée du porteur de projet.  
-**Réponse :** cadrage strict MVP, backlog priorisé par impact.
+### NFR-04 Maintenabilité
+- Pipeline modulaire (ingestion → normalisation → scoring → notification).
+- Configuration externalisée pour faciliter ajout de sources/canaux.
 
-## Functional Requirements
+### NFR-05 UX
+- Interface orientée décision (priorité à lisibilité, tri et filtres essentiels).
+- Réduction de la complexité (éviter surcharge d’écrans/options au MVP).
 
-### Configuration & Product Targeting
-- FR-001: Le système doit permettre d’ajouter/modifier/supprimer des produits cibles et leurs métadonnées.
-- FR-002: Le système doit permettre de configurer les sources retail par produit.
-- FR-003: Le système doit permettre de définir des seuils de marge et paramètres de frais.
+## Risques principaux et mitigations
+- **Fragilité de collecte** → stratégie API-first + retries + fallback manuel.
+- **Bruit d’alertes** → seuils par défaut robustes + calibration continue.
+- **Contrainte légale sur les sources** → prioriser flux autorisés/partenariats.
+- **Complexité excessive trop tôt** → scope MVP strict, extensions en phases.
 
-### Stock Monitoring
-- FR-004: Le système doit interroger périodiquement les sources configurées.
-- FR-005: Le système doit détecter les changements de disponibilité produit.
-- FR-006: Le système doit conserver l’état de dernière observation par source.
-
-### Market Price Estimation
-- FR-007: Le système doit récupérer des références de prix secondaire (Cardmarket/eBay ou équivalent).
-- FR-008: Le système doit normaliser les données de prix pour comparabilité.
-- FR-009: Le système doit timestamp chaque donnée de prix collectée.
-
-### Opportunity Scoring & Margin Calculation
-- FR-010: Le système doit calculer une marge nette estimée en intégrant frais configurés.
-- FR-011: Le système doit classer/prioriser les opportunités selon rentabilité.
-- FR-012: Le système doit permettre d’exclure des opportunités sous seuil.
-
-### Alerting & Notification
-- FR-013: Le système doit envoyer une alerte Telegram lorsqu’une opportunité dépasse le seuil défini.
-- FR-014: L’alerte doit inclure au minimum produit, prix achat, prix revente estimé, marge et source.
-- FR-015: Le système doit éviter le spam de notifications via règles anti-duplication.
-
-### Dashboard & Tracking
-- FR-016: Le système doit afficher les opportunités détectées dans un tableau de bord local.
-- FR-017: Le système doit permettre de consulter l’historique des alertes et signaux.
-- FR-018: Le système doit afficher l’état courant du moteur (actif, erreur, pause).
-
-### Reliability & Operations
-- FR-019: Le système doit journaliser erreurs de scraping et événements clés.
-- FR-020: Le système doit appliquer des stratégies de reprise en cas d’échec temporaire.
-- FR-021: Le système doit supporter la mise à jour des paramètres sans redéploiement complet.
-
-## Non-Functional Requirements
-
-### Performance
-- NFR-001: Le délai détection → alerte doit être inférieur à 60 secondes sur sources prioritaires.
-- NFR-002: Le cycle de monitoring doit rester stable sous charge MVP définie.
-
-### Security
-- NFR-003: Les secrets (token Telegram, clés éventuelles) doivent être stockés de manière sécurisée localement.
-- NFR-004: Les logs ne doivent pas exposer de secrets en clair.
-
-### Scalability
-- NFR-005: L’architecture doit permettre l’ajout de nouvelles sources sans refonte globale.
-- NFR-006: Le système doit gérer une montée progressive du nombre de produits surveillés.
-
-### Accessibility
-- NFR-007: L’interface doit rester lisible et utilisable pour des sessions longues (contrastes, hiérarchie visuelle claire).
-
-### Integration
-- NFR-008: L’intégration Telegram doit être fiable et testable par message de contrôle.
-- NFR-009: Les connecteurs de sources doivent exposer une interface homogène pour simplifier maintenance et extension.
+## Validation et rollout
+1. Lancer un pilote utilisateur sur périmètre réduit (sources et produits limités).
+2. Mesurer métriques clés (latence, actionnabilité, temps de décision, marge nette).
+3. Ajuster règles de scoring et UX avant élargissement.
+4. Étendre progressivement la couverture sources/canaux.
 
 ## Conclusion
-Ce PRD formalise une trajectoire orientée exécution : commencer petit, prouver la valeur économique rapidement, puis étendre de manière maîtrisée. Toutes les phases aval (UX, architecture détaillée, epics/stories) doivent rester alignées sur le différenciateur central : transformer un bruit de marché en décisions d’achat rentables et rapides.
+Ce PRD positionne Poke-Radar comme un **outil de décision rentable** plutôt qu’un simple tracker de stock. La stratégie retenue privilégie un MVP minimal, robuste et actionnable, ancré dans les artefacts actuels (brief/research/brainstorming) et prêt pour une montée en puissance progressive.
