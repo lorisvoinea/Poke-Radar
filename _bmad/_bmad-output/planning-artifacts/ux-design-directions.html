@@ -6,45 +6,51 @@
   <title>Poke-Radar — UX Design Directions</title>
   <style>
     body { font-family: Inter, Arial, sans-serif; margin:0; padding:24px; background:#0B1020; color:#F5F7FF; }
-    .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap:16px; }
+    h1 { margin-top:0; }
+    .sub { color:#A8B0CC; margin-bottom:20px; }
+    .cards { display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:16px; }
     .card { background:#131A2E; border:1px solid #2A3355; border-radius:14px; padding:16px; }
-    .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:600; }
+    .badge { display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700; margin-bottom:8px; }
     .a { background:#7B8CDE; color:#0B1020; }
-    .b { background:#2EC4B6; color:#0B1020; }
+    .b { background:#35D07F; color:#0B1020; }
     .c { background:#FF9F1C; color:#0B1020; }
+    h2 { margin:6px 0 10px; }
     ul { margin:8px 0 0 18px; }
+    .footer { margin-top:20px; color:#A8B0CC; font-size:14px; }
   </style>
 </head>
 <body>
   <h1>Design Directions — Poke-Radar</h1>
+  <p class="sub">Synthèse des directions UX issues du workflow create-ux-design et alignées sur brief + PRD + research + brainstorming.</p>
   <div class="cards">
     <article class="card">
       <span class="badge a">Direction A</span>
       <h2>Trading Desk</h2>
       <ul>
-        <li>Interface dense orientée expert</li>
-        <li>Très rapide en scan multi-lignes</li>
-        <li>Courbe d’apprentissage plus élevée</li>
+        <li>Densité élevée pour scan ultra-rapide.</li>
+        <li>Optimisée pour utilisateurs experts.</li>
+        <li>Risque d’onboarding plus difficile.</li>
       </ul>
     </article>
     <article class="card">
       <span class="badge b">Direction B (Recommandée)</span>
       <h2>Decision Assistant</h2>
       <ul>
-        <li>Équilibre lisibilité / performance</li>
-        <li>Score explicable + actions immédiates</li>
-        <li>Adaptée expert + utilisateur en progression</li>
+        <li>Équilibre lisibilité et vitesse d’action.</li>
+        <li>Score explicable, confiance visible, CTA immédiats.</li>
+        <li>Compatible mode normal + densité expert.</li>
       </ul>
     </article>
     <article class="card">
       <span class="badge c">Direction C</span>
       <h2>Calm Monitor</h2>
       <ul>
-        <li>Minimalisme fort et réduction du bruit</li>
-        <li>Excellente lecture mono-opportunité</li>
-        <li>Moins efficace en comparaison intensive</li>
+        <li>Minimalisme fort et faible charge cognitive.</li>
+        <li>Très bon pour supervision continue.</li>
+        <li>Moins efficace en comparaison massive.</li>
       </ul>
     </article>
   </div>
+  <p class="footer">Recommandation finale : Direction B pour le MVP, avec mode dégradé explicite et preset de stratégie.</p>
 </body>
 </html>
