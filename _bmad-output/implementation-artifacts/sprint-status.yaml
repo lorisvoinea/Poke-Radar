@@ -1,0 +1,65 @@
+# generated: 2026-02-19 13:06:35
+# project: bmad
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: {project-root}/_bmad-output/implementation-artifacts
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-02-19 13:06:35
+project: bmad
+project_key: NOKEY
+tracking_system: file-system
+story_location: {project-root}/_bmad-output/implementation-artifacts
+
+development_status:
+  epic-1: backlog
+  1-1-initialiser-lapplication-desktop-et-la-persistance-locale: backlog
+  1-2-configurer-produits-profils-de-surveillance-et-parametres-economiques: backlog
+  1-3-exploiter-des-referentiels-preenregistres-pour-limiter-les-erreurs: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-planifier-et-executer-les-cycles-de-collecte-multi-sources: backlog
+  2-2-surveiller-la-sante-des-connecteurs-et-gerer-la-degradation: backlog
+  2-3-journaliser-et-auto-recuperer-les-incidents-de-collecte: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-enrichir-les-signaux-avec-des-references-de-marche-secondaire: backlog
+  3-2-calculer-la-marge-brute-nette-avec-explication-des-hypotheses: backlog
+  3-3-classer-et-filtrer-les-opportunites-selon-strategie-utilisateur: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-envoyer-des-alertes-telegram-exploitables-et-non-bloquantes: backlog
+  4-2-reduire-le-bruit-grace-a-la-deduplication-et-a-lhistorisation-des-statuts: backlog
+  4-3-exploiter-un-dashboard-decisionnel-avec-fallback-manuel: backlog
+  epic-4-retrospective: optional
