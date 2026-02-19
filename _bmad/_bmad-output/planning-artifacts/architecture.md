@@ -3,7 +3,6 @@ stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputDocuments:
   - _bmad/_bmad-output/planning-artifacts/prd.md
   - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
-  - _bmad/_bmad-output/planning-artifacts/epics.md
   - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
 workflowType: 'architecture'
 project_name: 'Poke-Radar'
@@ -18,7 +17,7 @@ completedAt: '2026-02-19'
 
 ## 1) Contexte et cadre de décision
 
-Cette architecture est alignée sur les artefacts actifs du projet (PRD, UX spec, epics) et vise un MVP desktop orienté décision pour revendeurs Pokémon.
+Cette architecture est alignée sur les artefacts actifs du projet (PRD et UX spec) et vise un MVP desktop orienté décision pour revendeurs Pokémon.
 
 ### Objectifs techniques prioritaires
 - Boucle **détection → scoring → notification** en quasi temps réel.
