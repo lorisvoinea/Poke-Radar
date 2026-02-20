@@ -41,7 +41,7 @@ story_location: {project-root}/_bmad-output/implementation-artifacts
 
 development_status:
   epic-1: in-progress
-  1-1-initialiser-lapplication-desktop-et-la-persistance-locale: ready-for-dev
+  1-1-initialiser-lapplication-desktop-et-la-persistance-locale: in-progress
   1-2-configurer-produits-profils-de-surveillance-et-parametres-economiques: backlog
   1-3-exploiter-des-referentiels-preenregistres-pour-limiter-les-erreurs: backlog
   epic-1-retrospective: optional
