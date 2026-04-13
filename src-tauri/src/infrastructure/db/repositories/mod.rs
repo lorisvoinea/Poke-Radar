@@ -26,8 +26,9 @@ pub fn create_product(
 }
 
 pub fn list_products(connection: &Connection) -> Result<Vec<Product>, ConfigRepositoryError> {
-    let mut statement = connection
-        .prepare("SELECT id, sku, title, created_at_utc FROM products ORDER BY id ASC")?;
+    let mut statement = connection.prepare(
+        "SELECT id, sku, title, created_at AS created_at_utc FROM products ORDER BY id ASC",
+    )?;
 
     let rows = statement.query_map([], |row| {
         Ok(Product {
@@ -46,8 +47,9 @@ fn get_product(
     connection: &Connection,
     product_id: i64,
 ) -> Result<Option<Product>, ConfigRepositoryError> {
-    let mut statement =
-        connection.prepare("SELECT id, sku, title, created_at_utc FROM products WHERE id = ?1")?;
+    let mut statement = connection.prepare(
+        "SELECT id, sku, title, created_at AS created_at_utc FROM products WHERE id = ?1",
+    )?;
 
     let mut rows = statement.query(params![product_id])?;
     if let Some(row) = rows.next()? {
