@@ -35,9 +35,9 @@ so that je peux démarrer ma configuration sans dépendance externe.
 
 ### Review Findings
 
-- [ ] [Review][Patch] `app_ready` n'est pas enregistrée dans le runtime Tauri, donc le pont UI ↔ backend ne peut pas être validé en exécution réelle. [src-tauri/src/app/commands.rs:5]
-- [ ] [Review][Patch] Le chemin SQLite utilise `current_dir()` au lieu d'un répertoire applicatif (`app_data_dir`), ce qui peut casser l'installation desktop selon les permissions de lancement. [src-tauri/src/app/commands.rs:16]
-- [ ] [Review][Patch] `BootPage` déclare l'application prête même quand les APIs Tauri sont absentes, masquant un échec d'intégration et invalidant le smoke test nominal. [ui/src/pages/BootPage.tsx:11]
+- [x] [Review][Patch] `app_ready` est maintenant enregistrée via une configuration runtime Tauri dédiée (`tauri_app::configure_builder`), ce qui rend le pont UI ↔ backend validable en exécution réelle. [src-tauri/src/tauri_app.rs:5]
+- [x] [Review][Patch] Le chemin SQLite utilise désormais `app_data_dir` (avec création du dossier) au lieu de `current_dir()`, pour sécuriser l'installation desktop selon les permissions de lancement. [src-tauri/src/app/commands.rs:25]
+- [x] [Review][Patch] `BootPage` échoue explicitement quand les APIs Tauri sont absentes, évitant tout faux-positif d'intégration et sécurisant le smoke test nominal. [ui/src/pages/BootPage.tsx:24]
 
 ## Dev Notes
 
@@ -140,3 +140,5 @@ GPT-5.2-Codex
 ### Change Log
 
 - 2026-02-19: Démarrage implémentation Story 1.1 (squelette app + persistance SQLite + tests ajoutés, exécution tests bloquée par accès registre dépendances).
+
+- 2026-04-13: Prise en compte des retours de review (runtime Tauri, chemin app_data_dir, gestion explicite absence Tauri côté UI) + ajout README de démarrage rapide.
