@@ -7,8 +7,42 @@
   </head>
   <body>
     <main>
-      <h1>Poke Radar</h1>
-      <p>Runtime Tauri initialisé. Le frontend de production pourra remplacer cette page.</p>
+      <h1>Boot Poke Radar</h1>
+      <p id="boot-status">Initialisation en cours...</p>
     </main>
+
+    <script>
+      const statusNode = document.getElementById("boot-status");
+
+      function setStatus(message) {
+        if (statusNode) {
+          statusNode.textContent = message;
+        }
+      }
+
+      async function runBootSequence() {
+        const tauri = window.__TAURI_INTERNALS__;
+
+        if (!tauri || typeof tauri.invoke !== "function") {
+          throw new Error(
+            "Runtime Tauri indisponible. Lancez l'application via Tauri (et non dans un navigateur seul)."
+          );
+        }
+
+        await tauri.invoke("app_ready");
+      }
+
+      void runBootSequence()
+        .then(() => {
+          setStatus("Application prête");
+        })
+        .catch((error) => {
+          setStatus(
+            error instanceof Error
+              ? error.message
+              : "Impossible de terminer l'initialisation. Vérifiez les logs puis redémarrez l'application."
+          );
+        });
+    </script>
   </body>
 </html>
