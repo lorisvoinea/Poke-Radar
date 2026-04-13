@@ -47,13 +47,17 @@ cargo tauri dev
 
 > Le dépôt contient désormais `src-tauri/tauri.conf.json`, donc la commande est reconnue comme projet Tauri.
 
-### Option B — utiliser la CLI npm (sans install globale cargo)
+### Option B — utiliser npm depuis `ui/` (recommandé pour ce repo)
 
 ```bash
 cd ui
-npm install -D @tauri-apps/cli
-npx tauri dev
+npm install
+npm run tauri:dev
 ```
+
+> Pourquoi pas `npx tauri dev` directement depuis `ui/` ?
+> La config Tauri est dans `src-tauri/` (dossier frère de `ui/`), donc la détection automatique de Tauri échoue depuis `ui/`.
+> Le script `npm run tauri:dev` remonte à la racine puis lance correctement Tauri.
 
 ## Notes utiles
 
