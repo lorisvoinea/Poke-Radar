@@ -1,3 +1,4 @@
+/// `pub mod` rend le module public pour qu'il soit utilisable hors de ce fichier.
 /// Couche application (orchestration de boot et commandes exposées à l'UI).
 pub mod app;
 
