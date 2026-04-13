@@ -1,6 +1,6 @@
 # Story 1.1: Initialiser l’application desktop et la persistance locale
 
-Status: in-progress
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
