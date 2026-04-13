@@ -8,6 +8,14 @@ describe("BootPage", () => {
   });
 
   it("affiche un état prêt après le boot nominal", async () => {
+    (window as Window & {
+      __TAURI_INTERNALS__?: {
+        invoke: () => Promise<string>;
+      };
+    }).__TAURI_INTERNALS__ = {
+      invoke: () => Promise.resolve("application prête")
+    };
+
     render(<BootPage />);
 
     expect(await screen.findByText("Application prête")).toBeInTheDocument();
@@ -26,5 +34,16 @@ describe("BootPage", () => {
 
     expect(await screen.findByText("Erreur d'initialisation")).toBeInTheDocument();
     expect(await screen.findByText("DB open failure")).toBeInTheDocument();
+  });
+
+  it("bloque l'application quand Tauri est absent", async () => {
+    render(<BootPage />);
+
+    expect(await screen.findByText("Erreur d'initialisation")).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        "Runtime Tauri indisponible. Lancez l'application via Tauri (et non dans un navigateur seul)."
+      )
+    ).toBeInTheDocument();
   });
 });
