@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "identifier": "com.pokeradar.app",
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "",
+    "beforeDevCommand": "npm --prefix ../ui run build",
+    "beforeBuildCommand": "npm --prefix ../ui run build",
     "frontendDist": "../ui-dist"
   },
   "app": {
