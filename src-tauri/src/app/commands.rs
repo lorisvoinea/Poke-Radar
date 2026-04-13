@@ -7,7 +7,7 @@ use crate::app::bootstrap::{run_boot_sequence, BootState};
 /// Cette commande réalise un boot minimal et renvoie un message succès
 /// seulement quand la base locale est correctement initialisée.
 #[tauri::command]
-pub fn app_ready(app_handle: tauri::AppHandle) -> Result<&'static str, String> {
+pub fn app_ready(app_handle: tauri::AppHandle<tauri::Wry>) -> Result<&'static str, String> {
     // On résout d'abord un chemin de base de données sûr pour un contexte desktop.
     let database_path = default_database_path(&app_handle)?;
 
@@ -22,7 +22,7 @@ pub fn app_ready(app_handle: tauri::AppHandle) -> Result<&'static str, String> {
 ///
 /// On évite volontairement `current_dir()` car il dépend du contexte de lancement
 /// (double-clic, service, terminal, etc.) et peut ne pas être accessible en écriture.
-fn default_database_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String> {
+fn default_database_path(app_handle: &tauri::AppHandle<tauri::Wry>) -> Result<PathBuf, String> {
     // `app_data_dir` est le dossier persistant recommandé pour une app desktop.
     let app_data_dir = app_handle
         .path()
