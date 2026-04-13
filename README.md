@@ -45,6 +45,8 @@ cd src-tauri
 cargo tauri dev
 ```
 
+> Le dépôt contient désormais `src-tauri/tauri.conf.json`, donc la commande est reconnue comme projet Tauri.
+
 ### Option B — utiliser la CLI npm (sans install globale cargo)
 
 ```bash
@@ -58,3 +60,4 @@ npx tauri dev
 - Au boot, la commande `app_ready` initialise la DB SQLite locale et applique les migrations.
 - Le fichier SQLite est stocké dans le dossier applicatif `app_data_dir` de Tauri (pas dans le `current_dir`).
 - Si le runtime Tauri est absent (exécution frontend seule), l'écran de boot affiche une erreur explicite.
+- En mode dev immédiat, Tauri charge `ui-dist/index.html` (page statique minimale) pour garantir un démarrage local même sans pipeline frontend complet.

@@ -1,0 +1,25 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Poke Radar",
+  "version": "0.1.0",
+  "identifier": "com.pokeradar.app",
+  "build": {
+    "beforeDevCommand": "",
+    "beforeBuildCommand": "",
+    "frontendDist": "../ui-dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Poke Radar",
+        "width": 1024,
+        "height": 720,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": false
+  }
+}
