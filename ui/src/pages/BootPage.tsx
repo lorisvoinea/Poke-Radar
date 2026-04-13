@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 
 // États d'interface possibles pendant la phase de boot.
+// `type A = "x" | "y"` définit une union de littéraux (valeurs autorisées strictes).
 export type BootStatus = "loading" | "ready" | "error";
 
 // Type minimal de l'API Tauri exposée au runtime frontend.
+// `Record<string, unknown>` = objet dont les clés sont des chaînes.
 type TauriInternals = {
   invoke: <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
 };
@@ -14,6 +16,7 @@ const TAURI_UNAVAILABLE_MESSAGE =
 
 // Exécute la commande de healthcheck backend et échoue explicitement si Tauri est absent.
 async function runBootSequence(): Promise<void> {
+  // `async` permet d'utiliser `await`; `Promise<void>` signifie "promesse sans valeur de retour".
   // On lit les internals injectés par Tauri dans la fenêtre globale.
   const tauri = (window as Window & {
     __TAURI_INTERNALS__?: TauriInternals;
@@ -31,12 +34,14 @@ async function runBootSequence(): Promise<void> {
 // Page de boot: orchestre le chargement initial et affiche un état explicite.
 export function BootPage(): JSX.Element {
   // État visuel principal du boot.
+  // `useState<T>(valeur)` crée un état React de type `T` + un setter.
   const [status, setStatus] = useState<BootStatus>("loading");
   // Message utilisateur associé à l'état courant.
   const [message, setMessage] = useState("Initialisation en cours...");
 
   // Déclenchement du boot au montage du composant.
   useEffect(() => {
+    // `void` ignore volontairement la promesse pour satisfaire les règles lint.
     void runBootSequence()
       .then(() => {
         // Succès nominal: backend prêt et persistance initialisée.
@@ -52,6 +57,7 @@ export function BootPage(): JSX.Element {
             : "Impossible de terminer l'initialisation. Vérifiez les logs puis redémarrez l'application."
         );
       });
+    // Tableau de dépendances vide `[]` => effet exécuté une seule fois au montage.
   }, []);
 
   // Rendu dédié pour les erreurs critiques de boot.
