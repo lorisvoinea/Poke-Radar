@@ -38,7 +38,7 @@ so that je peux démarrer ma configuration sans dépendance externe.
 - [x] [Review][Patch] `app_ready` est maintenant enregistrée via une configuration runtime Tauri dédiée (`tauri_app::configure_builder`), ce qui rend le pont UI ↔ backend validable en exécution réelle. [src-tauri/src/tauri_app.rs:5]
 - [x] [Review][Patch] Le chemin SQLite utilise désormais `app_data_dir` (avec création du dossier) au lieu de `current_dir()`, pour sécuriser l'installation desktop selon les permissions de lancement. [src-tauri/src/app/commands.rs:25]
 - [x] [Review][Patch] `BootPage` échoue explicitement quand les APIs Tauri sont absentes, évitant tout faux-positif d'intégration et sécurisant le smoke test nominal. [ui/src/pages/BootPage.tsx:24]
-- [ ] [Review][Patch] Le runtime desktop charge `ui-dist/index.html` statique (`frontendDist: "../ui-dist"`) qui n'exécute pas `BootPage` ni `app_ready`; la séquence de boot DB n'est donc pas déclenchée au lancement Tauri réel, en écart avec AC1/AC2. [src-tauri/tauri.conf.json:8]
+- [x] [Review][Patch] Le runtime desktop charge `ui-dist/index.html` statique (`frontendDist: "../ui-dist"`) qui n'exécute pas `BootPage` ni `app_ready`; la séquence de boot DB n'est donc pas déclenchée au lancement Tauri réel, en écart avec AC1/AC2. [src-tauri/tauri.conf.json:8]
 
 ## Dev Notes
 
@@ -116,6 +116,7 @@ GPT-5.2-Codex
 - Runner de migrations SQLite ajouté avec migration `001_initial_schema.sql` et séquence de boot bloquante/actionnable en cas d'échec critique.
 - Tests ajoutés: unitaires Rust (succès/SQL invalide/base verrouillée), intégration premier lancement, smoke test UI.
 - Exécution des tests bloquée par la politique réseau du conteneur (403 sur crates.io et npmjs), validation complète en attente d'accès dépendances.
+- Correctif review appliqué sur le runtime desktop statique: `ui-dist/index.html` déclenche désormais `app_ready` au chargement et affiche un état prêt/erreur actionnable, ce qui réactive la séquence de boot DB au lancement Tauri réel.
 
 ### File List
 
@@ -137,9 +138,11 @@ GPT-5.2-Codex
 - ui/src/pages/BootPage.tsx
 - ui/src/__tests__/boot-page.test.tsx
 - ui/src/test-setup.ts
+- ui-dist/index.html
 
 ### Change Log
 
 - 2026-02-19: Démarrage implémentation Story 1.1 (squelette app + persistance SQLite + tests ajoutés, exécution tests bloquée par accès registre dépendances).
 
 - 2026-04-13: Prise en compte des retours de review (runtime Tauri, chemin app_data_dir, gestion explicite absence Tauri côté UI) + ajout README de démarrage rapide.
+- 2026-04-13: Correctif review complémentaire — `ui-dist/index.html` exécute `app_ready` au boot pour aligner le lancement desktop réel avec AC1/AC2.
