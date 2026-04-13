@@ -35,19 +35,7 @@ cargo test
 
 ## 4) Démarrer l'application en local (mode dev)
 
-Le message `error: no such command: tauri` signifie que la CLI Tauri n'est pas installée.
-
-### Option A — installer la sous-commande cargo (globale)
-
-```bash
-cargo install tauri-cli --locked
-cd src-tauri
-cargo tauri dev
-```
-
-> Le dépôt contient désormais `src-tauri/tauri.conf.json`, donc la commande est reconnue comme projet Tauri.
-
-### Option B — utiliser npm depuis `ui/` (recommandé pour ce repo)
+✅ **Commande recommandée (et unique) pour ce repo**
 
 ```bash
 cd ui
@@ -55,14 +43,14 @@ npm install
 npm run tauri:dev
 ```
 
-> Pourquoi pas `npx tauri dev` directement depuis `ui/` ?
-> La config Tauri est dans `src-tauri/` (dossier frère de `ui/`), donc la détection automatique peut échouer depuis `ui/`.
-> Le script `npm run tauri:dev:npx` reste dans `ui/` (résout bien `@tauri-apps/cli` local) et passe explicitement `--config ../src-tauri/tauri.conf.json`.
+Ce script lance `cargo tauri dev` depuis la racine et déclenche le build frontend (`npm --prefix ./ui run build`) via `src-tauri/tauri.conf.json`.
+
+⚠️ Évite de lancer `cargo tauri dev` directement depuis `src-tauri/` sur cette base tant que le flux n'a pas été unifié côté tooling.
 
 ## Notes utiles
 
 - Au boot, la commande `app_ready` initialise la DB SQLite locale et applique les migrations.
 - Le fichier SQLite est stocké dans le dossier applicatif `app_data_dir` de Tauri (pas dans le `current_dir`).
 - Si le runtime Tauri est absent (exécution frontend seule), l'écran de boot affiche une erreur explicite.
-- En mode dev immédiat, Tauri charge `ui-dist/index.html` (page statique minimale) pour garantir un démarrage local même sans pipeline frontend complet.
+- En mode dev, Tauri charge `ui-dist/index.html` généré par Vite depuis `ui/src` (bundle React réel).
 - Sous Windows, `tauri-build` requiert `src-tauri/icons/icon.ico` pour générer la ressource applicative.
