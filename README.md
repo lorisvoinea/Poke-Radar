@@ -61,3 +61,4 @@ npx tauri dev
 - Le fichier SQLite est stocké dans le dossier applicatif `app_data_dir` de Tauri (pas dans le `current_dir`).
 - Si le runtime Tauri est absent (exécution frontend seule), l'écran de boot affiche une erreur explicite.
 - En mode dev immédiat, Tauri charge `ui-dist/index.html` (page statique minimale) pour garantir un démarrage local même sans pipeline frontend complet.
+- Sous Windows, `tauri-build` requiert `src-tauri/icons/icon.ico` pour générer la ressource applicative.
