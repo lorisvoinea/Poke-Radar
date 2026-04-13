@@ -121,6 +121,7 @@ GPT-5.2-Codex
 - Correctif AC1 post-revue: pipeline Vite ajouté (`ui/index.html`, `ui/vite.config.ts`) et build React branché sur le runtime Tauri pour servir `ui-dist` généré depuis `ui/src` au lieu d'une page statique ad hoc.
 - Correctif exécution Tauri: `beforeDevCommand`/`beforeBuildCommand` gèrent désormais les deux contextes de lancement (`repo/` et `src-tauri/`) via fallback de préfixe npm, évitant l'erreur ENOENT sur `../ui`.
 - Correctif compatibilité Windows: retrait de la commande `node -e` dans `tauri.conf.json` (problème de quoting), retour à un hook simple `npm --prefix ./ui run build` documenté dans le README avec un unique flux de lancement recommandé.
+- Stabilisation finale du lancement dev: suppression des hooks de build Tauri (`beforeDevCommand`/`beforeBuildCommand`) et déplacement du build UI dans `ui/package.json` (`tauri:dev`) pour éviter les erreurs de CWD (`ui/ui/package.json`).
 
 ### File List
 
@@ -156,3 +157,4 @@ GPT-5.2-Codex
 - 2026-04-13: Patch de conformité AC1 suite revue commit (`review-story-1.1-commits-ccc1b4a-71d1358.md`) — frontend desktop aligné sur le build React réel (Vite -> `ui-dist`) au lieu d'un HTML statique manuel.
 - 2026-04-13: Ajustement cross-cwd des hooks Tauri (`beforeDevCommand`/`beforeBuildCommand`) pour supporter `cargo tauri dev` lancé depuis la racine projet **ou** depuis `src-tauri/`.
 - 2026-04-13: Correction régression Windows (`SyntaxError` sur `node -e`) + simplification des instructions README vers un seul flux de lancement (`cd ui && npm run tauri:dev`).
+- 2026-04-13: Correction path CWD (`ui/ui/package.json`) — build frontend retiré des hooks Tauri et exécuté explicitement dans `npm run tauri:dev`.

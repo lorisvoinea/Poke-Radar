@@ -43,9 +43,9 @@ npm install
 npm run tauri:dev
 ```
 
-Ce script lance `cargo tauri dev` depuis la racine et déclenche le build frontend (`npm --prefix ./ui run build`) via `src-tauri/tauri.conf.json`.
+Ce script build d'abord le frontend (`npm run build`), puis lance `cargo tauri dev` depuis la racine.
 
-⚠️ Évite de lancer `cargo tauri dev` directement depuis `src-tauri/` sur cette base tant que le flux n'a pas été unifié côté tooling.
+⚠️ Évite de lancer `cargo tauri dev` directement depuis `src-tauri/` : le flux recommandé et maintenu est `cd ui && npm run tauri:dev`.
 
 ## Notes utiles
 
