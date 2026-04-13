@@ -25,6 +25,10 @@ const FALLBACK_PRODUCTS: Product[] = [
   { id: 1, sku: "PS5-DISC", title: "Console PS5" },
   { id: 2, sku: "NSW-OLED", title: "Nintendo Switch OLED" }
 ];
+const STARTER_PRODUCTS: Omit<Product, "id">[] = [
+  { sku: "PS5-DISC", title: "Console PS5" },
+  { sku: "NSW-OLED", title: "Nintendo Switch OLED" }
+];
 
 export function StrategyPage(): JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
@@ -79,11 +83,36 @@ export function StrategyPage(): JSX.Element {
     await refreshData();
   }
 
+  async function createStarterProducts() {
+    if (!tauri) {
+      setProducts(FALLBACK_PRODUCTS);
+      setStatus("Produits de démonstration initialisés.");
+      return;
+    }
+
+    await Promise.all(
+      STARTER_PRODUCTS.map(async (product) => {
+        try {
+          await tauri.invoke("create_product_command", { input: product });
+        } catch {
+          // Produit déjà présent: on ignore pour garder l'action idempotente.
+        }
+      })
+    );
+
+    await refreshData();
+    setStatus("Produits de démarrage prêts. Vous pouvez maintenant créer un profil.");
+  }
+
   return (
     <main>
       <h1>Poke Radar - Stratégie</h1>
       <p>{status}</p>
-      <StrategyForm products={products} onSubmit={createProfile} />
+      <StrategyForm
+        products={products}
+        onSubmit={createProfile}
+        onCreateStarterProducts={createStarterProducts}
+      />
 
       <section>
         <h2>Profils sauvegardés</h2>

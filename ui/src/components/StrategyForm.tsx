@@ -18,19 +18,21 @@ type ProfileInput = {
 type Props = {
   products: Product[];
   onSubmit: (input: ProfileInput) => Promise<void>;
+  onCreateStarterProducts?: () => Promise<void>;
 };
 
-export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
+export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Props): JSX.Element {
   const [name, setName] = useState("");
   const [minMarginBps, setMinMarginBps] = useState(1500);
   const [fixedCostCents, setFixedCostCents] = useState(0);
   const [variableFeeBps, setVariableFeeBps] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [message, setMessage] = useState<string>("");
+  const [isCreatingProducts, setIsCreatingProducts] = useState(false);
 
   const canSubmit = useMemo(
-    () => name.trim().length > 0 && selectedProducts.length > 0,
-    [name, selectedProducts]
+    () => name.trim().length > 0 && (products.length === 0 || selectedProducts.length > 0),
+    [name, products.length, selectedProducts]
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -51,7 +53,26 @@ export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
     });
 
     setName("");
+    setSelectedProducts([]);
     setMessage("Profil enregistré avec succès.");
+  }
+
+  async function handleCreateStarterProducts() {
+    if (!onCreateStarterProducts) {
+      return;
+    }
+
+    setIsCreatingProducts(true);
+    setMessage("");
+
+    try {
+      await onCreateStarterProducts();
+      setMessage("Produits de démarrage créés. Sélectionnez-les puis enregistrez votre profil.");
+    } catch {
+      setMessage("Impossible de créer les produits de démarrage pour le moment.");
+    } finally {
+      setIsCreatingProducts(false);
+    }
   }
 
   return (
@@ -98,6 +119,9 @@ export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
 
       <fieldset>
         <legend>Produits surveillés</legend>
+        {products.length === 0 ? (
+          <p>Aucun produit disponible pour le moment.</p>
+        ) : null}
         {products.map((product) => (
           <label key={product.id}>
             <input
@@ -115,6 +139,12 @@ export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
           </label>
         ))}
       </fieldset>
+
+      {products.length === 0 && onCreateStarterProducts ? (
+        <button type="button" onClick={() => void handleCreateStarterProducts()} disabled={isCreatingProducts}>
+          {isCreatingProducts ? "Création en cours..." : "Créer des produits de démarrage"}
+        </button>
+      ) : null}
 
       <button type="submit">Enregistrer le profil</button>
       {message ? <p>{message}</p> : null}
