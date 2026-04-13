@@ -6,7 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "tauri:dev": "cd .. && cargo tauri dev",
-    "tauri:dev:npx": "cd .. && npx tauri dev"
+    "tauri:dev:npx": "npx --no-install tauri dev --config ../src-tauri/tauri.conf.json"
   },
   "dependencies": {
     "react": "^18.3.1",

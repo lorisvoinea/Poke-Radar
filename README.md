@@ -56,8 +56,8 @@ npm run tauri:dev
 ```
 
 > Pourquoi pas `npx tauri dev` directement depuis `ui/` ?
-> La config Tauri est dans `src-tauri/` (dossier frère de `ui/`), donc la détection automatique de Tauri échoue depuis `ui/`.
-> Le script `npm run tauri:dev` remonte à la racine puis lance correctement Tauri.
+> La config Tauri est dans `src-tauri/` (dossier frère de `ui/`), donc la détection automatique peut échouer depuis `ui/`.
+> Le script `npm run tauri:dev:npx` reste dans `ui/` (résout bien `@tauri-apps/cli` local) et passe explicitement `--config ../src-tauri/tauri.conf.json`.
 
 ## Notes utiles
 
