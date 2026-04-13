@@ -4,8 +4,8 @@ use log::info;
 use rusqlite::{Connection, Error as SqlError};
 use thiserror::Error;
 
-/// `enum DbError` centralise les erreurs de la couche base de données.
-/// Avec `thiserror::Error`, chaque variante reçoit un message formaté via `#[error(...)]`.
+pub mod repositories;
+
 #[derive(Debug, Error)]
 pub enum DbError {
     #[error("database open error: {0}")]
@@ -18,9 +18,6 @@ pub enum DbError {
     },
 }
 
-/// Structure interne (`struct`) qui décrit une migration SQL versionnée.
-/// `&'static str` signifie "référence de chaîne valide pour toute la durée du programme"
-/// (adapté aux scripts inclus à la compilation).
 #[derive(Debug)]
 struct Migration {
     version: i64,
@@ -28,32 +25,42 @@ struct Migration {
     script: &'static str,
 }
 
-const MIGRATIONS: &[Migration] = &[Migration {
-    version: 1,
-    name: "001_initial_schema",
-    script: include_str!("migrations/001_initial_schema.sql"),
-}];
+const MIGRATIONS: &[Migration] = &[
+    Migration {
+        version: 1,
+        name: "001_initial_schema",
+        script: include_str!("migrations/001_initial_schema.sql"),
+    },
+    Migration {
+        version: 2,
+        name: "002_monitor_profiles",
+        script: include_str!("migrations/002_monitor_profiles.sql"),
+    },
+];
 
-/// Point d'entrée d'initialisation: ouverture de la DB puis application des migrations.
 pub fn initialize_database(path: &Path) -> Result<(), DbError> {
     info!("Ouverture DB locale: {}", path.display());
     let mut connection = open_connection(path)?;
+    connection
+        .execute_batch("PRAGMA foreign_keys = ON;")
+        .map_err(|source| DbError::Migration {
+            migration: "foreign_keys_on".to_string(),
+            source,
+        })?;
 
     info!("Exécution des migrations versionnées");
     apply_migrations(&mut connection, MIGRATIONS)
 }
 
-/// Ouvre une connexion SQLite. `map_err(DbError::Open)` convertit l'erreur SQL
-/// en variante applicative `DbError::Open`.
 pub fn open_connection(path: &Path) -> Result<Connection, DbError> {
-    Connection::open(path).map_err(DbError::Open)
+    let connection = Connection::open(path).map_err(DbError::Open)?;
+    connection
+        .execute_batch("PRAGMA foreign_keys = ON;")
+        .map_err(|source| DbError::Open(source))?;
+    Ok(connection)
 }
 
-/// Applique les migrations dans une transaction:
-/// - tout réussit => `commit`,
-/// - une erreur survient => rollback implicite (sécurité d'intégrité).
 fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Result<(), DbError> {
-    // Table de suivi des migrations déjà exécutées.
     connection
         .execute(
             "CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -68,7 +75,6 @@ fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Re
             source,
         })?;
 
-    // `transaction()` démarre un contexte atomique: toutes les étapes passent ou aucune.
     let transaction = connection
         .transaction()
         .map_err(|source| DbError::Migration {
@@ -76,9 +82,7 @@ fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Re
             source,
         })?;
 
-    // `for migration in migrations` itère sur chaque migration à appliquer.
     for migration in migrations {
-        // `query_row` lit une seule ligne; `SELECT EXISTS(...)` renvoie 0 ou 1.
         let already_applied = transaction
             .query_row(
                 "SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE version = ?1)",
@@ -91,12 +95,10 @@ fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Re
                 source,
             })?;
 
-        // `continue` saute au tour de boucle suivant si la migration est déjà faite.
         if already_applied {
             continue;
         }
 
-        // `execute_batch` exécute le script SQL brut contenu dans la migration.
         transaction
             .execute_batch(migration.script)
             .map_err(|source| DbError::Migration {
@@ -104,7 +106,6 @@ fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Re
                 source,
             })?;
 
-        // On historise la migration exécutée pour garantir l'idempotence au prochain lancement.
         transaction
             .execute(
                 "INSERT INTO schema_migrations(version, name) VALUES (?1, ?2)",
@@ -116,7 +117,6 @@ fn apply_migrations(connection: &mut Connection, migrations: &[Migration]) -> Re
             })?;
     }
 
-    // `commit` valide définitivement la transaction en base.
     transaction.commit().map_err(|source| DbError::Migration {
         migration: "commit".to_string(),
         source,
@@ -188,8 +188,8 @@ mod tests {
         let result = apply_migrations(
             &mut blocked_connection,
             &[Migration {
-                version: 2,
-                name: "002_locked_test",
+                version: 3,
+                name: "003_locked_test",
                 script: "CREATE TABLE IF NOT EXISTS locked_test(id INTEGER PRIMARY KEY);",
             }],
         );
