@@ -119,6 +119,7 @@ GPT-5.2-Codex
 - Exécution des tests bloquée par la politique réseau du conteneur (403 sur crates.io et npmjs), validation complète en attente d'accès dépendances.
 - Correctif review appliqué sur le runtime desktop statique: `ui-dist/index.html` déclenche désormais `app_ready` au chargement et affiche un état prêt/erreur actionnable, ce qui réactive la séquence de boot DB au lancement Tauri réel.
 - Correctif AC1 post-revue: pipeline Vite ajouté (`ui/index.html`, `ui/vite.config.ts`) et build React branché sur le runtime Tauri pour servir `ui-dist` généré depuis `ui/src` au lieu d'une page statique ad hoc.
+- Correctif exécution Tauri: `beforeDevCommand`/`beforeBuildCommand` gèrent désormais les deux contextes de lancement (`repo/` et `src-tauri/`) via fallback de préfixe npm, évitant l'erreur ENOENT sur `../ui`.
 
 ### File List
 
@@ -152,3 +153,4 @@ GPT-5.2-Codex
 - 2026-04-13: Prise en compte des retours de review (runtime Tauri, chemin app_data_dir, gestion explicite absence Tauri côté UI) + ajout README de démarrage rapide.
 - 2026-04-13: Correctif review complémentaire — `ui-dist/index.html` exécute `app_ready` au boot pour aligner le lancement desktop réel avec AC1/AC2.
 - 2026-04-13: Patch de conformité AC1 suite revue commit (`review-story-1.1-commits-ccc1b4a-71d1358.md`) — frontend desktop aligné sur le build React réel (Vite -> `ui-dist`) au lieu d'un HTML statique manuel.
+- 2026-04-13: Ajustement cross-cwd des hooks Tauri (`beforeDevCommand`/`beforeBuildCommand`) pour supporter `cargo tauri dev` lancé depuis la racine projet **ou** depuis `src-tauri/`.
