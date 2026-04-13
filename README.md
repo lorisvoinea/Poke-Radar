@@ -35,11 +35,22 @@ cargo test
 
 ## 4) Démarrer l'application en local (mode dev)
 
-> Selon votre setup Tauri CLI:
+Le message `error: no such command: tauri` signifie que la CLI Tauri n'est pas installée.
+
+### Option A — installer la sous-commande cargo (globale)
 
 ```bash
+cargo install tauri-cli --locked
 cd src-tauri
 cargo tauri dev
+```
+
+### Option B — utiliser la CLI npm (sans install globale cargo)
+
+```bash
+cd ui
+npm install -D @tauri-apps/cli
+npx tauri dev
 ```
 
 ## Notes utiles
