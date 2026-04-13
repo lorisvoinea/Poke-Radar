@@ -33,6 +33,12 @@ so that je peux démarrer ma configuration sans dépendance externe.
   - [ ] Test d’intégration du premier lancement (DB absente → créée + migration appliquée).
   - [ ] Test UI (smoke) confirmant qu’un état “prêt” est visible après boot nominal.
 
+### Review Findings
+
+- [ ] [Review][Patch] `app_ready` n'est pas enregistrée dans le runtime Tauri, donc le pont UI ↔ backend ne peut pas être validé en exécution réelle. [src-tauri/src/app/commands.rs:5]
+- [ ] [Review][Patch] Le chemin SQLite utilise `current_dir()` au lieu d'un répertoire applicatif (`app_data_dir`), ce qui peut casser l'installation desktop selon les permissions de lancement. [src-tauri/src/app/commands.rs:16]
+- [ ] [Review][Patch] `BootPage` déclare l'application prête même quand les APIs Tauri sont absentes, masquant un échec d'intégration et invalidant le smoke test nominal. [ui/src/pages/BootPage.tsx:11]
+
 ## Dev Notes
 
 - Cette story doit poser les fondations techniques utilisées par les stories suivantes de l’Epic 1 (configuration profil, seuils, référentiels).
