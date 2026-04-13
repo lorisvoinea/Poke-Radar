@@ -32,16 +32,40 @@
         await tauri.invoke("app_ready");
       }
 
+      function extractBootErrorMessage(error) {
+        if (error instanceof Error) {
+          return error.message;
+        }
+
+        if (typeof error === "string" && error.trim().length > 0) {
+          return error;
+        }
+
+        if (error && typeof error === "object") {
+          const withMessage = /** @type {{ message?: unknown }} */ (error).message;
+          if (typeof withMessage === "string" && withMessage.trim().length > 0) {
+            return withMessage;
+          }
+
+          try {
+            const serialized = JSON.stringify(error);
+            if (serialized && serialized !== "{}") {
+              return serialized;
+            }
+          } catch {
+            // No-op: fallback message below.
+          }
+        }
+
+        return "Impossible de terminer l'initialisation. Vérifiez les logs puis redémarrez l'application.";
+      }
+
       void runBootSequence()
         .then(() => {
           setStatus("Application prête");
         })
         .catch((error) => {
-          setStatus(
-            error instanceof Error
-              ? error.message
-              : "Impossible de terminer l'initialisation. Vérifiez les logs puis redémarrez l'application."
-          );
+          setStatus(extractBootErrorMessage(error));
         });
     </script>
   </body>
