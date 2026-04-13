@@ -38,6 +38,7 @@ so that je peux démarrer ma configuration sans dépendance externe.
 - [x] [Review][Patch] `app_ready` est maintenant enregistrée via une configuration runtime Tauri dédiée (`tauri_app::configure_builder`), ce qui rend le pont UI ↔ backend validable en exécution réelle. [src-tauri/src/tauri_app.rs:5]
 - [x] [Review][Patch] Le chemin SQLite utilise désormais `app_data_dir` (avec création du dossier) au lieu de `current_dir()`, pour sécuriser l'installation desktop selon les permissions de lancement. [src-tauri/src/app/commands.rs:25]
 - [x] [Review][Patch] `BootPage` échoue explicitement quand les APIs Tauri sont absentes, évitant tout faux-positif d'intégration et sécurisant le smoke test nominal. [ui/src/pages/BootPage.tsx:24]
+- [ ] [Review][Patch] Le runtime desktop charge `ui-dist/index.html` statique (`frontendDist: "../ui-dist"`) qui n'exécute pas `BootPage` ni `app_ready`; la séquence de boot DB n'est donc pas déclenchée au lancement Tauri réel, en écart avec AC1/AC2. [src-tauri/tauri.conf.json:8]
 
 ## Dev Notes
 
