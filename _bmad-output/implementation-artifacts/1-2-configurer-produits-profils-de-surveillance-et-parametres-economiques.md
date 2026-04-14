@@ -1,6 +1,6 @@
 # Story 1.2: Configurer produits, profils de surveillance et paramètres économiques
 
-Status: review
+Status: in-progress
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -41,6 +41,11 @@ so that le système reflète ma stratégie réelle de revente.
   - [x] Ajouter tests unitaires Rust sur validation et repository config (cas nominal + valeurs invalides).
   - [x] Ajouter test d’intégration: création profil -> redémarrage simulé -> relecture identique.
   - [x] Ajouter test UI (smoke/interaction) couvrant création ou édition d’un profil et retour visuel de persistance.
+
+### Review Findings
+
+- [ ] [Review][Patch] Soumission autorisée sans produit alors que le backend l’interdit [ui/src/components/StrategyForm.tsx]
+- [ ] [Review][Patch] Erreurs de sauvegarde non gérées dans le formulaire (pas de feedback utilisateur explicite) [ui/src/components/StrategyForm.tsx]
 
 ## Dev Notes
 
