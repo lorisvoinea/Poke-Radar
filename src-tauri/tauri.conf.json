@@ -15,7 +15,8 @@
         "title": "Poke Radar",
         "width": 1024,
         "height": 720,
-        "resizable": true
+        "resizable": true,
+        "icon": "icons/icon.ico"
       }
     ]
   },
