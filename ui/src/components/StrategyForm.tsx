@@ -31,8 +31,8 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
   const [isCreatingProducts, setIsCreatingProducts] = useState(false);
 
   const canSubmit = useMemo(
-    () => name.trim().length > 0 && (products.length === 0 || selectedProducts.length > 0),
-    [name, products.length, selectedProducts]
+    () => name.trim().length > 0 && selectedProducts.length > 0,
+    [name, selectedProducts]
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -43,18 +43,22 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
       return;
     }
 
-    await onSubmit({
-      name,
-      minMarginBps,
-      fixedCostCents,
-      variableFeeBps,
-      productIds: selectedProducts,
-      makeActive: true
-    });
+    try {
+      await onSubmit({
+        name,
+        minMarginBps,
+        fixedCostCents,
+        variableFeeBps,
+        productIds: selectedProducts,
+        makeActive: true
+      });
 
-    setName("");
-    setSelectedProducts([]);
-    setMessage("Profil enregistré avec succès.");
+      setName("");
+      setSelectedProducts([]);
+      setMessage("Profil enregistré avec succès.");
+    } catch {
+      setMessage("Échec de la sauvegarde du profil. Vérifiez les champs puis réessayez.");
+    }
   }
 
   async function handleCreateStarterProducts() {
@@ -146,7 +150,9 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         </button>
       ) : null}
 
-      <button type="submit">Enregistrer le profil</button>
+      <button type="submit" disabled={!canSubmit}>
+        Enregistrer le profil
+      </button>
       {message ? <p>{message}</p> : null}
     </form>
   );
