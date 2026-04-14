@@ -44,8 +44,8 @@ so that le système reflète ma stratégie réelle de revente.
 
 ### Review Findings
 
-- [ ] [Review][Patch] Soumission autorisée sans produit alors que le backend l’interdit [ui/src/components/StrategyForm.tsx]
-- [ ] [Review][Patch] Erreurs de sauvegarde non gérées dans le formulaire (pas de feedback utilisateur explicite) [ui/src/components/StrategyForm.tsx]
+- [x] [Review][Patch] Soumission autorisée sans produit alors que le backend l’interdit [ui/src/components/StrategyForm.tsx]
+- [x] [Review][Patch] Erreurs de sauvegarde non gérées dans le formulaire (pas de feedback utilisateur explicite) [ui/src/components/StrategyForm.tsx]
 
 ## Dev Notes
 
@@ -184,3 +184,4 @@ GPT-5.3-Codex
 ### Change Log
 
 - 2026-04-13: Implémentation Story 1.2 complétée (migrations SQLite v2, commandes Tauri CRUD profils/produits, écran stratégie React, tests UI + tests repository/intégration).
+- 2026-04-14: Correctifs review appliqués sur `StrategyForm` (soumission bloquée sans produit, gestion explicite des erreurs `onSubmit`) + configuration Tauri explicite des icônes bundle sur `icons/icon.ico` pour éviter les chemins d’icônes implicites au build.
