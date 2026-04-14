@@ -5,9 +5,9 @@ stepsCompleted:
   - step-03-create-stories
   - step-04-final-validation
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/prd.md
-  - _bmad/_bmad-output/planning-artifacts/architecture.md
-  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/architecture.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
 ---
 
 # Poke-Radar - Epic Breakdown

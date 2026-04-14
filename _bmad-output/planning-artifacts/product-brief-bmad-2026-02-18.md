@@ -1,8 +1,8 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6]
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
-  - _bmad/_bmad-output/brainstorming/brainstorming-session-2025-02-05.md
+  - _bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad-output/brainstorming/brainstorming-session-2025-02-05.md
 date: 2026-02-18
 author: Loris
 ---

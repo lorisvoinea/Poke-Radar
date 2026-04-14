@@ -123,7 +123,7 @@ so that le système reflète ma stratégie réelle de revente.
 ### Project Context Reference
 
 - Config BMAD détectée: communication/documentation en français, niveau utilisateur intermédiaire.
-- Les artefacts de planning sont localisés sous `_bmad/_bmad-output/planning-artifacts` (et non sous `_bmad-output/planning-artifacts`); garder cette réalité en tête pour les workflows suivants.
+- Les artefacts de planning sont localisés sous `_bmad-output/planning-artifacts` (et non sous `_bmad/_bmad-output/planning-artifacts`); garder cette réalité en tête pour les workflows suivants.
 
 ### Story Completion Status
 
@@ -137,10 +137,10 @@ so that le système reflète ma stratégie réelle de revente.
 
 ## References
 
-- Epic / Story source: `_bmad/_bmad-output/planning-artifacts/epics.md` (Epic 1, Story 1.2).
-- Exigences produit: `_bmad/_bmad-output/planning-artifacts/prd.md` (FR-01, contexte MVP desktop).
-- Décisions d’architecture: `_bmad/_bmad-output/planning-artifacts/architecture.md` (ADR-001, ADR-003, modèle de données v1).
-- Contraintes UX stratégie/configuration: `_bmad/_bmad-output/planning-artifacts/ux-design-specification.md` (Écran 3 — Stratégie & paramètres).
+- Epic / Story source: `_bmad-output/planning-artifacts/epics.md` (Epic 1, Story 1.2).
+- Exigences produit: `_bmad-output/planning-artifacts/prd.md` (FR-01, contexte MVP desktop).
+- Décisions d’architecture: `_bmad-output/planning-artifacts/architecture.md` (ADR-001, ADR-003, modèle de données v1).
+- Contraintes UX stratégie/configuration: `_bmad-output/planning-artifacts/ux-design-specification.md` (Écran 3 — Stratégie & paramètres).
 - Learnings Story précédente: `_bmad-output/implementation-artifacts/1-1-initialiser-lapplication-desktop-et-la-persistance-locale.md`.
 
 ## Dev Agent Record
