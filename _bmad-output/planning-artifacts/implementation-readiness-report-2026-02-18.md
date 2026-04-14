@@ -7,14 +7,14 @@ stepsCompleted:
   - step-05-epic-quality-review
   - step-06-final-assessment
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/prd.md
-  - _bmad/_bmad-output/planning-artifacts/epics.md
-  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
-  - _bmad/_bmad-output/planning-artifacts/architecture.md
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/epics.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad-output/planning-artifacts/architecture.md
 assessor: Winston (Architect)
 assessmentDate: 2026-02-18
 project: Poke-Radar
-executionContext: "Re-exécution demandée après déplacement _bmad-output -> _bmad/_bmad-output et suppression des .md racine"
+executionContext: "Re-exécution demandée après déplacement _bmad-output -> _bmad-output et suppression des .md racine"
 ---
 
 # Implementation Readiness Assessment Report
@@ -26,15 +26,15 @@ executionContext: "Re-exécution demandée après déplacement _bmad-output -> _
 
 ### Documents inventoriés
 
-- **PRD (whole):** `_bmad/_bmad-output/planning-artifacts/prd.md`
-- **Architecture (whole):** `_bmad/_bmad-output/planning-artifacts/architecture.md`
-- **Epics & Stories (whole):** `_bmad/_bmad-output/planning-artifacts/epics.md`
-- **UX (whole):** `_bmad/_bmad-output/planning-artifacts/ux-design-specification.md`
+- **PRD (whole):** `_bmad-output/planning-artifacts/prd.md`
+- **Architecture (whole):** `_bmad-output/planning-artifacts/architecture.md`
+- **Epics & Stories (whole):** `_bmad-output/planning-artifacts/epics.md`
+- **UX (whole):** `_bmad-output/planning-artifacts/ux-design-specification.md`
 
 ### Issues détectées
 
 - ✅ Aucun doublon whole/sharded détecté.
-- ⚠️ Le fichier de config BMM (`_bmad/bmm/config.yaml`) référence encore `{project-root}/_bmad-output/planning-artifacts`, alors que les artefacts actifs sont désormais sous `_bmad/_bmad-output/planning-artifacts`.
+- ⚠️ Le fichier de config BMM (`_bmad/bmm/config.yaml`) référence encore `{project-root}/_bmad-output/planning-artifacts`, alors que les artefacts actifs sont désormais sous `_bmad-output/planning-artifacts`.
 - ⚠️ Le frontmatter de `prd.md` / `architecture.md` contient encore des références à des fichiers `.md` racine supprimés, ce qui peut créer une confusion de traçabilité historique.
 
 ## PRD Analysis
@@ -122,7 +122,7 @@ Aucun blocage critique fonctionnel identifié.
 
 ### Recommended Next Steps
 
-1. Mettre à jour `_bmad/bmm/config.yaml` pour pointer vers `_bmad/_bmad-output/planning-artifacts`.
+1. Mettre à jour `_bmad/bmm/config.yaml` pour pointer vers `_bmad-output/planning-artifacts`.
 2. Nettoyer les références obsolètes dans les frontmatters (`inputDocuments`) de `prd.md` et `architecture.md`.
 3. Ajouter 2–3 critères quantifiés supplémentaires dans les AC des stories les plus critiques (latence, résilience, anti-duplication).
 

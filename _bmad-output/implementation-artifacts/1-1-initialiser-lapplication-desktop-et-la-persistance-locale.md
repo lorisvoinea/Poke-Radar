@@ -96,10 +96,10 @@ so that je peux démarrer ma configuration sans dépendance externe.
 
 ### References
 
-- Story source Epic 1.1: `_bmad/_bmad-output/planning-artifacts/epics.md` (section “Story 1.1”).
-- Contraintes stack & séparation responsabilités: `_bmad/_bmad-output/planning-artifacts/architecture.md` (ADR-001).
-- Contraintes persistance locale & migrations: `_bmad/_bmad-output/planning-artifacts/architecture.md` (ADR-003).
-- Exigences produit de configuration locale desktop: `_bmad/_bmad-output/planning-artifacts/prd.md` (FR-01, contexte produit desktop).
+- Story source Epic 1.1: `_bmad-output/planning-artifacts/epics.md` (section “Story 1.1”).
+- Contraintes stack & séparation responsabilités: `_bmad-output/planning-artifacts/architecture.md` (ADR-001).
+- Contraintes persistance locale & migrations: `_bmad-output/planning-artifacts/architecture.md` (ADR-003).
+- Exigences produit de configuration locale desktop: `_bmad-output/planning-artifacts/prd.md` (FR-01, contexte produit desktop).
 
 ## Dev Agent Record
 

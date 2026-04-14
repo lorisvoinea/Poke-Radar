@@ -1,9 +1,9 @@
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/prd.md
-  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
-  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
 workflowType: 'architecture'
 project_name: 'Poke-Radar'
 user_name: 'Loris'

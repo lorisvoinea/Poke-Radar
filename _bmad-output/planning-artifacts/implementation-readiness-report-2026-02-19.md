@@ -7,10 +7,10 @@ stepsCompleted:
   - step-05-epic-quality-review
   - step-06-final-assessment
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/prd.md
-  - _bmad/_bmad-output/planning-artifacts/architecture.md
-  - _bmad/_bmad-output/planning-artifacts/epics.md
-  - _bmad/_bmad-output/planning-artifacts/ux-design-specification.md
+  - _bmad-output/planning-artifacts/prd.md
+  - _bmad-output/planning-artifacts/architecture.md
+  - _bmad-output/planning-artifacts/epics.md
+  - _bmad-output/planning-artifacts/ux-design-specification.md
 assessor: Winston (Architect)
 assessmentDate: 2026-02-19
 project: Poke-Radar
@@ -26,15 +26,15 @@ executionContext: "Exécution demandée via /bmad-agent-bmm-architect puis /bmad
 
 ### Documents Found
 
-- **PRD (whole):** `_bmad/_bmad-output/planning-artifacts/prd.md`
-- **Architecture (whole):** `_bmad/_bmad-output/planning-artifacts/architecture.md`
-- **Epics & Stories (whole):** `_bmad/_bmad-output/planning-artifacts/epics.md`
-- **UX (whole):** `_bmad/_bmad-output/planning-artifacts/ux-design-specification.md`
+- **PRD (whole):** `_bmad-output/planning-artifacts/prd.md`
+- **Architecture (whole):** `_bmad-output/planning-artifacts/architecture.md`
+- **Epics & Stories (whole):** `_bmad-output/planning-artifacts/epics.md`
+- **UX (whole):** `_bmad-output/planning-artifacts/ux-design-specification.md`
 
 ### Discovery Issues
 
 - ✅ Aucun doublon whole/sharded détecté.
-- ⚠️ Le `planning_artifacts` de `_bmad/bmm/config.yaml` cible `{project-root}/_bmad-output/planning-artifacts` alors que les documents actifs sont sous `_bmad/_bmad-output/planning-artifacts`.
+- ⚠️ Le `planning_artifacts` de `_bmad/bmm/config.yaml` cible `{project-root}/_bmad-output/planning-artifacts` alors que les documents actifs sont sous `_bmad-output/planning-artifacts`.
 
 ## PRD Analysis
 
@@ -121,7 +121,7 @@ Aucune exigence FR manquante dans la couverture epics/stories.
 
 ### UX Document Status
 
-✅ Document UX présent: `_bmad/_bmad-output/planning-artifacts/ux-design-specification.md`
+✅ Document UX présent: `_bmad-output/planning-artifacts/ux-design-specification.md`
 
 ### Alignment Issues
 
@@ -170,7 +170,7 @@ Aucun blocage critique empêchant le démarrage de l’implémentation.
 
 ### Recommended Next Steps
 
-1. Corriger `_bmad/bmm/config.yaml` pour aligner `planning_artifacts` et `output_folder` avec `_bmad/_bmad-output`.
+1. Corriger `_bmad/bmm/config.yaml` pour aligner `planning_artifacts` et `output_folder` avec `_bmad-output`.
 2. Ajouter des AC quantifiés dans les stories de performance/alerting (SLO latence, fenêtre de déduplication).
 3. Créer un mini artefact d’implémentation design tokens (même MVP) pour réduire le risque d’écart UI.
 

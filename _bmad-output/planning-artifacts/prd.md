@@ -15,9 +15,9 @@ stepsCompleted:
   - step-11-polish
   - step-12-complete
 inputDocuments:
-  - _bmad/_bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
-  - _bmad/_bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
-  - _bmad/_bmad-output/brainstorming/brainstorming-session-2025-02-05.md
+  - _bmad-output/planning-artifacts/product-brief-bmad-2026-02-18.md
+  - _bmad-output/planning-artifacts/research/domain-tcg-pokemon-prix-marche-research-2025-02-05.md
+  - _bmad-output/brainstorming/brainstorming-session-2025-02-05.md
 workflowType: 'prd'
 projectClassification: 'brownfield'
 projectType: 'Application desktop de market intelligence (revendeurs Pokémon)'
