@@ -184,4 +184,4 @@ GPT-5.3-Codex
 ### Change Log
 
 - 2026-04-13: Implémentation Story 1.2 complétée (migrations SQLite v2, commandes Tauri CRUD profils/produits, écran stratégie React, tests UI + tests repository/intégration).
-- 2026-04-14: Correctifs review appliqués sur `StrategyForm` (soumission bloquée sans produit, gestion explicite des erreurs `onSubmit`) + configuration Tauri explicite des icônes bundle sur `icons/icon.ico` pour éviter les chemins d’icônes implicites au build.
+- 2026-04-14: Correctifs review appliqués sur `StrategyForm` (soumission bloquée sans produit, gestion explicite des erreurs `onSubmit`) + ajout de l’asset `src-tauri/icons/icon.png` pour compatibilité des builds Tauri qui le requièrent.
