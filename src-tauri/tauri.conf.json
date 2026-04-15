@@ -14,12 +14,15 @@
       {
         "title": "Poke Radar",
         "width": 1024,
-        "height": 720,
-        "resizable": true
+        "height": 720
       }
     ]
   },
   "bundle": {
-    "active": false
+    "active": false,
+    "icon": [
+      "icons/icon.ico",
+      "icons/icon.png"
+    ]
   }
 }
