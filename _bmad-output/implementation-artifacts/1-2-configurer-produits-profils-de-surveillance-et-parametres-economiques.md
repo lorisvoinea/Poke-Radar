@@ -1,6 +1,6 @@
 # Story 1.2: Configurer produits, profils de surveillance et paramètres économiques
 
-Status: in-progress
+Status: done
 
 <!-- Note: Validation is optional. Run validate-create-story for quality check before dev-story. -->
 
@@ -46,6 +46,25 @@ so that le système reflète ma stratégie réelle de revente.
 
 - [x] [Review][Patch] Soumission autorisée sans produit alors que le backend l’interdit [ui/src/components/StrategyForm.tsx]
 - [x] [Review][Patch] Erreurs de sauvegarde non gérées dans le formulaire (pas de feedback utilisateur explicite) [ui/src/components/StrategyForm.tsx]
+- [x] [Review][Patch] Préserver et afficher le message d’erreur actionnable rejeté par le backend au lieu de le remplacer systématiquement par « Vérifiez les champs » [ui/src/components/StrategyForm.tsx:61]
+- [x] [Review][Patch] Ajouter un état de soumission qui efface le message obsolète et empêche les doubles créations concurrentes [ui/src/components/StrategyForm.tsx:39]
+- [x] [Review][Patch] Rendre le message de validation nom/produit accessible lorsque le formulaire est incomplet, malgré le bouton désactivé [ui/src/components/StrategyForm.tsx:144]
+- [x] [Review][Patch] Couvrir par des tests UI le produit obligatoire, le rejet asynchrone, le feedback et la soumission unique [ui/src/__tests__/strategy-form.test.tsx:5]
+- [x] [Review][Patch] Restaurer explicitement la fenêtre redimensionnable supprimée sans lien avec la Story 1.2 [src-tauri/tauri.conf.json:18]
+- [x] [Review][Defer] Écarter les identifiants sélectionnés devenus absents de la prop `products` [ui/src/components/StrategyForm.tsx:34] — deferred, pre-existing
+- [x] [Review][Defer] Persister le nom normalisé avec `trim()` plutôt que la valeur brute [ui/src/components/StrategyForm.tsx:48] — deferred, pre-existing
+- [x] [Review][Patch] Éviter d'afficher simultanément le succès de sauvegarde et l'alerte de formulaire incomplet après la réinitialisation [ui/src/components/StrategyForm.tsx:91]
+- [x] [Review][Patch] Empêcher qu'une réponse de sauvegarde efface les nouvelles saisies modifiées pendant la requête [ui/src/components/StrategyForm.tsx:91]
+- [x] [Review][Patch] Ne pas afficher le succès ou l'erreur d'une ancienne soumission sur un brouillon modifié pendant la requête [ui/src/components/StrategyForm.tsx:98]
+- [x] [Review][Patch] Corriger le test de modification pendant sauvegarde qui entérine actuellement un succès trompeur pour des valeurs non sauvegardées [ui/src/__tests__/strategy-form.test.tsx:81]
+- [x] [Review][Patch] Tester réellement le verrou synchrone de double soumission, sans dépendre uniquement du bouton déjà désactivé après le premier rendu [ui/src/__tests__/strategy-form.test.tsx:58]
+- [x] [Review][Defer] Compléter le CRUD produits côté commandes Tauri (mise à jour et suppression absentes) [src-tauri/src/app/commands.rs:93] — deferred, pre-existing
+- [x] [Review][Defer] Exposer dans l'UI la modification et la suppression des profils exigées par la gestion complète [ui/src/pages/strategy/StrategyPage.tsx:59] — deferred, pre-existing
+- [x] [Review][Defer] Permettre la gestion libre des produits cibles au lieu des seuls produits de démarrage codés en dur [ui/src/pages/strategy/StrategyPage.tsx:28] — deferred, pre-existing
+- [x] [Review][Defer] Ajouter la validation ergonomique UI des bornes et valeurs économiques avant appel backend [ui/src/components/StrategyForm.tsx:58] — deferred, pre-existing
+- [x] [Review][Defer] Conserver des erreurs typées sur la surface Tauri au lieu de les aplatir en chaînes [src-tauri/src/app/commands.rs:136] — deferred, pre-existing
+- [x] [Review][Defer] Couvrir en Rust toutes les bornes annoncées pour marge, frais variables, produits requis et mise à jour [src-tauri/src/domain/services/mod.rs:61] — deferred, pre-existing
+- [x] [Review][Defer] Protéger la création des produits de démarrage contre deux appels concurrents avant rerender [ui/src/components/StrategyForm.tsx:111] — deferred, pre-existing
 
 ## Dev Notes
 
@@ -149,10 +168,18 @@ so that le système reflète ma stratégie réelle de revente.
 
 GPT-5.3-Codex
 
+### Implementation Plan
+
+- Ajouter les tests de régression des réponses obsolètes et exercer le verrou de soumission via deux événements `submit` directs, puis conditionner tout feedback asynchrone à la révision effectivement soumise.
+
 ### Debug Log References
 
 - Workflow exécuté: `bmad-dev-story 1.2`
-- Commandes de vérification: `cargo fmt`, `cargo test` (bloqué par dépendance système GLib manquante dans l'environnement), `npm test`.
+- Commandes de vérification initiales: `cargo fmt`, `cargo test` (initialement bloqué par une dépendance système GLib manquante), `npm test`.
+- Vérification finale du 2026-07-17: `npm test`, `npm run build`, `cargo test` et `cargo build` réussis après remplacement du PNG Tauri invalide par une version RGBA 128×128 dérivée de l'ICO existant.
+- Correctifs de revue du 2026-07-17 exécutés en TDD: 4 tests UI ajoutés et observés en échec avant implémentation; validation finale avec 9 tests UI, 9 tests Rust, builds UI/Rust et formatage Rust réussis.
+- Correctifs de revue du 2026-07-19 exécutés en TDD: 2 tests UI ajoutés et observés en échec avant implémentation; validation finale avec 10 tests UI, 9 tests Rust, builds UI/Rust et formatage Rust réussis.
+- Correctifs de seconde revue du 2026-07-19 exécutés en TDD: 2 scénarios de feedback obsolète observés en échec avant correction; validation finale avec 11 tests UI, 9 tests Rust, builds UI/Rust et `cargo fmt --check` réussis.
 
 ### Completion Notes List
 
@@ -160,10 +187,20 @@ GPT-5.3-Codex
 - Écran stratégie React/TypeScript ajouté avec validation ergonomique locale et feedback de sauvegarde.
 - Réutilisation automatique validée via chargement au démarrage et stub de cycle de monitoring avec profil actif.
 - Tests ajoutés: validation service Rust, repository Rust, intégration roundtrip après redémarrage simulé, smoke test UI stratégie.
+- Blocage de compilation Tauri levé: l'icône PNG est désormais au format RGBA attendu; tests UI/Rust et builds frontend/backend validés.
+- ✅ Résolu [Review][Patch]: le formulaire restitue le message d'erreur actionnable du backend, expose la validation incomplète aux technologies d'assistance et empêche les doubles soumissions concurrentes.
+- ✅ Résolu [Review][Patch]: quatre tests UI couvrent le produit obligatoire, le rejet asynchrone, le feedback de succès et l'unicité de soumission.
+- ✅ Résolu [Review][Patch]: la fenêtre Tauri est de nouveau explicitement redimensionnable.
+- ✅ Résolu [Review][Patch]: le succès de sauvegarde ne coexiste plus avec l'alerte d'incomplétude provoquée par le reset.
+- ✅ Résolu [Review][Patch]: une sauvegarde terminée ne réinitialise plus les saisies modifiées pendant la requête.
+- ✅ Résolu [Review][Patch]: le succès et l'erreur d'une requête ne sont affichés que si le brouillon visible correspond encore à la révision soumise.
+- ✅ Résolu [Review][Patch]: les tests couvrent désormais le succès et l'erreur obsolètes ainsi que deux événements `submit` concurrents indépendamment de l'état désactivé du bouton.
 
 ### File List
 
 - src-tauri/Cargo.toml
+- src-tauri/icons/icon.png
+- src-tauri/tauri.conf.json
 - src-tauri/src/lib.rs
 - src-tauri/src/tauri_app.rs
 - src-tauri/src/app/commands.rs
@@ -176,12 +213,21 @@ GPT-5.3-Codex
 - src-tauri/tests/profile_persistence.rs
 - ui/src/main.tsx
 - ui/src/components/StrategyForm.tsx
+- ui/src/__tests__/strategy-form.test.tsx
 - ui/src/pages/strategy/StrategyPage.tsx
 - ui/src/__tests__/strategy-page.test.tsx
+- ui-dist/index.html
+- ui-dist/assets/index-CmKEjt60.js (supprimé/remplacé par le build)
+- ui-dist/assets/index-awvegpQq.js
 - _bmad-output/implementation-artifacts/1-2-configurer-produits-profils-de-surveillance-et-parametres-economiques.md
+- _bmad-output/implementation-artifacts/sprint-status.yaml
 
 
 ### Change Log
 
 - 2026-04-13: Implémentation Story 1.2 complétée (migrations SQLite v2, commandes Tauri CRUD profils/produits, écran stratégie React, tests UI + tests repository/intégration).
-- 2026-04-14: Correctifs review appliqués sur `StrategyForm` (soumission bloquée sans produit, gestion explicite des erreurs `onSubmit`) + ajout de l’asset `src-tauri/icons/icon.png` pour compatibilité des builds Tauri qui le requièrent.
+- 2026-04-14: Correctifs review appliqués sur `StrategyForm` (soumission bloquée sans produit, gestion explicite des erreurs `onSubmit`) + ajout de l'asset `src-tauri/icons/icon.png` pour compatibilité des builds Tauri qui le requièrent.
+- 2026-07-17: Remplacement de l'icône PNG grayscale+alpha 1×1 invalide par une version RGBA 128×128 dérivée de l'ICO existant; validation complète UI et Rust réussie; story passée en `review`.
+- 2026-07-17: Correctifs de code review appliqués — 5 constats résolus (erreurs backend actionnables, état de soumission, validation accessible, couverture UI et fenêtre redimensionnable); story remise en `review`.
+- 2026-07-19: Deux derniers constats de revue corrigés en TDD — feedback succès cohérent et protection des saisies modifiées pendant une sauvegarde; story maintenue en `review`.
+- 2026-07-19: Trois constats de seconde code review corrigés en TDD — feedback asynchrone lié à la révision soumise et test réel du verrou de double soumission; story remise en `review`.

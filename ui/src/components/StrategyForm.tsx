@@ -1,4 +1,4 @@
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useRef, useState } from "react";
 
 type Product = {
   id: number;
@@ -21,27 +21,69 @@ type Props = {
   onCreateStarterProducts?: () => Promise<void>;
 };
 
+type Feedback = {
+  kind: "error" | "success";
+  text: string;
+};
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message.trim().length > 0) {
+    return error.message;
+  }
+
+  if (typeof error === "string" && error.trim().length > 0) {
+    return error;
+  }
+
+  return "Échec de la sauvegarde du profil. Réessayez dans quelques instants.";
+}
+
 export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Props): JSX.Element {
   const [name, setName] = useState("");
   const [minMarginBps, setMinMarginBps] = useState(1500);
   const [fixedCostCents, setFixedCostCents] = useState(0);
   const [variableFeeBps, setVariableFeeBps] = useState(0);
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
-  const [message, setMessage] = useState<string>("");
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [isCreatingProducts, setIsCreatingProducts] = useState(false);
+  const isSubmittingRef = useRef(false);
+  const editRevisionRef = useRef(0);
+
+  function markEdited() {
+    editRevisionRef.current += 1;
+    setFeedback(null);
+  }
 
   const canSubmit = useMemo(
     () => name.trim().length > 0 && selectedProducts.length > 0,
     [name, selectedProducts]
   );
 
+  const validationMessage = useMemo(() => {
+    if (name.trim().length === 0 && selectedProducts.length === 0) {
+      return "Complétez le nom et sélectionnez au moins un produit.";
+    }
+    if (name.trim().length === 0) {
+      return "Complétez le nom du profil.";
+    }
+    if (selectedProducts.length === 0) {
+      return "Sélectionnez au moins un produit.";
+    }
+    return "";
+  }, [name, selectedProducts]);
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!canSubmit) {
-      setMessage("Complétez le nom et sélectionnez au moins un produit.");
+    if (!canSubmit || isSubmittingRef.current) {
       return;
     }
+
+    isSubmittingRef.current = true;
+    setIsSubmitting(true);
+    setFeedback(null);
+    const submittedRevision = editRevisionRef.current;
 
     try {
       await onSubmit({
@@ -53,11 +95,18 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         makeActive: true
       });
 
-      setName("");
-      setSelectedProducts([]);
-      setMessage("Profil enregistré avec succès.");
-    } catch {
-      setMessage("Échec de la sauvegarde du profil. Vérifiez les champs puis réessayez.");
+      if (editRevisionRef.current === submittedRevision) {
+        setName("");
+        setSelectedProducts([]);
+        setFeedback({ kind: "success", text: "Profil enregistré avec succès." });
+      }
+    } catch (error: unknown) {
+      if (editRevisionRef.current === submittedRevision) {
+        setFeedback({ kind: "error", text: getErrorMessage(error) });
+      }
+    } finally {
+      isSubmittingRef.current = false;
+      setIsSubmitting(false);
     }
   }
 
@@ -67,13 +116,16 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
     }
 
     setIsCreatingProducts(true);
-    setMessage("");
+    setFeedback(null);
 
     try {
       await onCreateStarterProducts();
-      setMessage("Produits de démarrage créés. Sélectionnez-les puis enregistrez votre profil.");
+      setFeedback({
+        kind: "success",
+        text: "Produits de démarrage créés. Sélectionnez-les puis enregistrez votre profil."
+      });
     } catch {
-      setMessage("Impossible de créer les produits de démarrage pour le moment.");
+      setFeedback({ kind: "error", text: "Impossible de créer les produits de démarrage pour le moment." });
     } finally {
       setIsCreatingProducts(false);
     }
@@ -87,7 +139,10 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         <input
           aria-label="Nom du profil"
           value={name}
-          onChange={(event) => setName(event.target.value)}
+          onChange={(event) => {
+            markEdited();
+            setName(event.target.value);
+          }}
         />
       </label>
 
@@ -97,7 +152,10 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
           aria-label="Marge minimale"
           type="number"
           value={minMarginBps}
-          onChange={(event) => setMinMarginBps(Number(event.target.value))}
+          onChange={(event) => {
+            markEdited();
+            setMinMarginBps(Number(event.target.value));
+          }}
         />
       </label>
 
@@ -107,7 +165,10 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
           aria-label="Frais fixes"
           type="number"
           value={fixedCostCents}
-          onChange={(event) => setFixedCostCents(Number(event.target.value))}
+          onChange={(event) => {
+            markEdited();
+            setFixedCostCents(Number(event.target.value));
+          }}
         />
       </label>
 
@@ -117,7 +178,10 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
           aria-label="Frais variables"
           type="number"
           value={variableFeeBps}
-          onChange={(event) => setVariableFeeBps(Number(event.target.value))}
+          onChange={(event) => {
+            markEdited();
+            setVariableFeeBps(Number(event.target.value));
+          }}
         />
       </label>
 
@@ -132,6 +196,7 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
               type="checkbox"
               checked={selectedProducts.includes(product.id)}
               onChange={(event) => {
+                markEdited();
                 setSelectedProducts((current) =>
                   event.target.checked
                     ? [...current, product.id]
@@ -150,10 +215,14 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         </button>
       ) : null}
 
-      <button type="submit" disabled={!canSubmit}>
-        Enregistrer le profil
+      {validationMessage && feedback?.kind !== "success" ? <p role="alert">{validationMessage}</p> : null}
+
+      <button type="submit" disabled={!canSubmit || isSubmitting}>
+        {isSubmitting ? "Enregistrement en cours..." : "Enregistrer le profil"}
       </button>
-      {message ? <p>{message}</p> : null}
+      {feedback ? (
+        <p role={feedback.kind === "error" ? "alert" : "status"}>{feedback.text}</p>
+      ) : null}
     </form>
   );
 }
