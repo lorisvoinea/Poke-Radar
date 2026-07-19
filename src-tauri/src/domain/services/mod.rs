@@ -1,4 +1,20 @@
-use crate::domain::models::{NewMonitorProfile, UpdateMonitorProfile, ValidationError};
+use crate::domain::models::{NewMonitorProfile, NewProduct, UpdateMonitorProfile, ValidationError};
+
+pub fn validate_new_product(
+    reference_id: Option<String>,
+    sku: Option<String>,
+    title: Option<String>,
+) -> Result<NewProduct, ValidationError> {
+    let reference_id = reference_id.filter(|value| !value.trim().is_empty());
+    let sku = sku.filter(|value| !value.trim().is_empty());
+    let title = title.filter(|value| !value.trim().is_empty());
+
+    match (reference_id, sku, title) {
+        (Some(reference_id), None, None) => Ok(NewProduct::Reference { reference_id }),
+        (None, Some(sku), Some(title)) => Ok(NewProduct::FreeText { sku, title }),
+        _ => Err(ValidationError::AmbiguousProductMode),
+    }
+}
 
 pub fn validate_new_profile(input: &NewMonitorProfile) -> Result<(), ValidationError> {
     validate_profile_payload(
@@ -54,9 +70,42 @@ fn validate_profile_payload(
 
 #[cfg(test)]
 mod tests {
-    use crate::domain::models::{NewMonitorProfile, ValidationError};
+    use crate::domain::models::{NewMonitorProfile, NewProduct, ValidationError};
 
-    use super::validate_new_profile;
+    use super::{validate_new_product, validate_new_profile};
+
+    #[test]
+    fn accepts_exactly_one_product_creation_mode() {
+        assert_eq!(
+            validate_new_product(Some("ref-1".into()), None, None),
+            Ok(NewProduct::Reference {
+                reference_id: "ref-1".into()
+            })
+        );
+        assert_eq!(
+            validate_new_product(None, Some("SKU".into()), Some("Titre".into())),
+            Ok(NewProduct::FreeText {
+                sku: "SKU".into(),
+                title: "Titre".into()
+            })
+        );
+    }
+
+    #[test]
+    fn rejects_ambiguous_or_incomplete_product_payloads() {
+        assert_eq!(
+            validate_new_product(
+                Some("ref-1".into()),
+                Some("SKU".into()),
+                Some("Titre".into())
+            ),
+            Err(ValidationError::AmbiguousProductMode)
+        );
+        assert_eq!(
+            validate_new_product(None, Some("SKU".into()), None),
+            Err(ValidationError::AmbiguousProductMode)
+        );
+    }
 
     #[test]
     fn rejects_negative_costs() {

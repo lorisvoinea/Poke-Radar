@@ -36,6 +36,11 @@ const MIGRATIONS: &[Migration] = &[
         name: "002_monitor_profiles",
         script: include_str!("migrations/002_monitor_profiles.sql"),
     },
+    Migration {
+        version: 3,
+        name: "003_product_references",
+        script: include_str!("migrations/003_product_references.sql"),
+    },
 ];
 
 pub fn initialize_database(path: &Path) -> Result<(), DbError> {
@@ -209,5 +214,73 @@ mod tests {
         assert!(!Path::new(&database_path).exists());
         let _connection = open_connection(&database_path).expect("first launch should create db");
         assert!(Path::new(&database_path).exists());
+    }
+
+    #[test]
+    fn migration_v3_preserves_historical_products_and_profile_links() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("upgrade.db");
+        let mut connection = Connection::open(&database_path).expect("open db");
+        apply_migrations(&mut connection, &MIGRATIONS[..2]).expect("migrate to v2");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title) VALUES('OLD-1', 'Produit historique')",
+                [],
+            )
+            .expect("old product");
+        let product_id = connection.last_insert_rowid();
+        connection
+            .execute("INSERT INTO monitor_profiles(name, min_margin_bps, fixed_cost_cents, variable_fee_bps) VALUES('Historique', 1000, 0, 0)", [])
+            .expect("old profile");
+        let profile_id = connection.last_insert_rowid();
+        connection
+            .execute(
+                "INSERT INTO profile_products(profile_id, product_id) VALUES(?1, ?2)",
+                (profile_id, product_id),
+            )
+            .expect("old link");
+
+        apply_migrations(&mut connection, MIGRATIONS).expect("migrate to v3");
+
+        let historical: (i64, String, String, String, Option<String>) = connection
+            .query_row(
+                "SELECT id, sku, title, normalization_status, reference_id FROM products WHERE id = ?1",
+                [product_id],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?, row.get(4)?)),
+            )
+            .expect("historical product");
+        assert_eq!(
+            historical,
+            (
+                product_id,
+                "OLD-1".into(),
+                "Produit historique".into(),
+                "free_text".into(),
+                None
+            )
+        );
+        let link_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM profile_products WHERE profile_id = ?1 AND product_id = ?2",
+                (profile_id, product_id),
+                |row| row.get(0),
+            )
+            .expect("link count");
+        assert_eq!(link_count, 1);
+    }
+
+    #[test]
+    fn reference_seed_is_deterministic_and_migrations_are_idempotent() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("seed.db");
+        initialize_database(&database_path).expect("first init");
+        initialize_database(&database_path).expect("second init");
+        let connection = Connection::open(database_path).expect("open db");
+        let count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM product_references", [], |row| {
+                row.get(0)
+            })
+            .expect("reference count");
+        assert_eq!(count, 3);
     }
 }

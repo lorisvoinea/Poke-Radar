@@ -1,7 +1,7 @@
 use tempfile::tempdir;
 
 use poke_radar_tauri::{
-    domain::models::NewMonitorProfile,
+    domain::models::{NewMonitorProfile, NewProduct},
     infrastructure::db::{
         initialize_database, open_connection,
         repositories::{create_monitor_profile, create_product, list_monitor_profiles},
@@ -16,8 +16,14 @@ fn profile_roundtrip_survives_restart_simulation() {
     initialize_database(&db_path).expect("init database");
 
     let mut first_connection = open_connection(&db_path).expect("first connection");
-    let product =
-        create_product(&first_connection, "PS5-DISC", "Console PS5").expect("create product");
+    let product = create_product(
+        &mut first_connection,
+        &NewProduct::FreeText {
+            sku: "PS5-DISC".into(),
+            title: "Console PS5".into(),
+        },
+    )
+    .expect("create product");
 
     create_monitor_profile(
         &mut first_connection,

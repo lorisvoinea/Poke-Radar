@@ -1,9 +1,11 @@
-import { FormEvent, useMemo, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 type Product = {
   id: number;
   sku: string;
   title: string;
+  normalizationStatus?: "normalized" | "free_text";
+  reference?: { setName: string; edition: string; language: string; code: string } | null;
 };
 
 type ProfileInput = {
@@ -18,7 +20,6 @@ type ProfileInput = {
 type Props = {
   products: Product[];
   onSubmit: (input: ProfileInput) => Promise<void>;
-  onCreateStarterProducts?: () => Promise<void>;
 };
 
 type Feedback = {
@@ -38,7 +39,7 @@ function getErrorMessage(error: unknown): string {
   return "Échec de la sauvegarde du profil. Réessayez dans quelques instants.";
 }
 
-export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Props): JSX.Element {
+export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
   const [name, setName] = useState("");
   const [minMarginBps, setMinMarginBps] = useState(1500);
   const [fixedCostCents, setFixedCostCents] = useState(0);
@@ -46,9 +47,13 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isCreatingProducts, setIsCreatingProducts] = useState(false);
   const isSubmittingRef = useRef(false);
   const editRevisionRef = useRef(0);
+
+  useEffect(() => {
+    const existingIds = new Set(products.map((product) => product.id));
+    setSelectedProducts((current) => current.filter((id) => existingIds.has(id)));
+  }, [products]);
 
   function markEdited() {
     editRevisionRef.current += 1;
@@ -110,31 +115,16 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
     }
   }
 
-  async function handleCreateStarterProducts() {
-    if (!onCreateStarterProducts) {
-      return;
-    }
-
-    setIsCreatingProducts(true);
-    setFeedback(null);
-
-    try {
-      await onCreateStarterProducts();
-      setFeedback({
-        kind: "success",
-        text: "Produits de démarrage créés. Sélectionnez-les puis enregistrez votre profil."
-      });
-    } catch {
-      setFeedback({ kind: "error", text: "Impossible de créer les produits de démarrage pour le moment." });
-    } finally {
-      setIsCreatingProducts(false);
-    }
-  }
-
   return (
-    <form onSubmit={handleSubmit}>
-      <h2>Stratégie & paramètres</h2>
-      <label>
+    <form className="strategy-form" onSubmit={handleSubmit}>
+      <div className="section-heading">
+        <p className="eyebrow">Configuration</p>
+        <h2>Stratégie & paramètres</h2>
+        <p>Définissez vos seuils et les produits à surveiller.</p>
+      </div>
+
+      <div className="form-grid">
+      <label className="form-field form-field--wide">
         Nom du profil
         <input
           aria-label="Nom du profil"
@@ -146,7 +136,7 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         />
       </label>
 
-      <label>
+      <label className="form-field">
         Marge minimale (bps)
         <input
           aria-label="Marge minimale"
@@ -159,7 +149,7 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         />
       </label>
 
-      <label>
+      <label className="form-field">
         Frais fixes (centimes)
         <input
           aria-label="Frais fixes"
@@ -172,7 +162,7 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
         />
       </label>
 
-      <label>
+      <label className="form-field">
         Frais variables (bps)
         <input
           aria-label="Frais variables"
@@ -184,14 +174,15 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
           }}
         />
       </label>
+      </div>
 
-      <fieldset>
+      <fieldset className="product-picker">
         <legend>Produits surveillés</legend>
         {products.length === 0 ? (
           <p>Aucun produit disponible pour le moment.</p>
         ) : null}
         {products.map((product) => (
-          <label key={product.id}>
+          <label className="product-option" key={product.id}>
             <input
               type="checkbox"
               checked={selectedProducts.includes(product.id)}
@@ -204,24 +195,23 @@ export function StrategyForm({ products, onSubmit, onCreateStarterProducts }: Pr
                 );
               }}
             />
-            {product.sku} - {product.title}
+            <span>
+              <strong>{product.title}</strong>
+              <small>{product.sku}</small>
+              {product.normalizationStatus === "free_text" ? <small className="normalization-badge">Non normalisé</small> : null}
+              {product.reference ? <small>{product.reference.setName} · {product.reference.edition} · {product.reference.language}</small> : null}
+            </span>
           </label>
         ))}
       </fieldset>
 
-      {products.length === 0 && onCreateStarterProducts ? (
-        <button type="button" onClick={() => void handleCreateStarterProducts()} disabled={isCreatingProducts}>
-          {isCreatingProducts ? "Création en cours..." : "Créer des produits de démarrage"}
-        </button>
-      ) : null}
+      {validationMessage && feedback?.kind !== "success" ? <p className="feedback feedback--hint" role="alert">{validationMessage}</p> : null}
 
-      {validationMessage && feedback?.kind !== "success" ? <p role="alert">{validationMessage}</p> : null}
-
-      <button type="submit" disabled={!canSubmit || isSubmitting}>
+      <button className="button button--primary" type="submit" disabled={!canSubmit || isSubmitting}>
         {isSubmitting ? "Enregistrement en cours..." : "Enregistrer le profil"}
       </button>
       {feedback ? (
-        <p role={feedback.kind === "error" ? "alert" : "status"}>{feedback.text}</p>
+        <p className={`feedback feedback--${feedback.kind}`} role={feedback.kind === "error" ? "alert" : "status"}>{feedback.text}</p>
       ) : null}
     </form>
   );

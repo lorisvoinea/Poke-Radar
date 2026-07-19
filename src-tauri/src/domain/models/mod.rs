@@ -6,6 +6,39 @@ pub struct Product {
     pub sku: String,
     pub title: String,
     pub created_at_utc: String,
+    pub normalization_status: NormalizationStatus,
+    pub reference: Option<ProductReference>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NormalizationStatus {
+    Normalized,
+    FreeText,
+}
+
+impl NormalizationStatus {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            Self::Normalized => "normalized",
+            Self::FreeText => "free_text",
+        }
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ProductReference {
+    pub id: String,
+    pub code: String,
+    pub name: String,
+    pub set_name: String,
+    pub edition: String,
+    pub language: String,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum NewProduct {
+    Reference { reference_id: String },
+    FreeText { sku: String, title: String },
 }
 
 #[derive(Debug, Clone)]
@@ -53,6 +86,7 @@ pub enum ValidationError {
     NegativeValue(&'static str),
     InvalidRange(&'static str),
     EmptyProducts,
+    AmbiguousProductMode,
 }
 
 impl fmt::Display for ValidationError {
@@ -70,6 +104,10 @@ impl fmt::Display for ValidationError {
             ValidationError::EmptyProducts => {
                 write!(f, "Sélectionnez au moins un produit surveillé.")
             }
+            ValidationError::AmbiguousProductMode => write!(
+                f,
+                "Choisissez soit une référence, soit une saisie libre complète."
+            ),
         }
     }
 }

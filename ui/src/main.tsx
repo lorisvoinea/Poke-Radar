@@ -1,6 +1,7 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import { StrategyPage } from "./pages/strategy/StrategyPage";
+import "./styles.css";
 
 const element = document.getElementById("root");
 

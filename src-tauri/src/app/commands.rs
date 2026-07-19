@@ -6,14 +6,16 @@ use tauri::Manager;
 use crate::{
     app::bootstrap::{run_boot_sequence, BootState},
     domain::{
-        models::{NewMonitorProfile, UpdateMonitorProfile},
-        services::{validate_new_profile, validate_update_profile},
+        models::{
+            NewMonitorProfile, NormalizationStatus, Product, ProductReference, UpdateMonitorProfile,
+        },
+        services::{validate_new_product, validate_new_profile, validate_update_profile},
     },
     infrastructure::db::{
         open_connection,
         repositories::{
             create_monitor_profile, create_product, delete_monitor_profile, list_monitor_profiles,
-            list_products, update_monitor_profile,
+            list_product_references, list_products, update_monitor_profile,
         },
     },
 };
@@ -21,8 +23,20 @@ use crate::{
 #[derive(Debug, Clone, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CreateProductInput {
-    pub sku: String,
-    pub title: String,
+    pub reference_id: Option<String>,
+    pub sku: Option<String>,
+    pub title: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProductReferenceDto {
+    pub id: String,
+    pub code: String,
+    pub name: String,
+    pub set_name: String,
+    pub edition: String,
+    pub language: String,
 }
 
 #[derive(Debug, Clone, Serialize)]
@@ -32,6 +46,8 @@ pub struct ProductDto {
     pub sku: String,
     pub title: String,
     pub created_at_utc: String,
+    pub normalization_status: String,
+    pub reference: Option<ProductReferenceDto>,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -95,21 +111,25 @@ pub fn create_product_command<R: tauri::Runtime>(
     app_handle: tauri::AppHandle<R>,
     input: CreateProductInput,
 ) -> Result<ProductDto, String> {
-    if input.sku.trim().is_empty() || input.title.trim().is_empty() {
-        return Err("Les champs `sku` et `title` sont obligatoires.".to_string());
-    }
+    let payload = validate_new_product(input.reference_id, input.sku, input.title)
+        .map_err(|error| error.to_string())?;
 
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
-    let product = create_product(&connection, &input.sku, &input.title)
+    let mut connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let product = create_product(&mut connection, &payload)
         .map_err(|error| format!("Impossible de créer le produit: {error}"))?;
+    Ok(map_product(product))
+}
 
-    Ok(ProductDto {
-        id: product.id,
-        sku: product.sku,
-        title: product.title,
-        created_at_utc: product.created_at_utc,
-    })
+#[tauri::command]
+pub fn list_product_references_command<R: tauri::Runtime>(
+    app_handle: tauri::AppHandle<R>,
+) -> Result<Vec<ProductReferenceDto>, String> {
+    let db_path = default_database_path(&app_handle)?;
+    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    list_product_references(&connection)
+        .map_err(|error| format!("Impossible de charger le référentiel: {error}"))
+        .map(|items| items.into_iter().map(map_reference).collect())
 }
 
 #[tauri::command]
@@ -121,15 +141,7 @@ pub fn list_products_command<R: tauri::Runtime>(
     let products = list_products(&connection)
         .map_err(|error| format!("Impossible de charger les produits: {error}"))?;
 
-    Ok(products
-        .into_iter()
-        .map(|product| ProductDto {
-            id: product.id,
-            sku: product.sku,
-            title: product.title,
-            created_at_utc: product.created_at_utc,
-        })
-        .collect())
+    Ok(products.into_iter().map(map_product).collect())
 }
 
 #[tauri::command]
@@ -261,5 +273,31 @@ fn map_profile(profile: crate::domain::models::MonitorProfileWithProducts) -> Mo
         product_ids: profile.product_ids,
         created_at_utc: profile.profile.created_at_utc,
         updated_at_utc: profile.profile.updated_at_utc,
+    }
+}
+
+fn map_product(product: Product) -> ProductDto {
+    ProductDto {
+        id: product.id,
+        sku: product.sku,
+        title: product.title,
+        created_at_utc: product.created_at_utc,
+        normalization_status: match product.normalization_status {
+            NormalizationStatus::Normalized => "normalized",
+            NormalizationStatus::FreeText => "free_text",
+        }
+        .to_string(),
+        reference: product.reference.map(map_reference),
+    }
+}
+
+fn map_reference(reference: ProductReference) -> ProductReferenceDto {
+    ProductReferenceDto {
+        id: reference.id,
+        code: reference.code,
+        name: reference.name,
+        set_name: reference.set_name,
+        edition: reference.edition,
+        language: reference.language,
     }
 }

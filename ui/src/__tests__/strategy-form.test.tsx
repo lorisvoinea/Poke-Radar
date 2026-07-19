@@ -7,21 +7,9 @@ describe("StrategyForm", () => {
 
   afterEach(cleanup);
 
-  it("propose de créer des produits de démarrage quand la liste est vide", async () => {
-    const onCreateStarterProducts = vi.fn().mockResolvedValue(undefined);
-    render(
-      <StrategyForm
-        products={[]}
-        onSubmit={vi.fn().mockResolvedValue(undefined)}
-        onCreateStarterProducts={onCreateStarterProducts}
-      />
-    );
-
-    fireEvent.click(screen.getByRole("button", { name: "Créer des produits de démarrage" }));
-    expect(onCreateStarterProducts).toHaveBeenCalledTimes(1);
-    expect(
-      await screen.findByText("Produits de démarrage créés. Sélectionnez-les puis enregistrez votre profil.")
-    ).toBeInTheDocument();
+  it("signale explicitement les produits historiques non normalisés", () => {
+    render(<StrategyForm products={[{ ...products[0], normalizationStatus: "free_text" }]} onSubmit={vi.fn()} />);
+    expect(screen.getByText("Non normalisé")).toBeInTheDocument();
   });
 
   it("rend la validation du nom et du produit accessible avant soumission", () => {
@@ -126,5 +114,15 @@ describe("StrategyForm", () => {
     );
     expect(screen.queryByText("Erreur liée à l'ancien brouillon")).not.toBeInTheDocument();
     expect(nameInput).toHaveValue("Brouillon corrigé");
+  });
+
+  it("écarte une sélection qui disparaît lors du rafraîchissement", async () => {
+    const { rerender } = render(<StrategyForm products={products} onSubmit={vi.fn()} />);
+    fireEvent.change(screen.getByLabelText("Nom du profil"), { target: { value: "Profil" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: /PKM-007/ }));
+    expect(screen.getByRole("button", { name: "Enregistrer le profil" })).toBeEnabled();
+
+    rerender(<StrategyForm products={[]} onSubmit={vi.fn()} />);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Enregistrer le profil" })).toBeDisabled());
   });
 });
