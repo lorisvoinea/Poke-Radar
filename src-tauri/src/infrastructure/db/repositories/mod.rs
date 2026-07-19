@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Error as SqlError};
+use rusqlite::{params, Connection, Error as SqlError, ErrorCode};
 use thiserror::Error;
 
 use crate::domain::models::{
@@ -12,6 +12,12 @@ pub enum ConfigRepositoryError {
     Sql(#[from] SqlError),
     #[error("La référence demandée est introuvable.")]
     UnknownReference,
+    #[error("Ce code est réservé à un item du référentiel. Sélectionnez cet item plutôt que la saisie libre.")]
+    ReservedReferenceCode,
+    #[error("Un produit avec ce code existe déjà.")]
+    DuplicateSku,
+    #[error("Le produit a été créé, mais il n'est plus disponible. Rechargez la configuration.")]
+    CreatedProductMissing,
 }
 
 pub fn create_product(
@@ -23,14 +29,24 @@ pub fn create_product(
         NewProduct::Reference { reference_id } => {
             let reference =
                 get_reference(&tx, reference_id)?.ok_or(ConfigRepositoryError::UnknownReference)?;
-            tx.execute(
+            execute_product_insert(
+                &tx,
                 "INSERT INTO products(sku, title, reference_id, normalization_status)
                  VALUES(?1, ?2, ?3, 'normalized')",
                 params![reference.code, reference.name, reference.id],
             )?;
         }
         NewProduct::FreeText { sku, title } => {
-            tx.execute(
+            let code_is_reserved = tx.query_row(
+                "SELECT EXISTS(SELECT 1 FROM product_references WHERE code = ?1)",
+                params![sku],
+                |row| row.get::<_, bool>(0),
+            )?;
+            if code_is_reserved {
+                return Err(ConfigRepositoryError::ReservedReferenceCode);
+            }
+            execute_product_insert(
+                &tx,
                 "INSERT INTO products(sku, title, reference_id, normalization_status)
                  VALUES(?1, ?2, NULL, 'free_text')",
                 params![sku, title],
@@ -39,14 +55,33 @@ pub fn create_product(
     }
     let id = tx.last_insert_rowid();
     tx.commit()?;
-    get_product(connection, id).map(|p| p.expect("created product should exist"))
+    get_product(connection, id)?.ok_or(ConfigRepositoryError::CreatedProductMissing)
+}
+
+fn execute_product_insert<P: rusqlite::Params>(
+    connection: &Connection,
+    sql: &str,
+    params: P,
+) -> Result<(), ConfigRepositoryError> {
+    match connection.execute(sql, params) {
+        Ok(_) => Ok(()),
+        Err(SqlError::SqliteFailure(error, message))
+            if error.code == ErrorCode::ConstraintViolation
+                && message
+                    .as_deref()
+                    .is_some_and(|text| text.contains("products.sku")) =>
+        {
+            Err(ConfigRepositoryError::DuplicateSku)
+        }
+        Err(error) => Err(error.into()),
+    }
 }
 
 pub fn list_product_references(
     connection: &Connection,
 ) -> Result<Vec<ProductReference>, ConfigRepositoryError> {
     let mut statement = connection.prepare(
-        "SELECT id, code, name, set_name, edition, language
+        "SELECT id, code, name, set_name, edition, rarity, language
          FROM product_references
          ORDER BY name COLLATE NOCASE, set_name COLLATE NOCASE, code",
     )?;
@@ -55,7 +90,7 @@ pub fn list_product_references(
 }
 
 pub fn list_products(connection: &Connection) -> Result<Vec<Product>, ConfigRepositoryError> {
-    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id ORDER BY p.id ASC")?;
+    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.rarity, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id ORDER BY p.id ASC")?;
 
     let rows = statement.query_map([], map_product)?;
 
@@ -67,7 +102,7 @@ fn get_product(
     connection: &Connection,
     product_id: i64,
 ) -> Result<Option<Product>, ConfigRepositoryError> {
-    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id WHERE p.id = ?1")?;
+    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.rarity, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id WHERE p.id = ?1")?;
 
     let mut rows = statement.query(params![product_id])?;
     if let Some(row) = rows.next()? {
@@ -82,7 +117,7 @@ fn get_reference(
     reference_id: &str,
 ) -> Result<Option<ProductReference>, ConfigRepositoryError> {
     let mut statement = connection.prepare(
-        "SELECT id, code, name, set_name, edition, language
+        "SELECT id, code, name, set_name, edition, rarity, language
          FROM product_references WHERE id = ?1",
     )?;
     let mut rows = statement.query(params![reference_id])?;
@@ -99,7 +134,8 @@ fn map_reference(row: &rusqlite::Row<'_>) -> Result<ProductReference, SqlError> 
         name: row.get(2)?,
         set_name: row.get(3)?,
         edition: row.get(4)?,
-        language: row.get(5)?,
+        rarity: row.get(5)?,
+        language: row.get(6)?,
     })
 }
 
@@ -113,7 +149,8 @@ fn map_product(row: &rusqlite::Row<'_>) -> Result<Product, SqlError> {
             name: row.get(7)?,
             set_name: row.get(8)?,
             edition: row.get(9)?,
-            language: row.get(10)?,
+            rarity: row.get(10)?,
+            language: row.get(11)?,
         }),
         None => None,
     };
@@ -403,5 +440,84 @@ mod tests {
         .expect_err("unknown reference");
         assert!(matches!(error, ConfigRepositoryError::UnknownReference));
         assert!(list_products(&connection).expect("products").is_empty());
+    }
+
+    #[test]
+    fn rejects_free_text_using_a_reference_code() {
+        let dir = tempdir().expect("tempdir");
+        let db_path = dir.path().join("reserved-reference-code.db");
+        initialize_database(&db_path).expect("db init");
+        let mut connection = open_connection(&db_path).expect("db open");
+        let reference = list_product_references(&connection).expect("references")[0].clone();
+
+        let error = create_product(
+            &mut connection,
+            &NewProduct::FreeText {
+                sku: reference.code,
+                title: "Fausse saisie libre".into(),
+            },
+        )
+        .expect_err("reference code must stay reserved");
+
+        assert!(matches!(
+            error,
+            ConfigRepositoryError::ReservedReferenceCode
+        ));
+        assert!(list_products(&connection).expect("products").is_empty());
+    }
+
+    #[test]
+    fn reports_duplicate_sku_as_an_actionable_error() {
+        let dir = tempdir().expect("tempdir");
+        let db_path = dir.path().join("duplicate-sku.db");
+        initialize_database(&db_path).expect("db init");
+        let mut connection = open_connection(&db_path).expect("db open");
+        let input = NewProduct::FreeText {
+            sku: "DUPLICATE-1".into(),
+            title: "Premier produit".into(),
+        };
+        create_product(&mut connection, &input).expect("first product");
+
+        let error = create_product(
+            &mut connection,
+            &NewProduct::FreeText {
+                sku: "DUPLICATE-1".into(),
+                title: "Second produit".into(),
+            },
+        )
+        .expect_err("duplicate sku");
+
+        assert!(matches!(error, ConfigRepositoryError::DuplicateSku));
+        assert_eq!(error.to_string(), "Un produit avec ce code existe déjà.");
+    }
+
+    #[test]
+    fn returns_an_error_if_created_product_disappears_before_reload() {
+        let dir = tempdir().expect("tempdir");
+        let db_path = dir.path().join("deleted-after-insert.db");
+        initialize_database(&db_path).expect("db init");
+        let mut connection = open_connection(&db_path).expect("db open");
+        connection
+            .execute_batch(
+                "CREATE TRIGGER delete_created_product AFTER INSERT ON products
+                 BEGIN
+                   DELETE FROM products WHERE id = NEW.id;
+                 END;",
+            )
+            .expect("delete trigger");
+
+        let error = create_product(
+            &mut connection,
+            &NewProduct::FreeText {
+                sku: "VANISH-1".into(),
+                title: "Produit éphémère".into(),
+            },
+        )
+        .expect_err("missing committed product");
+
+        assert!(matches!(
+            error,
+            ConfigRepositoryError::CreatedProductMissing
+        ));
     }
 }

@@ -282,5 +282,14 @@ mod tests {
             })
             .expect("reference count");
         assert_eq!(count, 3);
+
+        let dracaufeu: (String, String) = connection
+            .query_row(
+                "SELECT edition, rarity FROM product_references WHERE id = 'pokemon-sv2-fr-203'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?)),
+            )
+            .expect("reference metadata");
+        assert_eq!(dracaufeu, ("Première édition".into(), "Ultra rare".into()));
     }
 }

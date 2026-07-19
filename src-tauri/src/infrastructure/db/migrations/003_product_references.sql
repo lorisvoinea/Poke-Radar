@@ -4,13 +4,14 @@ CREATE TABLE product_references (
     name TEXT NOT NULL,
     set_name TEXT NOT NULL,
     edition TEXT NOT NULL,
+    rarity TEXT NOT NULL,
     language TEXT NOT NULL
 );
 
-INSERT OR IGNORE INTO product_references(id, code, name, set_name, edition, language) VALUES
-    ('pokemon-sv1-fr-001', 'SV1-001-FR', 'Poussacha', 'Écarlate et Violet', 'Écarlate et Violet', 'fr'),
-    ('pokemon-sv2-fr-203', 'SV2-203-FR', 'Dracaufeu ex', '151', 'Ultra rare', 'fr'),
-    ('pokemon-swsh12-fr-160', 'SWSH12-160-FR', 'Pikachu VMAX', 'Zénith Suprême', 'Holo rare VMAX', 'fr');
+INSERT OR IGNORE INTO product_references(id, code, name, set_name, edition, rarity, language) VALUES
+    ('pokemon-sv1-fr-001', 'SV1-001-FR', 'Poussacha', 'Écarlate et Violet', 'Première édition', 'Commune', 'fr'),
+    ('pokemon-sv2-fr-203', 'SV2-203-FR', 'Dracaufeu ex', '151', 'Première édition', 'Ultra rare', 'fr'),
+    ('pokemon-swsh12-fr-160', 'SWSH12-160-FR', 'Pikachu VMAX', 'Zénith Suprême', 'Première édition', 'Holo rare VMAX', 'fr');
 
 ALTER TABLE products ADD COLUMN reference_id TEXT REFERENCES product_references(id);
 ALTER TABLE products ADD COLUMN normalization_status TEXT NOT NULL DEFAULT 'free_text'

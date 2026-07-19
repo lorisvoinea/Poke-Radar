@@ -8,6 +8,7 @@ const references = [{
   name: "Poussacha",
   setName: "Écarlate et Violet",
   edition: "Première édition",
+  rarity: "Rare",
   language: "fr"
 }];
 
@@ -20,6 +21,7 @@ describe("ProductConfigurator", () => {
 
     expect(screen.getByLabelText("Métadonnées de la référence")).toHaveTextContent("Écarlate et Violet");
     expect(screen.getByLabelText("Métadonnées de la référence")).toHaveTextContent("Première édition");
+    expect(screen.getByLabelText("Métadonnées de la référence")).toHaveTextContent("Rare");
     fireEvent.click(screen.getByRole("button", { name: "Ajouter le produit" }));
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledWith({ referenceId: "ref-1" }));
@@ -59,5 +61,23 @@ describe("ProductConfigurator", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeEnabled());
     expect(screen.getByLabelText("Nom libre")).toHaveValue("Modifié");
     expect(screen.queryByText("Produit créé et liste actualisée.")).not.toBeInTheDocument();
+  });
+
+  it("sélectionne la première référence lorsqu'elle arrive après le rendu initial", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    const { rerender } = render(<ProductConfigurator references={[]} existingSkus={[]} onSubmit={onSubmit} />);
+
+    expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeDisabled();
+    rerender(<ProductConfigurator references={references} existingSkus={[]} onSubmit={onSubmit} />);
+
+    expect(screen.getByRole("combobox", { name: "Référence Pokémon" })).toHaveValue("ref-1");
+    expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeEnabled();
+  });
+
+  it("écarte les références dont le SKU existe déjà", () => {
+    render(<ProductConfigurator references={references} existingSkus={["SV1-001-FR"]} onSubmit={vi.fn()} />);
+
+    expect(screen.queryByRole("option", { name: /Poussacha/ })).not.toBeInTheDocument();
+    expect(screen.getByText("Toutes les références disponibles sont déjà suivies.")).toBeInTheDocument();
   });
 });

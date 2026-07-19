@@ -5,9 +5,15 @@ pub fn validate_new_product(
     sku: Option<String>,
     title: Option<String>,
 ) -> Result<NewProduct, ValidationError> {
-    let reference_id = reference_id.filter(|value| !value.trim().is_empty());
-    let sku = sku.filter(|value| !value.trim().is_empty());
-    let title = title.filter(|value| !value.trim().is_empty());
+    let reference_id = reference_id
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty());
+    let sku = sku
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty());
+    let title = title
+        .map(|value| value.trim().to_string())
+        .filter(|value| !value.is_empty());
 
     match (reference_id, sku, title) {
         (Some(reference_id), None, None) => Ok(NewProduct::Reference { reference_id }),
@@ -87,6 +93,27 @@ mod tests {
             Ok(NewProduct::FreeText {
                 sku: "SKU".into(),
                 title: "Titre".into()
+            })
+        );
+    }
+
+    #[test]
+    fn persists_product_values_after_trimming_validated_whitespace() {
+        assert_eq!(
+            validate_new_product(Some("  ref-1  ".into()), None, None),
+            Ok(NewProduct::Reference {
+                reference_id: "ref-1".into()
+            })
+        );
+        assert_eq!(
+            validate_new_product(
+                None,
+                Some("  SKU-1  ".into()),
+                Some("  Carte locale  ".into())
+            ),
+            Ok(NewProduct::FreeText {
+                sku: "SKU-1".into(),
+                title: "Carte locale".into()
             })
         );
     }

@@ -36,6 +36,7 @@ pub struct ProductReferenceDto {
     pub name: String,
     pub set_name: String,
     pub edition: String,
+    pub rarity: String,
     pub language: String,
 }
 
@@ -298,6 +299,7 @@ fn map_reference(reference: ProductReference) -> ProductReferenceDto {
         name: reference.name,
         set_name: reference.set_name,
         edition: reference.edition,
+        rarity: reference.rarity,
         language: reference.language,
     }
 }

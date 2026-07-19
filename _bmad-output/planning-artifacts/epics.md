@@ -124,6 +124,7 @@ So that le système reflète ma stratégie réelle de revente.
 **When** je crée ou modifie un profil de surveillance
 **Then** les paramètres produits/seuils/frais sont persistés localement
 **And** ils sont réutilisés automatiquement au prochain cycle de monitoring.
+**And** l’écran reste intégralement utilisable de 320 px jusqu’au desktop, sans défilement horizontal de page, avec champs et actions adaptés au tactile.
 
 ### Story 1.3: Exploiter des référentiels préenregistrés pour limiter les erreurs
 

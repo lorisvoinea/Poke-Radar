@@ -8,23 +8,33 @@ deferred_work_file: '{implementation_artifacts}/deferred-work.md'
 
 - YOU MUST ALWAYS SPEAK OUTPUT in your Agent communication style with the config `{communication_language}`
 - NEVER auto-push.
+- All review subagents must run at the same model capability as the current session.
 
 ## INSTRUCTIONS
 
 ### Implement
 
+Follow `./sync-sprint-status.md` with `{target_status}` = `in-progress`.
+
 Implement the clarified intent directly.
 
 ### Review
 
-Invoke the `bmad-review-adversarial-general` skill in a subagent with the changed files. The subagent gets NO conversation context — to avoid anchoring bias. If no sub-agents are available, write the changed files to a review prompt file in `{implementation_artifacts}` and HALT. Ask the human to run the review in a separate session and paste back the findings.
+Launch Blind Hunter without prior conversation context. If no subagents are available, generate one review prompt file in `{implementation_artifacts}` and HALT. Ask the human to run it in a separate session and paste back the findings.
+
+- **Blind Hunter** — prompt: "Invoke the `bmad-review-adversarial-general` skill on the changed files."
 
 ### Classify
 
 Deduplicate all review findings. Three categories only:
 
 - **patch** — trivially fixable. Auto-fix immediately.
-- **defer** — pre-existing issue not caused by this change. Append to `{deferred_work_file}`.
+- **defer** — pre-existing issue not caused by this change. Append one new entry to `{deferred_work_file}` using this format. Do not modify existing entries or look for duplicates.
+  ```markdown
+  - source_spec: `{spec_file}`
+    summary: <one sentence>
+    evidence: <why this is real>
+  ```
 - **reject** — noise. Drop silently.
 
 If a finding is caused by this change but too significant for a trivial patch, HALT and present it to the human for decision before proceeding.
@@ -38,6 +48,8 @@ Write `{spec_file}` using `./spec-template.md`. Fill only these sections — del
 1. **Frontmatter** — set `title: '{title}'`, `type`, `created`, `status: 'done'`. Add `route: 'one-shot'`.
 2. **Title and Intent** — `# {title}` heading and `## Intent` with **Problem** and **Approach** lines. Reuse the summary you already generated for the terminal.
 3. **Suggested Review Order** — append after Intent. Build using the same convention as `./step-05-present.md` § "Generate Suggested Review Order" (spec-file-relative links, concern-based ordering, ultra-concise framing).
+
+Follow `./sync-sprint-status.md` with `{target_status}` = `review`.
 
 ### Commit
 
@@ -59,3 +71,9 @@ If version control is available and the tree is dirty, create a local commit wit
 HALT and wait for human input.
 
 Workflow complete.
+
+## On Complete
+
+Run: `python3 {project-root}/_bmad/scripts/resolve_customization.py --skill {skill-root} --key workflow.on_complete`
+
+If the resolved `workflow.on_complete` is non-empty, follow it as the final terminal instruction before exiting.

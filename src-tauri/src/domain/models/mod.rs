@@ -32,6 +32,7 @@ pub struct ProductReference {
     pub name: String,
     pub set_name: String,
     pub edition: String,
+    pub rarity: String,
     pub language: String,
 }
 

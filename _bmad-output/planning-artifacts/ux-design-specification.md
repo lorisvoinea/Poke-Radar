@@ -265,9 +265,12 @@ Micro-interactions :
 
 ### Responsive
 
+- Mobile : `320–767px` avec contenu empilé, navigation sans débordement horizontal, actions pleine largeur lorsque nécessaire et cibles tactiles de 44 px minimum.
 - Desktop prioritaire : `>= 1280px`
 - Laptop : `1024–1279px`
 - Tablet : `768–1023px` en consultation + actions critiques
+
+La mise en page suit une fondation mobile-first puis augmente progressivement sa densité sur tablette, laptop et desktop.
 
 ### Accessibilité
 

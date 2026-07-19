@@ -29,7 +29,7 @@ const FALLBACK_PRODUCTS: Product[] = [
   { id: 2, sku: "NSW-OLED", title: "Nintendo Switch OLED", normalizationStatus: "free_text", reference: null }
 ];
 const FALLBACK_REFERENCES: ProductReference[] = [
-  { id: "pokemon-sv1-fr-001", code: "SV1-001-FR", name: "Poussacha", setName: "Écarlate et Violet", edition: "Écarlate et Violet", language: "fr" }
+  { id: "pokemon-sv1-fr-001", code: "SV1-001-FR", name: "Poussacha", setName: "Écarlate et Violet", edition: "Première édition", rarity: "Commune", language: "fr" }
 ];
 
 export function StrategyPage(): JSX.Element {
@@ -49,13 +49,22 @@ export function StrategyPage(): JSX.Element {
     }
 
     await tauri.invoke("app_ready");
-    const loadedProducts = await tauri.invoke<Product[]>("list_products_command");
-    const loadedReferences = await tauri.invoke<ProductReference[]>("list_product_references_command");
-    const loadedProfiles = await tauri.invoke<Profile[]>("list_monitor_profiles_command");
-    setProducts(loadedProducts);
-    setReferences(loadedReferences);
-    setProfiles(loadedProfiles);
-    setStatus("Configuration rechargée automatiquement.");
+    const [productResult, referenceResult, profileResult] = await Promise.allSettled([
+      tauri.invoke<Product[]>("list_products_command"),
+      tauri.invoke<ProductReference[]>("list_product_references_command"),
+      tauri.invoke<Profile[]>("list_monitor_profiles_command")
+    ]);
+    if (productResult.status === "fulfilled") setProducts(productResult.value);
+    if (referenceResult.status === "fulfilled") setReferences(referenceResult.value);
+    else setReferences([]);
+    if (profileResult.status === "fulfilled") setProfiles(profileResult.value);
+
+    if (productResult.status === "rejected" || profileResult.status === "rejected") {
+      throw new Error("Impossible de recharger les produits ou les profils.");
+    }
+    setStatus(referenceResult.status === "rejected"
+      ? "Configuration chargée; référentiel indisponible. La saisie libre reste possible."
+      : "Configuration rechargée automatiquement.");
   }
 
   useEffect(() => {
@@ -94,9 +103,13 @@ export function StrategyPage(): JSX.Element {
       const reference = "referenceId" in input
         ? references.find((item) => item.id === input.referenceId) ?? null
         : null;
+      const sku = reference?.code ?? input.sku?.trim() ?? "";
+      if (products.some((product) => product.sku === sku)) {
+        throw new Error("Un produit avec ce code existe déjà.");
+      }
       setProducts((current) => [...current, {
         id: Math.max(0, ...current.map((product) => product.id)) + 1,
-        sku: reference?.code ?? input.sku ?? "",
+        sku,
         title: reference?.name ?? input.title ?? "",
         normalizationStatus: reference ? "normalized" : "free_text",
         reference
@@ -105,9 +118,15 @@ export function StrategyPage(): JSX.Element {
       return;
     }
     await tauri.invoke("create_product_command", { input });
-    await refreshData();
-    setStatus("Produit créé et configuration rechargée.");
+    try {
+      await refreshData();
+      setStatus("Produit créé et configuration rechargée.");
+    } catch {
+      throw new Error("Produit créé, mais son rafraîchissement a échoué. Rechargez la configuration pour l'afficher.");
+    }
   }
+
+  const productsById = new Map(products.map((product) => [product.id, product]));
 
   return (
     <main className="app-shell">
@@ -121,7 +140,7 @@ export function StrategyPage(): JSX.Element {
 
       <div className="dashboard-grid">
         <section className="panel panel--form" aria-label="Configuration de la stratégie">
-          <ProductConfigurator references={references} onSubmit={createProduct} />
+          <ProductConfigurator references={references} existingSkus={products.map((product) => product.sku)} onSubmit={createProduct} />
           <StrategyForm
             products={products}
             onSubmit={createProfile}
@@ -143,7 +162,21 @@ export function StrategyPage(): JSX.Element {
               </div>
               <dl>
                 <div><dt>Marge min.</dt><dd>{profile.minMarginBps} bps</dd></div>
-                <div><dt>Produits</dt><dd>{profile.productIds.join(", ")}</dd></div>
+                <div>
+                  <dt>Produits</dt>
+                  <dd>
+                    <ul className="profile-product-list">
+                      {profile.productIds.map((productId) => {
+                        const product = productsById.get(productId);
+                        return (
+                          <li key={productId}>
+                            {product ? <><span>{product.title} · {product.sku}</span>{product.normalizationStatus === "free_text" ? <span className="normalization-badge">Non normalisé</span> : null}</> : <span>Produit indisponible (ID {productId})</span>}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </dd>
+                </div>
               </dl>
             </li>
           ))}

@@ -1,4 +1,4 @@
-import { FormEvent, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 
 export type ProductReference = {
   id: string;
@@ -6,6 +6,7 @@ export type ProductReference = {
   name: string;
   setName: string;
   edition: string;
+  rarity: string;
   language: string;
 };
 
@@ -15,6 +16,7 @@ export type ProductInput =
 
 type Props = {
   references: ProductReference[];
+  existingSkus?: string[];
   onSubmit: (input: ProductInput) => Promise<void>;
 };
 
@@ -24,9 +26,13 @@ function errorMessage(error: unknown): string {
   return "Impossible de créer le produit. Réessayez.";
 }
 
-export function ProductConfigurator({ references, onSubmit }: Props): JSX.Element {
+export function ProductConfigurator({ references, existingSkus = [], onSubmit }: Props): JSX.Element {
+  const availableReferences = useMemo(() => {
+    const used = new Set(existingSkus.map((sku) => sku.trim()));
+    return references.filter((reference) => !used.has(reference.code));
+  }, [existingSkus, references]);
   const [mode, setMode] = useState<"reference" | "free_text">("reference");
-  const [referenceId, setReferenceId] = useState(references[0]?.id ?? "");
+  const [referenceId, setReferenceId] = useState(availableReferences[0]?.id ?? "");
   const [sku, setSku] = useState("");
   const [title, setTitle] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
@@ -34,12 +40,18 @@ export function ProductConfigurator({ references, onSubmit }: Props): JSX.Elemen
   const submittingRef = useRef(false);
   const revisionRef = useRef(0);
 
+  useEffect(() => {
+    if (!availableReferences.some((reference) => reference.id === referenceId)) {
+      setReferenceId(availableReferences[0]?.id ?? "");
+    }
+  }, [availableReferences, referenceId]);
+
   function edited() {
     revisionRef.current += 1;
     setFeedback(null);
   }
 
-  const selected = references.find((item) => item.id === referenceId);
+  const selected = availableReferences.find((item) => item.id === referenceId);
   const valid = mode === "reference" ? Boolean(selected) : Boolean(sku.trim() && title.trim());
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -78,8 +90,8 @@ export function ProductConfigurator({ references, onSubmit }: Props): JSX.Elemen
 
       <fieldset className="mode-picker">
         <legend>Mode de création</legend>
-        <label><input type="radio" name="product-mode" checked={mode === "reference"} onChange={() => { edited(); setMode("reference"); }} /> Référentiel</label>
-        <label><input type="radio" name="product-mode" checked={mode === "free_text"} onChange={() => { edited(); setMode("free_text"); }} /> Saisie libre</label>
+        <label className="touch-target"><input type="radio" name="product-mode" checked={mode === "reference"} onChange={() => { edited(); setMode("reference"); }} /> Référentiel</label>
+        <label className="touch-target"><input type="radio" name="product-mode" checked={mode === "free_text"} onChange={() => { edited(); setMode("free_text"); }} /> Saisie libre</label>
       </fieldset>
 
       {mode === "reference" ? (
@@ -88,14 +100,18 @@ export function ProductConfigurator({ references, onSubmit }: Props): JSX.Elemen
             Référence Pokémon
             <select value={referenceId} onChange={(event) => { edited(); setReferenceId(event.target.value); }}>
               <option value="">Sélectionnez une référence</option>
-              {references.map((item) => <option key={item.id} value={item.id}>{item.name} — {item.code}</option>)}
+              {availableReferences.map((item) => <option key={item.id} value={item.id}>{item.name} — {item.code}</option>)}
             </select>
           </label>
+          {references.length > 0 && availableReferences.length === 0 ? (
+            <p className="feedback feedback--hint" role="status">Toutes les références disponibles sont déjà suivies.</p>
+          ) : null}
           {selected ? (
             <dl className="reference-preview" aria-label="Métadonnées de la référence">
               <div><dt>Nom</dt><dd>{selected.name}</dd></div>
               <div><dt>Set</dt><dd>{selected.setName}</dd></div>
               <div><dt>Édition</dt><dd>{selected.edition}</dd></div>
+              <div><dt>Rareté</dt><dd>{selected.rarity}</dd></div>
               <div><dt>Langue</dt><dd>{selected.language}</dd></div>
               <div><dt>Code</dt><dd>{selected.code}</dd></div>
             </dl>
@@ -109,7 +125,7 @@ export function ProductConfigurator({ references, onSubmit }: Props): JSX.Elemen
         </div>
       )}
 
-      <button className="button button--secondary" type="submit" disabled={!valid || submitting}>
+      <button className="button button--secondary touch-target" type="submit" disabled={!valid || submitting}>
         {submitting ? "Création en cours..." : "Ajouter le produit"}
       </button>
       {feedback ? <p className="feedback" role="status">{feedback}</p> : null}
