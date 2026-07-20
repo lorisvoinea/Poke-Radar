@@ -44,7 +44,15 @@ describe("ProductConfigurator", () => {
   it("affiche une erreur backend actionnable", async () => {
     render(<ProductConfigurator references={references} onSubmit={vi.fn().mockRejectedValue("Référence introuvable")} />);
     fireEvent.click(screen.getByRole("button", { name: "Ajouter le produit" }));
-    expect(await screen.findByText("Référence introuvable")).toBeInTheDocument();
+    expect(await screen.findByRole("alert")).toHaveTextContent("Référence introuvable");
+  });
+
+  it("annonce les succès sans les présenter comme des alertes", async () => {
+    render(<ProductConfigurator references={references} onSubmit={vi.fn().mockResolvedValue(undefined)} />);
+    fireEvent.click(screen.getByRole("button", { name: "Ajouter le produit" }));
+
+    expect(await screen.findByRole("status")).toHaveTextContent("Produit créé et liste actualisée.");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
   it("ne réinitialise pas un brouillon modifié pendant la création", async () => {

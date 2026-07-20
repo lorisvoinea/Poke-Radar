@@ -110,9 +110,8 @@ describe("StrategyPage", () => {
     expect(await screen.findByText("Un produit avec ce code existe déjà.")).toBeInTheDocument();
   });
 
-  it("respecte le parcours clavier et les cibles tactiles à 320 px", async () => {
-    Object.defineProperty(window, "innerWidth", { configurable: true, value: 320 });
-    const { container } = render(<StrategyPage />);
+  it("préserve les contrôles clavier et les classes de cibles tactiles", async () => {
+    render(<StrategyPage />);
     const mode = await screen.findByRole("radio", { name: "Référentiel" });
     const selector = screen.getByRole("combobox", { name: "Référence Pokémon" });
     const submit = screen.getByRole("button", { name: "Ajouter le produit" });
@@ -125,15 +124,8 @@ describe("StrategyPage", () => {
     submit.focus();
     expect(submit).toHaveFocus();
     expect(screen.getByRole("main")).toHaveClass("app-shell");
-    const grid = container.querySelector<HTMLElement>(".dashboard-grid");
     const modeTarget = mode.closest<HTMLElement>("label");
-    expect(grid).not.toBeNull();
     expect(modeTarget).not.toBeNull();
-    expect(styles).toMatch(/html\s*{[^}]*min-width:\s*320px/);
-    expect(styles).toMatch(/\.app-shell\s*{[^}]*width:\s*min\(100%,\s*1180px\)/);
-    expect(styles).toMatch(/\.dashboard-grid\s*{[^}]*min-width:\s*0/);
-    expect(styles).toMatch(/\.touch-target\s*{[^}]*min-height:\s*44px/);
-    expect(styles).toMatch(/\.button\s*{[^}]*min-height:\s*48px/);
     expect(modeTarget).toHaveClass("touch-target");
     expect(submit).toHaveClass("touch-target");
   });

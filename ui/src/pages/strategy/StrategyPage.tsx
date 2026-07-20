@@ -29,7 +29,7 @@ const FALLBACK_PRODUCTS: Product[] = [
   { id: 2, sku: "NSW-OLED", title: "Nintendo Switch OLED", normalizationStatus: "free_text", reference: null }
 ];
 const FALLBACK_REFERENCES: ProductReference[] = [
-  { id: "pokemon-sv1-fr-001", code: "SV1-001-FR", name: "Poussacha", setName: "Écarlate et Violet", edition: "Première édition", rarity: "Commune", language: "fr" }
+  { id: "pokemon-sv1-fr-001", code: "SVI-013-FR", name: "Poussacha", setName: "Écarlate et Violet", edition: "Standard", rarity: "Commune", language: "fr" }
 ];
 
 export function StrategyPage(): JSX.Element {

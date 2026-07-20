@@ -41,6 +41,11 @@ const MIGRATIONS: &[Migration] = &[
         name: "003_product_references",
         script: include_str!("migrations/003_product_references.sql"),
     },
+    Migration {
+        version: 4,
+        name: "004_correct_product_reference_seed",
+        script: include_str!("migrations/004_correct_product_reference_seed.sql"),
+    },
 ];
 
 pub fn initialize_database(path: &Path) -> Result<(), DbError> {
@@ -283,13 +288,107 @@ mod tests {
             .expect("reference count");
         assert_eq!(count, 3);
 
-        let dracaufeu: (String, String) = connection
+        let mut statement = connection
+            .prepare(
+                "SELECT id, code, name, set_name, edition, rarity, language \
+                 FROM product_references ORDER BY id",
+            )
+            .expect("seed query");
+        let references = statement
+            .query_map([], |row| {
+                Ok((
+                    row.get::<_, String>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(3)?,
+                    row.get::<_, String>(4)?,
+                    row.get::<_, String>(5)?,
+                    row.get::<_, String>(6)?,
+                ))
+            })
+            .expect("seed rows")
+            .collect::<Result<Vec<_>, _>>()
+            .expect("seed values");
+        assert_eq!(
+            references,
+            vec![
+                (
+                    "pokemon-sv1-fr-001".into(),
+                    "SVI-013-FR".into(),
+                    "Poussacha".into(),
+                    "Écarlate et Violet".into(),
+                    "Standard".into(),
+                    "Commune".into(),
+                    "fr".into()
+                ),
+                (
+                    "pokemon-sv2-fr-203".into(),
+                    "MEW-006-FR".into(),
+                    "Dracaufeu ex".into(),
+                    "Écarlate et Violet – 151".into(),
+                    "Standard".into(),
+                    "Double rare".into(),
+                    "fr".into()
+                ),
+                (
+                    "pokemon-swsh12-fr-160".into(),
+                    "CRZ-160-FR".into(),
+                    "Pikachu".into(),
+                    "Épée et Bouclier – Zénith Suprême".into(),
+                    "Standard".into(),
+                    "Rare secrète".into(),
+                    "fr".into()
+                ),
+            ]
+        );
+    }
+
+    #[test]
+    fn corrective_migration_updates_seed_from_an_already_applied_v3() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("v3-seed.db");
+        let mut connection = Connection::open(database_path).expect("open db");
+
+        apply_migrations(&mut connection, &MIGRATIONS[..3]).expect("migrate to v3");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('SV2-203-FR', 'Ancien Dracaufeu', 'pokemon-sv2-fr-203', 'normalized')",
+                [],
+            )
+            .expect("normalized product created before corrective migration");
+        apply_migrations(&mut connection, MIGRATIONS).expect("apply corrective migration");
+
+        let corrected: (String, String, String, String) = connection
             .query_row(
-                "SELECT edition, rarity FROM product_references WHERE id = 'pokemon-sv2-fr-203'",
+                "SELECT code, name, set_name, rarity FROM product_references \
+                 WHERE id = 'pokemon-sv2-fr-203'",
+                [],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?, row.get(3)?)),
+            )
+            .expect("corrected reference");
+
+        assert_eq!(
+            corrected,
+            (
+                "MEW-006-FR".into(),
+                "Dracaufeu ex".into(),
+                "Écarlate et Violet – 151".into(),
+                "Double rare".into()
+            )
+        );
+
+        let corrected_product: (String, String) = connection
+            .query_row(
+                "SELECT sku, title FROM products \
+                 WHERE reference_id = 'pokemon-sv2-fr-203'",
                 [],
                 |row| Ok((row.get(0)?, row.get(1)?)),
             )
-            .expect("reference metadata");
-        assert_eq!(dracaufeu, ("Première édition".into(), "Ultra rare".into()));
+            .expect("corrected normalized product");
+        assert_eq!(
+            corrected_product,
+            ("MEW-006-FR".into(), "Dracaufeu ex".into())
+        );
     }
 }

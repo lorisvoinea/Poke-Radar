@@ -36,6 +36,7 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
   const [sku, setSku] = useState("");
   const [title, setTitle] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [feedbackKind, setFeedbackKind] = useState<"success" | "error" | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const submittingRef = useRef(false);
   const revisionRef = useRef(0);
@@ -49,6 +50,7 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
   function edited() {
     revisionRef.current += 1;
     setFeedback(null);
+    setFeedbackKind(null);
   }
 
   const selected = availableReferences.find((item) => item.id === referenceId);
@@ -60,6 +62,7 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
     submittingRef.current = true;
     setSubmitting(true);
     setFeedback(null);
+    setFeedbackKind(null);
     const revision = revisionRef.current;
     try {
       await onSubmit(
@@ -71,9 +74,13 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
           setTitle("");
         }
         setFeedback("Produit créé et liste actualisée.");
+        setFeedbackKind("success");
       }
     } catch (error) {
-      if (revisionRef.current === revision) setFeedback(errorMessage(error));
+      if (revisionRef.current === revision) {
+        setFeedback(errorMessage(error));
+        setFeedbackKind("error");
+      }
     } finally {
       submittingRef.current = false;
       setSubmitting(false);
@@ -128,7 +135,14 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
       <button className="button button--secondary touch-target" type="submit" disabled={!valid || submitting}>
         {submitting ? "Création en cours..." : "Ajouter le produit"}
       </button>
-      {feedback ? <p className="feedback" role="status">{feedback}</p> : null}
+      {feedback ? (
+        <p
+          className={`feedback feedback--${feedbackKind}`}
+          role={feedbackKind === "error" ? "alert" : "status"}
+        >
+          {feedback}
+        </p>
+      ) : null}
     </form>
   );
 }
