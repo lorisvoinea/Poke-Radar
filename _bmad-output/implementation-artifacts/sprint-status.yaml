@@ -43,7 +43,7 @@ development_status:
   epic-1: in-progress
   1-1-initialiser-lapplication-desktop-et-la-persistance-locale: done
   1-2-configurer-produits-profils-de-surveillance-et-parametres-economiques: done
-  1-3-exploiter-des-referentiels-preenregistres-pour-limiter-les-erreurs: done
+  1-3-exploiter-des-referentiels-preenregistres-pour-limiter-les-erreurs: ready-for-dev
   epic-1-retrospective: optional
 
   epic-2: backlog

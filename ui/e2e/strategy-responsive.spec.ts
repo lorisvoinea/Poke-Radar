@@ -16,14 +16,29 @@ test("keeps the strategy flow usable without horizontal overflow at 320 px", asy
   expect(layout.bodyScrollWidth).toBeLessThanOrEqual(layout.bodyClientWidth);
 
   const referenceMode = page.getByRole("radio", { name: "Référentiel" });
+  const freeTextMode = page.getByRole("radio", { name: "Saisie libre" });
   const selector = page.getByRole("combobox", { name: "Référence Pokémon" });
   const submit = page.getByRole("button", { name: "Ajouter le produit" });
 
-  await referenceMode.focus();
+  await page.keyboard.press("Tab");
   await expect(referenceMode).toBeFocused();
-  await selector.focus();
+
+  await page.keyboard.press("ArrowRight");
+  await expect(freeTextMode).toBeChecked();
+  await expect(freeTextMode).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("textbox", { name: "Code libre" })).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("textbox", { name: "Nom libre" })).toBeFocused();
+
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Shift+Tab");
+  await expect(freeTextMode).toBeFocused();
+  await page.keyboard.press("ArrowLeft");
+  await expect(referenceMode).toBeChecked();
+  await page.keyboard.press("Tab");
   await expect(selector).toBeFocused();
-  await submit.focus();
+  await page.keyboard.press("Tab");
   await expect(submit).toBeFocused();
 
   const modeTarget = referenceMode.locator("xpath=ancestor::label");

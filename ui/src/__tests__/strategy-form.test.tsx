@@ -125,4 +125,27 @@ describe("StrategyForm", () => {
     rerender(<StrategyForm products={[]} onSubmit={vi.fn()} />);
     await waitFor(() => expect(screen.getByRole("button", { name: "Enregistrer le profil" })).toBeDisabled());
   });
+
+  it("traite l'élagage d'une sélection comme une modification du brouillon en cours", async () => {
+    let resolveSubmission!: () => void;
+    const onSubmit = vi.fn(
+      () => new Promise<void>((resolve) => {
+        resolveSubmission = resolve;
+      })
+    );
+    const { rerender } = render(<StrategyForm products={products} onSubmit={onSubmit} />);
+
+    const nameInput = screen.getByLabelText("Nom du profil");
+    fireEvent.change(nameInput, { target: { value: "Profil à conserver" } });
+    fireEvent.click(screen.getByRole("checkbox", { name: /PKM-007/ }));
+    fireEvent.click(screen.getByRole("button", { name: "Enregistrer le profil" }));
+
+    rerender(<StrategyForm products={[]} onSubmit={onSubmit} />);
+    await waitFor(() => expect(screen.queryByRole("checkbox", { name: /PKM-007/ })).not.toBeInTheDocument());
+    resolveSubmission();
+
+    await waitFor(() => expect(screen.getByRole("button", { name: "Enregistrer le profil" })).toBeDisabled());
+    expect(nameInput).toHaveValue("Profil à conserver");
+    expect(screen.queryByText("Profil enregistré avec succès.")).not.toBeInTheDocument();
+  });
 });

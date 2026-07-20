@@ -16,7 +16,7 @@ pub enum ConfigRepositoryError {
     ReservedReferenceCode,
     #[error("Un produit avec ce code existe déjà.")]
     DuplicateSku,
-    #[error("Le produit a été créé, mais il n'est plus disponible. Rechargez la configuration.")]
+    #[error("La création du produit a été annulée car sa vérification a échoué. Réessayez.")]
     CreatedProductMissing,
 }
 
@@ -54,8 +54,9 @@ pub fn create_product(
         }
     }
     let id = tx.last_insert_rowid();
+    let product = get_product(&tx, id)?.ok_or(ConfigRepositoryError::CreatedProductMissing)?;
     tx.commit()?;
-    get_product(connection, id)?.ok_or(ConfigRepositoryError::CreatedProductMissing)
+    Ok(product)
 }
 
 fn execute_product_insert<P: rusqlite::Params>(
@@ -492,15 +493,17 @@ mod tests {
     }
 
     #[test]
-    fn returns_an_error_if_created_product_disappears_before_reload() {
+    fn rolls_back_creation_if_product_disappears_before_commit() {
         let dir = tempdir().expect("tempdir");
         let db_path = dir.path().join("deleted-after-insert.db");
         initialize_database(&db_path).expect("db init");
         let mut connection = open_connection(&db_path).expect("db open");
         connection
             .execute_batch(
-                "CREATE TRIGGER delete_created_product AFTER INSERT ON products
+                "CREATE TABLE product_insert_audit(product_id INTEGER NOT NULL);
+                 CREATE TRIGGER delete_created_product AFTER INSERT ON products
                  BEGIN
+                   INSERT INTO product_insert_audit(product_id) VALUES(NEW.id);
                    DELETE FROM products WHERE id = NEW.id;
                  END;",
             )
@@ -519,5 +522,18 @@ mod tests {
             error,
             ConfigRepositoryError::CreatedProductMissing
         ));
+        assert_eq!(
+            error.to_string(),
+            "La création du produit a été annulée car sa vérification a échoué. Réessayez."
+        );
+        let audit_count: i64 = connection
+            .query_row("SELECT COUNT(*) FROM product_insert_audit", [], |row| {
+                row.get(0)
+            })
+            .expect("audit count");
+        assert_eq!(
+            audit_count, 0,
+            "a failed reload must roll back the still-uncommitted creation"
+        );
     }
 }

@@ -14,8 +14,11 @@ export type ProductInput =
   | { referenceId: string; sku?: never; title?: never }
   | { referenceId?: never; sku: string; title: string };
 
+export type ReferenceAvailability = "loading" | "available" | "empty" | "unavailable";
+
 type Props = {
   references: ProductReference[];
+  referenceAvailability?: ReferenceAvailability;
   existingSkus?: string[];
   onSubmit: (input: ProductInput) => Promise<void>;
 };
@@ -26,7 +29,8 @@ function errorMessage(error: unknown): string {
   return "Impossible de créer le produit. Réessayez.";
 }
 
-export function ProductConfigurator({ references, existingSkus = [], onSubmit }: Props): JSX.Element {
+export function ProductConfigurator({ references, referenceAvailability, existingSkus = [], onSubmit }: Props): JSX.Element {
+  const availability = referenceAvailability ?? (references.length > 0 ? "available" : "empty");
   const availableReferences = useMemo(() => {
     const used = new Set(existingSkus.map((sku) => sku.trim()));
     return references.filter((reference) => !used.has(reference.code));
@@ -110,6 +114,15 @@ export function ProductConfigurator({ references, existingSkus = [], onSubmit }:
               {availableReferences.map((item) => <option key={item.id} value={item.id}>{item.name} — {item.code}</option>)}
             </select>
           </label>
+          {availability === "loading" ? (
+            <p className="feedback feedback--hint" role="status">Chargement du référentiel...</p>
+          ) : null}
+          {availability === "empty" ? (
+            <p className="feedback feedback--hint" role="status">Aucune référence n'est disponible. La saisie libre reste possible.</p>
+          ) : null}
+          {availability === "unavailable" ? (
+            <p className="feedback feedback--hint" role="status">Le référentiel est indisponible. La saisie libre reste possible.</p>
+          ) : null}
           {references.length > 0 && availableReferences.length === 0 ? (
             <p className="feedback feedback--hint" role="status">Toutes les références disponibles sont déjà suivies.</p>
           ) : null}

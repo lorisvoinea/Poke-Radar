@@ -17,6 +17,7 @@ use crate::{
             create_monitor_profile, create_product, delete_monitor_profile, list_monitor_profiles,
             list_product_references, list_products, update_monitor_profile,
         },
+        DbError, DbErrorKind,
     },
 };
 
@@ -116,7 +117,7 @@ pub fn create_product_command<R: tauri::Runtime>(
         .map_err(|error| error.to_string())?;
 
     let db_path = default_database_path(&app_handle)?;
-    let mut connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let mut connection = open_connection(&db_path).map_err(database_access_error)?;
     let product = create_product(&mut connection, &payload)
         .map_err(|error| format!("Impossible de créer le produit: {error}"))?;
     Ok(map_product(product))
@@ -127,7 +128,7 @@ pub fn list_product_references_command<R: tauri::Runtime>(
     app_handle: tauri::AppHandle<R>,
 ) -> Result<Vec<ProductReferenceDto>, String> {
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let connection = open_connection(&db_path).map_err(database_access_error)?;
     list_product_references(&connection)
         .map_err(|error| format!("Impossible de charger le référentiel: {error}"))
         .map(|items| items.into_iter().map(map_reference).collect())
@@ -138,7 +139,7 @@ pub fn list_products_command<R: tauri::Runtime>(
     app_handle: tauri::AppHandle<R>,
 ) -> Result<Vec<ProductDto>, String> {
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let connection = open_connection(&db_path).map_err(database_access_error)?;
     let products = list_products(&connection)
         .map_err(|error| format!("Impossible de charger les produits: {error}"))?;
 
@@ -162,7 +163,7 @@ pub fn create_monitor_profile_command<R: tauri::Runtime>(
     validate_new_profile(&payload).map_err(|error| error.to_string())?;
 
     let db_path = default_database_path(&app_handle)?;
-    let mut connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let mut connection = open_connection(&db_path).map_err(database_access_error)?;
     let profile = create_monitor_profile(&mut connection, &payload)
         .map_err(|error| format!("Impossible de créer le profil: {error}"))?;
 
@@ -174,7 +175,7 @@ pub fn list_monitor_profiles_command<R: tauri::Runtime>(
     app_handle: tauri::AppHandle<R>,
 ) -> Result<Vec<MonitorProfileDto>, String> {
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let connection = open_connection(&db_path).map_err(database_access_error)?;
     let profiles = list_monitor_profiles(&connection)
         .map_err(|error| format!("Impossible de charger les profils: {error}"))?;
 
@@ -199,7 +200,7 @@ pub fn update_monitor_profile_command<R: tauri::Runtime>(
     validate_update_profile(&payload).map_err(|error| error.to_string())?;
 
     let db_path = default_database_path(&app_handle)?;
-    let mut connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let mut connection = open_connection(&db_path).map_err(database_access_error)?;
     let updated = update_monitor_profile(&mut connection, &payload)
         .map_err(|error| format!("Impossible de mettre à jour le profil: {error}"))?;
 
@@ -214,7 +215,7 @@ pub fn delete_monitor_profile_command<R: tauri::Runtime>(
     profile_id: i64,
 ) -> Result<bool, String> {
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let connection = open_connection(&db_path).map_err(database_access_error)?;
     delete_monitor_profile(&connection, profile_id)
         .map_err(|error| format!("Impossible de supprimer le profil: {error}"))
 }
@@ -224,7 +225,7 @@ pub fn run_monitoring_cycle_stub_command<R: tauri::Runtime>(
     app_handle: tauri::AppHandle<R>,
 ) -> Result<MonitoringCycleStubResult, String> {
     let db_path = default_database_path(&app_handle)?;
-    let connection = open_connection(&db_path).map_err(|error| error.to_string())?;
+    let connection = open_connection(&db_path).map_err(database_access_error)?;
     let profiles = list_monitor_profiles(&connection)
         .map_err(|error| format!("Impossible de lire les profils: {error}"))?;
 
@@ -301,5 +302,64 @@ fn map_reference(reference: ProductReference) -> ProductReferenceDto {
         edition: reference.edition,
         rarity: reference.rarity,
         language: reference.language,
+    }
+}
+
+fn database_access_error(error: DbError) -> String {
+    log::error!("Échec d'accès à la base locale: {error}");
+    match error.kind() {
+        DbErrorKind::CorruptOrInvalid => "Impossible d\u{2019}accéder aux données locales: la base locale est corrompue ou invalide. Restaurez une sauvegarde ou contactez le support."
+            .to_string(),
+        DbErrorKind::Permission => "Impossible d\u{2019}accéder aux données locales. Vérifiez les permissions du dossier de données, puis réessayez."
+            .to_string(),
+        DbErrorKind::Busy => "La base de données est temporairement verrouillée. Réessayez dans quelques instants."
+            .to_string(),
+        DbErrorKind::Other => "Impossible d'accéder aux données locales. Réessayez; si le problème persiste, contactez le support."
+            .to_string(),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+
+    use rusqlite::{
+        ffi::{Error as FfiError, ErrorCode},
+        Error as SqlError,
+    };
+
+    use crate::infrastructure::db::DbError;
+
+    use super::database_access_error;
+
+    #[test]
+    fn database_access_errors_do_not_expose_sqlite_details() {
+        let message = database_access_error(DbError::Open(SqlError::InvalidPath(PathBuf::from(
+            "/private/user/database.sqlite",
+        ))));
+
+        assert_eq!(
+            message,
+            "Impossible d’accéder aux données locales. Vérifiez les permissions du dossier de données, puis réessayez."
+        );
+        assert!(!message.contains("/private/user/database.sqlite"));
+        assert!(!message.contains("database open error"));
+    }
+
+    #[test]
+    fn corrupt_database_access_error_is_distinct_from_permissions() {
+        let message = database_access_error(DbError::Open(SqlError::SqliteFailure(
+            FfiError {
+                code: ErrorCode::DatabaseCorrupt,
+                extended_code: 11,
+            },
+            Some("database disk image is malformed: /private/user/database.sqlite".to_string()),
+        )));
+
+        assert!(message.contains("corrompue ou invalide"));
+        assert!(message.contains("sauvegarde"));
+        assert!(!message.contains("permissions"));
+        assert!(!message.contains("/private/user/database.sqlite"));
+        assert!(!message.contains("database disk image is malformed"));
     }
 }

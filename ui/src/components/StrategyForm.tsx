@@ -52,8 +52,12 @@ export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
 
   useEffect(() => {
     const existingIds = new Set(products.map((product) => product.id));
-    setSelectedProducts((current) => current.filter((id) => existingIds.has(id)));
-  }, [products]);
+    if (selectedProducts.some((id) => !existingIds.has(id))) {
+      editRevisionRef.current += 1;
+      setFeedback(null);
+      setSelectedProducts((current) => current.filter((id) => existingIds.has(id)));
+    }
+  }, [products, selectedProducts]);
 
   function markEdited() {
     editRevisionRef.current += 1;
@@ -198,7 +202,7 @@ export function StrategyForm({ products, onSubmit }: Props): JSX.Element {
             <span>
               <strong>{product.title}</strong>
               <small>{product.sku}</small>
-              {product.normalizationStatus === "free_text" ? <small className="normalization-badge">Non normalisé</small> : null}
+              {product.normalizationStatus === "free_text" ? <small className="normalization-badge" aria-label="Statut : Non normalisé">Non normalisé</small> : null}
               {product.reference ? <small>{product.reference.setName} · {product.reference.edition} · {product.reference.language}</small> : null}
             </span>
           </label>

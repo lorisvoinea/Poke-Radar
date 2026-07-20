@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { StrategyForm } from "../../components/StrategyForm";
-import { ProductConfigurator, ProductInput, ProductReference } from "../../components/ProductConfigurator";
+import { ProductConfigurator, ProductInput, ProductReference, ReferenceAvailability } from "../../components/ProductConfigurator";
 
 type TauriInternals = {
   invoke: <T>(command: string, args?: Record<string, unknown>) => Promise<T>;
@@ -36,35 +36,77 @@ export function StrategyPage(): JSX.Element {
   const [products, setProducts] = useState<Product[]>([]);
   const [profiles, setProfiles] = useState<Profile[]>([]);
   const [references, setReferences] = useState<ProductReference[]>([]);
+  const [referenceAvailability, setReferenceAvailability] = useState<ReferenceAvailability>("loading");
   const [status, setStatus] = useState("Initialisation...");
+  const refreshRequestRef = useRef(0);
+  const latestRefreshRef = useRef<Promise<boolean> | null>(null);
 
   const tauri = (window as Window & { __TAURI_INTERNALS__?: TauriInternals }).__TAURI_INTERNALS__;
 
-  async function refreshData() {
+  async function waitForWinningRefresh(): Promise<void> {
+    const latestRefresh = latestRefreshRef.current;
+    if (!latestRefresh) {
+      throw new Error("Impossible de déterminer l'issue du rafraîchissement actif.");
+    }
+    await latestRefresh;
+  }
+
+  async function performRefresh(requestId: number): Promise<boolean> {
     if (!tauri) {
       setProducts(FALLBACK_PRODUCTS);
       setReferences(FALLBACK_REFERENCES);
+      setReferenceAvailability("available");
       setStatus("Mode navigateur: données de démonstration affichées.");
-      return;
+      return true;
     }
 
-    await tauri.invoke("app_ready");
+    try {
+      await tauri.invoke("app_ready");
+    } catch (error) {
+      if (requestId === refreshRequestRef.current) throw error;
+      await waitForWinningRefresh();
+      return false;
+    }
+    if (requestId !== refreshRequestRef.current) {
+      await waitForWinningRefresh();
+      return false;
+    }
+
     const [productResult, referenceResult, profileResult] = await Promise.allSettled([
       tauri.invoke<Product[]>("list_products_command"),
       tauri.invoke<ProductReference[]>("list_product_references_command"),
       tauri.invoke<Profile[]>("list_monitor_profiles_command")
     ]);
-    if (productResult.status === "fulfilled") setProducts(productResult.value);
-    if (referenceResult.status === "fulfilled") setReferences(referenceResult.value);
-    else setReferences([]);
-    if (profileResult.status === "fulfilled") setProfiles(profileResult.value);
+    if (requestId !== refreshRequestRef.current) {
+      await waitForWinningRefresh();
+      return false;
+    }
 
     if (productResult.status === "rejected" || profileResult.status === "rejected") {
       throw new Error("Impossible de recharger les produits ou les profils.");
     }
+
+    if (referenceResult.status === "fulfilled") {
+      setReferences(referenceResult.value);
+      setReferenceAvailability(referenceResult.value.length > 0 ? "available" : "empty");
+    } else {
+      setReferences([]);
+      setReferenceAvailability("unavailable");
+    }
+
+    setProducts(productResult.value);
+    setProfiles(profileResult.value);
     setStatus(referenceResult.status === "rejected"
       ? "Configuration chargée; référentiel indisponible. La saisie libre reste possible."
       : "Configuration rechargée automatiquement.");
+    return true;
+  }
+
+  function refreshData(): Promise<boolean> {
+    const requestId = ++refreshRequestRef.current;
+    const refresh = performRefresh(requestId);
+    latestRefreshRef.current = refresh;
+    return refresh;
   }
 
   useEffect(() => {
@@ -94,8 +136,8 @@ export function StrategyPage(): JSX.Element {
 
     await tauri.invoke("create_monitor_profile_command", { input });
     const cycle = await tauri.invoke<{ message: string }>("run_monitoring_cycle_stub_command");
-    setStatus(cycle.message);
-    await refreshData();
+    const refreshed = await refreshData();
+    if (refreshed) setStatus(cycle.message);
   }
 
   async function createProduct(input: ProductInput) {
@@ -119,8 +161,8 @@ export function StrategyPage(): JSX.Element {
     }
     await tauri.invoke("create_product_command", { input });
     try {
-      await refreshData();
-      setStatus("Produit créé et configuration rechargée.");
+      const refreshed = await refreshData();
+      if (refreshed) setStatus("Produit créé et configuration rechargée.");
     } catch {
       throw new Error("Produit créé, mais son rafraîchissement a échoué. Rechargez la configuration pour l'afficher.");
     }
@@ -140,7 +182,7 @@ export function StrategyPage(): JSX.Element {
 
       <div className="dashboard-grid">
         <section className="panel panel--form" aria-label="Configuration de la stratégie">
-          <ProductConfigurator references={references} existingSkus={products.map((product) => product.sku)} onSubmit={createProduct} />
+          <ProductConfigurator referenceAvailability={referenceAvailability} references={references} existingSkus={products.map((product) => product.sku)} onSubmit={createProduct} />
           <StrategyForm
             products={products}
             onSubmit={createProfile}
@@ -170,7 +212,7 @@ export function StrategyPage(): JSX.Element {
                         const product = productsById.get(productId);
                         return (
                           <li key={productId}>
-                            {product ? <><span>{product.title} · {product.sku}</span>{product.normalizationStatus === "free_text" ? <span className="normalization-badge">Non normalisé</span> : null}</> : <span>Produit indisponible (ID {productId})</span>}
+                            {product ? <><span>{product.title} · {product.sku}</span>{product.normalizationStatus === "free_text" ? <span className="normalization-badge" aria-label="Statut : Non normalisé">Non normalisé</span> : null}</> : <span>Produit indisponible (ID {productId})</span>}
                           </li>
                         );
                       })}

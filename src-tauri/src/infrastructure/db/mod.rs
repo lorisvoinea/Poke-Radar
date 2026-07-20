@@ -1,7 +1,7 @@
 use std::path::Path;
 
 use log::info;
-use rusqlite::{Connection, Error as SqlError};
+use rusqlite::{ffi::ErrorCode, Connection, Error as SqlError};
 use thiserror::Error;
 
 pub mod repositories;
@@ -16,6 +16,50 @@ pub enum DbError {
         #[source]
         source: SqlError,
     },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DbErrorKind {
+    CorruptOrInvalid,
+    Permission,
+    Busy,
+    Other,
+}
+
+impl DbError {
+    pub fn kind(&self) -> DbErrorKind {
+        let source = match self {
+            Self::Open(source) | Self::Migration { source, .. } => source,
+        };
+
+        if let SqlError::SqliteFailure(error, _) = source {
+            if matches!(
+                error.code,
+                ErrorCode::DatabaseCorrupt | ErrorCode::NotADatabase
+            ) {
+                return DbErrorKind::CorruptOrInvalid;
+            }
+
+            if matches!(
+                error.code,
+                ErrorCode::DatabaseBusy | ErrorCode::DatabaseLocked
+            ) {
+                return DbErrorKind::Busy;
+            }
+
+            if matches!(
+                error.code,
+                ErrorCode::PermissionDenied | ErrorCode::ReadOnly | ErrorCode::CannotOpen
+            ) {
+                return DbErrorKind::Permission;
+            }
+        }
+
+        match self {
+            Self::Open(_) => DbErrorKind::Permission,
+            Self::Migration { .. } => DbErrorKind::Other,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -390,5 +434,177 @@ mod tests {
             corrected_product,
             ("MEW-006-FR".into(), "Dracaufeu ex".into())
         );
+    }
+
+    #[test]
+    fn corrective_migration_resolves_a_free_text_collision_without_data_loss() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("v3-free-text-collision.db");
+        let mut connection = Connection::open(database_path).expect("open db");
+
+        apply_migrations(&mut connection, &MIGRATIONS[..3]).expect("migrate to v3");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('SV2-203-FR', 'Ancien Dracaufeu', 'pokemon-sv2-fr-203', 'normalized')",
+                [],
+            )
+            .expect("normalized product created before corrective migration");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('MEW-006-FR', 'Saisie libre historique', NULL, 'free_text')",
+                [],
+            )
+            .expect("free text product using the future corrected code");
+        let free_text_product_id = connection.last_insert_rowid();
+        connection
+            .execute(
+                "INSERT INTO monitor_profiles(name, min_margin_bps, fixed_cost_cents, variable_fee_bps) \
+                 VALUES('Collision historique', 1000, 0, 0)",
+                [],
+            )
+            .expect("historical profile");
+        let profile_id = connection.last_insert_rowid();
+        connection
+            .execute(
+                "INSERT INTO profile_products(profile_id, product_id) VALUES(?1, ?2)",
+                (profile_id, free_text_product_id),
+            )
+            .expect("historical profile link");
+
+        apply_migrations(&mut connection, MIGRATIONS)
+            .expect("corrective migration must not reject historical free text data");
+
+        let products = connection
+            .prepare("SELECT id, sku, title, normalization_status FROM products ORDER BY id")
+            .expect("prepare products")
+            .query_map([], |row| {
+                Ok((
+                    row.get::<_, i64>(0)?,
+                    row.get::<_, String>(1)?,
+                    row.get::<_, String>(2)?,
+                    row.get::<_, String>(3)?,
+                ))
+            })
+            .expect("query products")
+            .collect::<Result<Vec<_>, _>>()
+            .expect("collect products");
+
+        assert_eq!(
+            products,
+            vec![
+                (
+                    free_text_product_id - 1,
+                    "MEW-006-FR".into(),
+                    "Dracaufeu ex".into(),
+                    "normalized".into()
+                ),
+                (
+                    free_text_product_id,
+                    format!("MEW-006-FR-FREE-TEXT-{free_text_product_id}"),
+                    "Saisie libre historique".into(),
+                    "free_text".into()
+                ),
+            ]
+        );
+        let link_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM profile_products WHERE profile_id = ?1 AND product_id = ?2",
+                (profile_id, free_text_product_id),
+                |row| row.get(0),
+            )
+            .expect("historical link count");
+        assert_eq!(link_count, 1);
+    }
+
+    #[test]
+    fn corrective_migration_releases_reference_code_without_a_normalized_product() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("v3-unclaimed-reference-code.db");
+        let mut connection = Connection::open(database_path).expect("open db");
+
+        apply_migrations(&mut connection, &MIGRATIONS[..3]).expect("migrate to v3");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('MEW-006-FR', 'Saisie libre historique', NULL, 'free_text')",
+                [],
+            )
+            .expect("free text product using the future corrected code");
+        let free_text_product_id = connection.last_insert_rowid();
+
+        apply_migrations(&mut connection, MIGRATIONS)
+            .expect("corrective migration must release every corrected reference code");
+
+        let historical: (String, String, String) = connection
+            .query_row(
+                "SELECT sku, title, normalization_status FROM products WHERE id = ?1",
+                [free_text_product_id],
+                |row| Ok((row.get(0)?, row.get(1)?, row.get(2)?)),
+            )
+            .expect("historical free text product");
+        assert_eq!(
+            historical,
+            (
+                format!("MEW-006-FR-FREE-TEXT-{free_text_product_id}"),
+                "Saisie libre historique".into(),
+                "free_text".into()
+            )
+        );
+
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('MEW-006-FR', 'Dracaufeu ex', 'pokemon-sv2-fr-203', 'normalized')",
+                [],
+            )
+            .expect("corrected reference must remain creatable");
+    }
+
+    #[test]
+    fn corrective_migration_selects_an_available_free_text_fallback_sku() {
+        let directory = tempdir().expect("tempdir");
+        let database_path = directory.path().join("v3-fallback-collision.db");
+        let mut connection = Connection::open(database_path).expect("open db");
+
+        apply_migrations(&mut connection, &MIGRATIONS[..3]).expect("migrate to v3");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES('MEW-006-FR', 'Saisie à renommer', NULL, 'free_text')",
+                [],
+            )
+            .expect("free text product using the future corrected code");
+        let renamed_product_id = connection.last_insert_rowid();
+        let occupied_fallback = format!("MEW-006-FR-FREE-TEXT-{renamed_product_id}");
+        connection
+            .execute(
+                "INSERT INTO products(sku, title, reference_id, normalization_status) \
+                 VALUES(?1, 'SKU historique valide', NULL, 'free_text')",
+                [&occupied_fallback],
+            )
+            .expect("historical product occupying the deterministic fallback");
+
+        apply_migrations(&mut connection, MIGRATIONS)
+            .expect("fallback collision must not make startup migration fail");
+
+        let renamed_sku: String = connection
+            .query_row(
+                "SELECT sku FROM products WHERE id = ?1",
+                [renamed_product_id],
+                |row| row.get(0),
+            )
+            .expect("renamed historical product");
+        assert_eq!(renamed_sku, format!("{occupied_fallback}-1"));
+
+        let occupied_fallback_count: i64 = connection
+            .query_row(
+                "SELECT COUNT(*) FROM products WHERE sku = ?1",
+                [&occupied_fallback],
+                |row| row.get(0),
+            )
+            .expect("occupied fallback count");
+        assert_eq!(occupied_fallback_count, 1);
     }
 }

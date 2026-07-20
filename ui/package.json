@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "test": "vitest run",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright install chromium && playwright test",
     "tauri:dev": "npm run build && cd .. && cargo tauri dev",
     "tauri:dev:npx": "npm run build && npx --no-install tauri dev --config ../src-tauri/tauri.conf.json"
   },

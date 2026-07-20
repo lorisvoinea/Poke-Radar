@@ -25,6 +25,53 @@ SET code = 'CRZ-160-FR',
     language = 'fr'
 WHERE id = 'pokemon-swsh12-fr-160';
 
+-- Libère d'abord le code corrigé lorsqu'une saisie libre historique l'occupe.
+-- L'identifiant stable rend le renommage déterministe. Si ce SKU de secours
+-- est déjà occupé, le CTE récursif choisit le premier suffixe numérique libre.
+-- Le titre, l'identité du produit et ses relations de profil restent inchangés.
+WITH RECURSIVE
+products_to_rename(id, base_sku) AS (
+    SELECT id, sku || '-FREE-TEXT-' || id
+    FROM products
+    WHERE normalization_status = 'free_text'
+      AND sku IN ('SVI-013-FR', 'MEW-006-FR', 'CRZ-160-FR')
+),
+fallback_candidates(id, base_sku, candidate, suffix) AS (
+    SELECT id, base_sku, base_sku, 0
+    FROM products_to_rename
+
+    UNION ALL
+
+    SELECT candidates.id,
+           candidates.base_sku,
+           candidates.base_sku || '-' || (candidates.suffix + 1),
+           candidates.suffix + 1
+    FROM fallback_candidates AS candidates
+    WHERE EXISTS (
+        SELECT 1
+        FROM products AS occupied
+        WHERE occupied.id <> candidates.id
+          AND occupied.sku = candidates.candidate
+    )
+),
+available_fallbacks(id, candidate) AS (
+    SELECT candidates.id, candidates.candidate
+    FROM fallback_candidates AS candidates
+    WHERE NOT EXISTS (
+        SELECT 1
+        FROM products AS occupied
+        WHERE occupied.id <> candidates.id
+          AND occupied.sku = candidates.candidate
+    )
+)
+UPDATE products
+SET sku = (
+        SELECT candidate
+        FROM available_fallbacks
+        WHERE available_fallbacks.id = products.id
+    )
+WHERE id IN (SELECT id FROM products_to_rename);
+
 UPDATE products
 SET sku = (
         SELECT code
