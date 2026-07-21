@@ -50,7 +50,7 @@ describe("StrategyPage", () => {
 
     expect(await screen.findByText("Historique")).toBeInTheDocument();
     expect(await screen.findByText("Profil conservé")).toBeInTheDocument();
-    expect(screen.getByText(/Configuration chargée; référentiel indisponible/, { selector: ".status-pill" })).toBeInTheDocument();
+    expect(screen.getByText(/Configuration partielle chargée.*référentiel indisponible/, { selector: ".status-pill" })).toBeInTheDocument();
   });
 
   it("crée via Tauri puis relit le même identifiant de référence", async () => {
@@ -248,7 +248,7 @@ describe("StrategyPage", () => {
     resolveSupersededProducts([initialProduct]);
 
     expect(await screen.findByText(/Produit créé, mais son rafraîchissement a échoué/)).toBeInTheDocument();
-    expect(screen.queryByText("Produit créé et liste actualisée.")).not.toBeInTheDocument();
+    expect(screen.getByText("Produit créé et liste actualisée.")).toBeInTheDocument();
   });
 
   it("ignore l'échec app_ready d'une requête supplantée après un rafraîchissement gagnant réussi", async () => {

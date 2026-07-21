@@ -88,4 +88,8 @@ WHERE normalization_status = 'normalized'
       'pokemon-sv1-fr-001',
       'pokemon-sv2-fr-203',
       'pokemon-swsh12-fr-160'
+  )
+  AND EXISTS (
+      SELECT 1 FROM product_references
+      WHERE product_references.id = products.reference_id
   );

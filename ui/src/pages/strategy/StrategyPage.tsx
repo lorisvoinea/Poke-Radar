@@ -40,6 +40,7 @@ export function StrategyPage(): JSX.Element {
   const [status, setStatus] = useState("Initialisation...");
   const refreshRequestRef = useRef(0);
   const latestRefreshRef = useRef<Promise<boolean> | null>(null);
+  const creatingRef = useRef(false);
 
   const tauri = (window as Window & { __TAURI_INTERNALS__?: TauriInternals }).__TAURI_INTERNALS__;
 
@@ -90,15 +91,29 @@ export function StrategyPage(): JSX.Element {
       setReferences(referenceResult.value);
       setReferenceAvailability(referenceResult.value.length > 0 ? "available" : "empty");
     } else {
-      setReferences([]);
       setReferenceAvailability("unavailable");
     }
 
-    setProducts(productResult.value);
-    setProfiles(profileResult.value);
-    setStatus(referenceResult.status === "rejected"
-      ? "Configuration chargée; référentiel indisponible. La saisie libre reste possible."
-      : "Configuration rechargée automatiquement.");
+    if (productResult.status === "fulfilled") {
+      setProducts(productResult.value);
+    }
+    if (profileResult.status === "fulfilled") {
+      setProfiles(profileResult.value);
+    }
+
+    const partial = [
+      productResult.status === "rejected" && "produits",
+      profileResult.status === "rejected" && "profils",
+      referenceResult.status === "rejected" && "référentiel"
+    ].filter(Boolean);
+
+    if (partial.length > 0) {
+      setStatus(`Configuration partielle chargée; ${partial.join("/")} indisponible(s).`);
+    } else {
+      setStatus(referenceResult.status === "rejected"
+        ? "Configuration chargée; référentiel indisponible. La saisie libre reste possible."
+        : "Configuration rechargée automatiquement.");
+    }
     return true;
   }
 
@@ -141,30 +156,52 @@ export function StrategyPage(): JSX.Element {
   }
 
   async function createProduct(input: ProductInput) {
-    if (!tauri) {
-      const reference = "referenceId" in input
-        ? references.find((item) => item.id === input.referenceId) ?? null
-        : null;
-      const sku = reference?.code ?? input.sku?.trim() ?? "";
-      if (products.some((product) => product.sku === sku)) {
-        throw new Error("Un produit avec ce code existe déjà.");
-      }
-      setProducts((current) => [...current, {
-        id: Math.max(0, ...current.map((product) => product.id)) + 1,
-        sku,
-        title: reference?.name ?? input.title ?? "",
-        normalizationStatus: reference ? "normalized" : "free_text",
-        reference
-      }]);
-      setStatus("Produit ajouté en mode démonstration.");
-      return;
+    if (creatingRef.current) {
+      throw new Error("Une création de produit est déjà en cours.");
     }
-    await tauri.invoke("create_product_command", { input });
+    creatingRef.current = true;
     try {
-      const refreshed = await refreshData();
-      if (refreshed) setStatus("Produit créé et configuration rechargée.");
-    } catch {
-      throw new Error("Produit créé, mais son rafraîchissement a échoué. Rechargez la configuration pour l'afficher.");
+      if (!tauri) {
+        if ("referenceId" in input) {
+          const reference = references.find((item) => item.id === input.referenceId);
+          if (!reference) throw new Error("Référence introuvable. Rechargez la page et réessayez.");
+          if (products.some((product) => product.sku === reference.code)) {
+            throw new Error("Un produit avec ce code existe déjà.");
+          }
+          setProducts((current) => [...current, {
+            id: Date.now(),
+            sku: reference.code,
+            title: reference.name,
+            normalizationStatus: "normalized",
+            reference
+          }]);
+          setStatus("Produit ajouté en mode démonstration.");
+          return;
+        }
+        const sku = input.sku?.trim() ?? "";
+        if (products.some((product) => product.sku === sku)) {
+          throw new Error("Un produit avec ce code existe déjà.");
+        }
+        setProducts((current) => [...current, {
+          id: Date.now(),
+          sku,
+          title: input.title ?? "",
+          normalizationStatus: "free_text",
+          reference: null
+        }]);
+        setStatus("Produit ajouté en mode démonstration.");
+        return;
+      }
+      await tauri.invoke("create_product_command", { input });
+      try {
+        const refreshed = await refreshData();
+        if (refreshed) setStatus("Produit créé et configuration rechargée.");
+        else setStatus("Produit créé; un rafraîchissement concurrent est en cours.");
+      } catch {
+        setStatus("Produit créé, mais son rafraîchissement a échoué. Rechargez la configuration pour l'afficher.");
+      }
+    } finally {
+      creatingRef.current = false;
     }
   }
 

@@ -14,7 +14,7 @@ button, label { -webkit-tap-highlight-color: transparent; }
 
 .app-shell { width: min(100%, 1180px); margin: 0 auto; padding: 24px 16px 48px; }
 .page-header { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
-h1, h2, p { overflow-wrap: anywhere; }
+h1, h2, p { overflow-wrap: break-word; }
 h1 { margin: 2px 0 0; font-size: clamp(1.75rem, 8vw, 2.75rem); line-height: 1.05; }
 h2 { margin: 2px 0 0; font-size: clamp(1.25rem, 5vw, 1.6rem); }
 .eyebrow { margin: 0; color: #95a5ff; font-size: .75rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
@@ -38,7 +38,7 @@ h2 { margin: 2px 0 0; font-size: clamp(1.25rem, 5vw, 1.6rem); }
 .reference-preview dt { color: #a8b0cc; }
 .reference-preview dd { margin: 0; max-width: 65%; overflow-wrap: anywhere; text-align: right; }
 .normalization-warning { margin: 0; padding: 12px; border-left: 4px solid #ffc857; border-radius: 8px; color: #fff0bd; background: #483a15; }
-.normalization-badge { width: fit-content; padding: 3px 7px; border: 1px solid #ffc857; border-radius: 999px; color: #fff0bd !important; font-weight: 800; }
+.normalization-badge { width: fit-content; padding: 3px 7px; border: 1px solid #ffc857; border-radius: 999px; color: #fff0bd; font-weight: 800; }
 .product-picker { display: grid; gap: 10px; min-width: 0; margin: 22px 0 0; padding: 0; border: 0; }
 .product-picker legend { margin-bottom: 10px; font-weight: 800; }
 .product-option { display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 10px 12px; border: 1px solid #303b63; border-radius: 12px; background: #10182d; cursor: pointer; }

@@ -5,6 +5,9 @@ pub fn validate_new_product(
     sku: Option<String>,
     title: Option<String>,
 ) -> Result<NewProduct, ValidationError> {
+    if reference_id.as_ref().is_some_and(|v| v.trim().is_empty()) {
+        return Err(ValidationError::MissingField("reference_id"));
+    }
     let reference_id = reference_id
         .map(|value| value.trim().to_string())
         .filter(|value| !value.is_empty());
@@ -18,6 +21,8 @@ pub fn validate_new_product(
     match (reference_id, sku, title) {
         (Some(reference_id), None, None) => Ok(NewProduct::Reference { reference_id }),
         (None, Some(sku), Some(title)) => Ok(NewProduct::FreeText { sku, title }),
+        (None, Some(_), None) => Err(ValidationError::MissingField("title")),
+        (None, None, Some(_)) => Err(ValidationError::MissingField("sku")),
         _ => Err(ValidationError::AmbiguousProductMode),
     }
 }
@@ -130,7 +135,11 @@ mod tests {
         );
         assert_eq!(
             validate_new_product(None, Some("SKU".into()), None),
-            Err(ValidationError::AmbiguousProductMode)
+            Err(ValidationError::MissingField("title"))
+        );
+        assert_eq!(
+            validate_new_product(None, None, Some("Titre".into())),
+            Err(ValidationError::MissingField("sku"))
         );
     }
 

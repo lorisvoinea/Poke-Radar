@@ -1,4 +1,4 @@
-use rusqlite::{params, Connection, Error as SqlError, ErrorCode};
+use rusqlite::{params, Connection, Error as SqlError, ErrorCode, Transaction};
 use thiserror::Error;
 
 use crate::domain::models::{
@@ -18,6 +18,8 @@ pub enum ConfigRepositoryError {
     DuplicateSku,
     #[error("La création du produit a été annulée car sa vérification a échoué. Réessayez.")]
     CreatedProductMissing,
+    #[error("L'opération a été annulée en raison d'une violation d'intégrité des données.")]
+    NormalizationViolation,
 }
 
 pub fn create_product(
@@ -37,20 +39,22 @@ pub fn create_product(
             )?;
         }
         NewProduct::FreeText { sku, title } => {
-            let code_is_reserved = tx.query_row(
-                "SELECT EXISTS(SELECT 1 FROM product_references WHERE code = ?1)",
-                params![sku],
-                |row| row.get::<_, bool>(0),
-            )?;
-            if code_is_reserved {
-                return Err(ConfigRepositoryError::ReservedReferenceCode);
-            }
-            execute_product_insert(
-                &tx,
+            match tx.execute(
                 "INSERT INTO products(sku, title, reference_id, normalization_status)
-                 VALUES(?1, ?2, NULL, 'free_text')",
+                 SELECT ?1, ?2, NULL, 'free_text'
+                 WHERE NOT EXISTS (SELECT 1 FROM product_references WHERE code = ?1)",
                 params![sku, title],
-            )?;
+            ) {
+                Ok(0) => return Err(ConfigRepositoryError::ReservedReferenceCode),
+                Ok(_) => {}
+                Err(SqlError::SqliteFailure(error, _message))
+                    if error.code == ErrorCode::ConstraintViolation
+                        && error.extended_code == 2067 =>
+                {
+                    return Err(ConfigRepositoryError::DuplicateSku);
+                }
+                Err(error) => return Err(error.into()),
+            }
         }
     }
     let id = tx.last_insert_rowid();
@@ -60,19 +64,22 @@ pub fn create_product(
 }
 
 fn execute_product_insert<P: rusqlite::Params>(
-    connection: &Connection,
+    tx: &Transaction,
     sql: &str,
     params: P,
 ) -> Result<(), ConfigRepositoryError> {
-    match connection.execute(sql, params) {
+    match tx.execute(sql, params) {
         Ok(_) => Ok(()),
-        Err(SqlError::SqliteFailure(error, message))
+        Err(SqlError::SqliteFailure(error, _message))
             if error.code == ErrorCode::ConstraintViolation
-                && message
-                    .as_deref()
-                    .is_some_and(|text| text.contains("products.sku")) =>
+                && error.extended_code == 2067 =>
         {
             Err(ConfigRepositoryError::DuplicateSku)
+        }
+        Err(SqlError::SqliteFailure(error, _message))
+            if error.extended_code == 4 =>
+        {
+            Err(ConfigRepositoryError::NormalizationViolation)
         }
         Err(error) => Err(error.into()),
     }
@@ -91,7 +98,7 @@ pub fn list_product_references(
 }
 
 pub fn list_products(connection: &Connection) -> Result<Vec<Product>, ConfigRepositoryError> {
-    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.rarity, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id ORDER BY p.id ASC")?;
+    let mut statement = connection.prepare("SELECT p.id AS id, p.sku AS sku, p.title AS title, p.created_at AS created_at, p.normalization_status AS normalization_status, r.id AS reference_id, r.code AS code, r.name AS name, r.set_name AS set_name, r.edition AS edition, r.rarity AS rarity, r.language AS language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id ORDER BY p.id ASC")?;
 
     let rows = statement.query_map([], map_product)?;
 
@@ -103,7 +110,7 @@ fn get_product(
     connection: &Connection,
     product_id: i64,
 ) -> Result<Option<Product>, ConfigRepositoryError> {
-    let mut statement = connection.prepare("SELECT p.id, p.sku, p.title, p.created_at, p.normalization_status, r.id, r.code, r.name, r.set_name, r.edition, r.rarity, r.language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id WHERE p.id = ?1")?;
+    let mut statement = connection.prepare("SELECT p.id AS id, p.sku AS sku, p.title AS title, p.created_at AS created_at, p.normalization_status AS normalization_status, r.id AS reference_id, r.code AS code, r.name AS name, r.set_name AS set_name, r.edition AS edition, r.rarity AS rarity, r.language AS language FROM products p LEFT JOIN product_references r ON r.id = p.reference_id WHERE p.id = ?1")?;
 
     let mut rows = statement.query(params![product_id])?;
     if let Some(row) = rows.next()? {
@@ -130,39 +137,43 @@ fn get_reference(
 
 fn map_reference(row: &rusqlite::Row<'_>) -> Result<ProductReference, SqlError> {
     Ok(ProductReference {
-        id: row.get(0)?,
-        code: row.get(1)?,
-        name: row.get(2)?,
-        set_name: row.get(3)?,
-        edition: row.get(4)?,
-        rarity: row.get(5)?,
-        language: row.get(6)?,
+        id: row.get("id")?,
+        code: row.get("code")?,
+        name: row.get("name")?,
+        set_name: row.get("set_name")?,
+        edition: row.get("edition")?,
+        rarity: row.get("rarity")?,
+        language: row.get("language")?,
     })
 }
 
 fn map_product(row: &rusqlite::Row<'_>) -> Result<Product, SqlError> {
-    let status: String = row.get(4)?;
-    let reference_id: Option<String> = row.get(5)?;
+    let product_id: i64 = row.get("id")?;
+    let status: String = row.get("normalization_status")?;
+    let reference_id: Option<String> = row.get("reference_id")?;
     let reference = match reference_id {
         Some(id) => Some(ProductReference {
             id,
-            code: row.get(6)?,
-            name: row.get(7)?,
-            set_name: row.get(8)?,
-            edition: row.get(9)?,
-            rarity: row.get(10)?,
-            language: row.get(11)?,
+            code: row.get("code")?,
+            name: row.get("name")?,
+            set_name: row.get("set_name")?,
+            edition: row.get("edition")?,
+            rarity: row.get("rarity")?,
+            language: row.get("language")?,
         }),
         None => None,
     };
     Ok(Product {
-        id: row.get(0)?,
-        sku: row.get(1)?,
-        title: row.get(2)?,
-        created_at_utc: row.get(3)?,
+        id: product_id,
+        sku: row.get("sku")?,
+        title: row.get("title")?,
+        created_at_utc: row.get("created_at")?,
         normalization_status: if status == "normalized" {
             NormalizationStatus::Normalized
         } else {
+            if status != "free_text" {
+                log::warn!("Unexpected normalization_status '{}' for product {}, falling back to free_text", status, product_id);
+            }
             NormalizationStatus::FreeText
         },
         reference,
