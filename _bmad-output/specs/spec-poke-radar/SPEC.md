@@ -68,38 +68,47 @@ Poke-Radar started as a Tauri desktop app for Pokémon TCG market arbitrage moni
   - **intent:** User maintains a list of cards they care about so the scanner knows what to track.
   - **success:** Adding "Dracaufeu VMAX Épée et Bouclier" to the tracked products list causes the next scan to include that card in results.
 
+- **CAP-13**: Authentication — single-user token-based login protecting the web dashboard. Token configured via environment variable, verified on every API request. Unauthenticated visitors see only the login page.
+  - **intent:** Only the authorized user can access the dashboard, view opportunities, and manage the system.
+  - **success:** Navigating to `pokeradar.lumpy.top` without a token shows only a login form; submitting a valid token grants access to the full dashboard. Invalid tokens or API requests without a token return 401.
+
+- **CAP-14**: Real-time dashboard updates — SSE connection from frontend to backend pushes new opportunities, source status changes, and system notifications to the dashboard without manual refresh.
+  - **intent:** Dashboard stays current without the user needing to reload or poll; new data appears automatically.
+  - **success:** A new opportunity scored above threshold appears on the radar within 5 seconds of the scanner completing, without any user action, while the dashboard is open.
+
 ## Constraints
 
 - **Deployed at `pokeradar.lumpy.top`** via reverse proxy (nginx/caddy) for HTTPS termination. No built-in TLS in the app.
-- **Single-user deployment on VPS.** Not designed for multi-tenancy or concurrent users. No authentication layer — access controlled at network level.
+- **Single-user deployment on VPS.** Not designed for multi-tenancy or concurrent users.
+- **Single-user token authentication required.** Token stored as environment variable, verified on every API request. No anonymous access to dashboard or API.
 - **Rust backend + React frontend.** Stack is fixed — no framework migration, no language change.
-- **SQLite database.** No external database server dependency.
+- **SQLite database.** No external database server dependency. All queries via parameterized statements — no string concatenation for SQL.
 - **French UI language mandatory.** i18n architecture present but no other locale implemented for MVP.
 - **Touch targets ≥44px on mobile.** AA contrast minimum, AAA on KPIs. Keyboard navigable. Respects `prefers-reduced-motion`.
-
 - **Amber Warmth light theme** (`#FFFDF7` background, `#D97706` amber accent, `#2D2412` primary text). Dark mode deferred post-MVP.
+- **Unit tests mandatory** on business rules: margin calculation, scoring, normalization, deduplication. **Integration tests** on the full pipeline (ingest → normalize → score → alert). **UI component tests** covering all states: default, loading, error, success. **E2E tests** covering the 4 critical user journeys (alert→decide, recalibrate, source-unavailable, manual-entry).
+- **XSS prevention** on all user-facing output. **Rate limiting** on API endpoints. **RGPD/nLPD compliant** for personal data storage and processing.
 
 ## Non-goals
 
-- **Multi-tenancy, SaaS, user accounts, authentication UI.** The app is accessed by one person via network-level trust or basic reverse-proxy auth. An auth layer can be added post-MVP without architectural changes.
+- **Multi-tenancy, SaaS, user accounts, roles.** One user, one token. Auth UI is a login form — no registration, password reset, or multi-user management.
 - **Dark mode, push notifications, PWA, native mobile apps.** All deferred post-MVP. The MVP is a responsive web app in light mode with Telegram as the push channel.
 - **Multiple languages beyond French.** i18n infrastructure is wired but translation is out of scope.
 - **Automated purchasing, payment integration, or inventory management.** The tool stops at the decision. Buying is manual.
-- **Real-time WebSocket push to the dashboard.** Polling or manual refresh is sufficient for MVP.
+- **WebSocket push.** Real-time updates use SSE; WebSocket is post-MVP.
 
 ## Success signal
 
-Loris opens Poke-Radar from his iPhone, sees a Cardmarket alert for a tracked card with net margin above his threshold, reviews the margin breakdown, swipes right to treat it, and the decision is logged — all within 5 minutes of the alert firing and without touching a desktop computer.
+Loris opens Poke-Radar from his iPhone, authenticates with his token, sees a Cardmarket alert for a tracked card with net margin above his threshold appear via SSE without refreshing, reviews the margin breakdown, swipes right to treat it, and the decision is logged — all within 5 minutes of the alert firing and without touching a desktop computer.
 
 ## Assumptions
 
 - VPS has a domain configured and a reverse proxy (nginx/caddy) will handle HTTPS termination.
-- The existing Tauri Rust backend can be adapted to serve HTTP without major refactoring — Tauri commands become REST endpoints.
+- The existing Tauri Rust backend can be adapted to serve HTTP without major refactoring — Tauri commands become REST/RPC endpoints.
 - `docs/DESIGN.md` will be regenerated separately to reflect the light-mode theme (currently contains the archived dark palette which is a reference for post-MVP dark mode).
 - Cardmarket and eBay data access (API or structured scraping) is feasible within their respective terms of use and rate limits.
+- Authentication token will be provisioned at deploy time via environment variable — no registration flow needed.
 
 ## Open Questions
-
-<!-- Resolved 2026-07-22: domain=pokeradar.lumpy.top, Tauri build preserved, no proxy auth, Cardmarket API pending verification. -->
 
 - **Cardmarket API access** pending verification — rate limits and terms of use must be confirmed before implementing CAP-5/CAP-6 for this source. Pending verification does not block other capabilities.

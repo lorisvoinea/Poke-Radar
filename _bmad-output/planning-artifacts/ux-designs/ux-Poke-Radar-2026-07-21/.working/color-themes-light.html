@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poke-Radar – Thèmes Light</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: #F0F0F0; color: #1a1a1a; padding: 24px; }
+  h1 { font-size: 24px; margin-bottom: 24px; }
+  .themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(380px, 1fr)); gap: 24px; }
+  .theme { border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+  .theme-header { padding: 16px 20px; font-size: 16px; font-weight: 700; border-bottom: 1px solid rgba(0,0,0,0.06); }
+  .theme-header small { display: block; font-weight: 400; font-size: 13px; margin-top: 2px; opacity: 0.7; }
+  .tokens { padding: 12px 20px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .token { font-size: 11px; font-family: 'SF Mono', 'Fira Code', monospace; padding: 3px 8px; border-radius: 4px; white-space: nowrap; }
+  .preview { padding: 20px; }
+  .card { border-radius: 10px; padding: 14px 16px; margin-bottom: 12px; }
+  .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .card-title { font-weight: 700; font-size: 15px; }
+  .confidence { font-size: 13px; font-weight: 600; padding: 2px 8px; border-radius: 6px; }
+  .card-prices { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px; }
+  .price-row { }
+  .price-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+  .price-value { font-size: 16px; font-weight: 700; }
+  .margin-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 10px; }
+  .margin-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .margin-value { font-size: 18px; font-weight: 800; }
+  .margin-pct { font-size: 13px; }
+  .card-meta { font-size: 12px; display: flex; gap: 16px; margin-bottom: 10px; }
+  .cta { display: block; text-align: center; padding: 10px; border-radius: 8px; font-weight: 600; font-size: 14px; text-decoration: none; }
+  .source-health { display: flex; gap: 8px; margin-bottom: 12px; }
+  .src-dot { width: 10px; height: 10px; border-radius: 50%; margin-top: 4px; }
+  .tabs { display: flex; border-radius: 10px; overflow: hidden; justify-content: space-around; padding: 10px 0 0; }
+  .tab { font-size: 10px; text-align: center; padding: 6px 4px; border-radius: 8px 8px 0 0; flex: 1; }
+  .tab.active { font-weight: 700; }
+
+  /* ============================================================
+     Theme 1 – "Blue Note" – Calme & professionnel
+     bg: #F5F7FB, surface: #FFFFFF, text: #1B1F3B,
+     text-secondary: #6B7280, accent: #4361EE, success: #10B981,
+     warning: #F59E0B, critical: #EF4444
+  ============================================================ */
+  .t1 .theme-header { background: #EEF1FA; color: #1B1F3B; }
+  .t1 .theme-header small { color: #6B7280; }
+  .t1 .token.text { background: #1B1F3B; color: #fff; }
+  .t1 .token.text-sec { background: #6B7280; color: #fff; }
+  .t1 .token.bg { background: #E4E7F1; color: #1B1F3B; }
+  .t1 .token.surface { background: #D0D4E4; color: #1B1F3B; }
+  .t1 .token.accent { background: #4361EE; color: #fff; }
+  .t1 .token.success { background: #10B981; color: #fff; }
+  .t1 .token.warning { background: #F59E0B; color: #1B1F3B; }
+  .t1 .token.critical { background: #EF4444; color: #fff; }
+  .t1 .preview { background: #F5F7FB; }
+  .t1 .card { background: #FFFFFF; border: 1px solid #E4E7F1; }
+  .t1 .card-title { color: #1B1F3B; }
+  .t1 .confidence { background: #D1FAE5; color: #065F46; }
+  .t1 .price-label { color: #6B7280; }
+  .t1 .price-value { color: #1B1F3B; }
+  .t1 .margin-value { color: #10B981; }
+  .t1 .margin-pct { color: #10B981; }
+  .t1 .card-meta { color: #6B7280; }
+  .t1 .cta { background: #4361EE; color: #fff; }
+  .t1 .src-dot.ok { background: #10B981; }
+  .t1 .src-dot.warn { background: #F59E0B; }
+  .t1 .tabs { background: #FFFFFF; border: 1px solid #E4E7F1; }
+  .t1 .tab { color: #6B7280; }
+  .t1 .tab.active { color: #4361EE; }
+
+  /* ============================================================
+     Theme 2 – "Market Green" – Finance & trading
+     bg: #F8FCF9, surface: #FFFFFF, text: #0F2B1D,
+     text-secondary: #5A7D6A, accent: #059669, success: #16A34A,
+     warning: #D97706, critical: #DC2626
+  ============================================================ */
+  .t2 .theme-header { background: #E6F4EC; color: #0F2B1D; }
+  .t2 .theme-header small { color: #5A7D6A; }
+  .t2 .token.text { background: #0F2B1D; color: #fff; }
+  .t2 .token.text-sec { background: #5A7D6A; color: #fff; }
+  .t2 .token.bg { background: #D4E8DC; color: #0F2B1D; }
+  .t2 .token.surface { background: #C5E0D0; color: #0F2B1D; }
+  .t2 .token.accent { background: #059669; color: #fff; }
+  .t2 .token.success { background: #16A34A; color: #fff; }
+  .t2 .token.warning { background: #D97706; color: #fff; }
+  .t2 .token.critical { background: #DC2626; color: #fff; }
+  .t2 .preview { background: #F8FCF9; }
+  .t2 .card { background: #FFFFFF; border: 1px solid #D4E8DC; }
+  .t2 .card-title { color: #0F2B1D; }
+  .t2 .confidence { background: #D1FAE5; color: #065F46; }
+  .t2 .price-label { color: #5A7D6A; }
+  .t2 .price-value { color: #0F2B1D; }
+  .t2 .margin-value { color: #16A34A; }
+  .t2 .margin-pct { color: #16A34A; }
+  .t2 .card-meta { color: #5A7D6A; }
+  .t2 .cta { background: #059669; color: #fff; }
+  .t2 .src-dot.ok { background: #16A34A; }
+  .t2 .src-dot.warn { background: #D97706; }
+  .t2 .tabs { background: #FFFFFF; border: 1px solid #D4E8DC; }
+  .t2 .tab { color: #5A7D6A; }
+  .t2 .tab.active { color: #059669; }
+
+  /* ============================================================
+     Theme 3 – "Amber Warmth" – Accessible & chaleureux
+     bg: #FFFDF7, surface: #FFFFFF, text: #2D2412,
+     text-secondary: #92805A, accent: #D97706, success: #16A34A,
+     warning: #F59E0B, critical: #DC2626
+  ============================================================ */
+  .t3 .theme-header { background: #FDF3DD; color: #2D2412; }
+  .t3 .theme-header small { color: #92805A; }
+  .t3 .token.text { background: #2D2412; color: #fff; }
+  .t3 .token.text-sec { background: #92805A; color: #fff; }
+  .t3 .token.bg { background: #F3E9D2; color: #2D2412; }
+  .t3 .token.surface { background: #EAE0C8; color: #2D2412; }
+  .t3 .token.accent { background: #D97706; color: #fff; }
+  .t3 .token.success { background: #16A34A; color: #fff; }
+  .t3 .token.warning { background: #F59E0B; color: #2D2412; }
+  .t3 .token.critical { background: #DC2626; color: #fff; }
+  .t3 .preview { background: #FFFDF7; }
+  .t3 .card { background: #FFFFFF; border: 1px solid #F3E9D2; }
+  .t3 .card-title { color: #2D2412; }
+  .t3 .confidence { background: #D1FAE5; color: #065F46; }
+  .t3 .price-label { color: #92805A; }
+  .t3 .price-value { color: #2D2412; }
+  .t3 .margin-value { color: #16A34A; }
+  .t3 .margin-pct { color: #16A34A; }
+  .t3 .card-meta { color: #92805A; }
+  .t3 .cta { background: #D97706; color: #fff; }
+  .t3 .src-dot.ok { background: #16A34A; }
+  .t3 .src-dot.warn { background: #F59E0B; }
+  .t3 .tabs { background: #FFFFFF; border: 1px solid #F3E9D2; }
+  .t3 .tab { color: #92805A; }
+  .t3 .tab.active { color: #D97706; }
+
+  /* ============================================================
+     Theme 4 – "Sky Slate" – Moderne & aérien
+     bg: #F4F7FA, surface: #FFFFFF, text: #1E293B,
+     text-secondary: #94A3B8, accent: #3B82F6, success: #22C55E,
+     warning: #EAB308, critical: #EF4444
+  ============================================================ */
+  .t4 .theme-header { background: #E2E8F0; color: #1E293B; }
+  .t4 .theme-header small { color: #94A3B8; }
+  .t4 .token.text { background: #1E293B; color: #fff; }
+  .t4 .token.text-sec { background: #94A3B8; color: #fff; }
+  .t4 .token.bg { background: #DCE5F0; color: #1E293B; }
+  .t4 .token.surface { background: #CDD7E4; color: #1E293B; }
+  .t4 .token.accent { background: #3B82F6; color: #fff; }
+  .t4 .token.success { background: #22C55E; color: #fff; }
+  .t4 .token.warning { background: #EAB308; color: #1E293B; }
+  .t4 .token.critical { background: #EF4444; color: #fff; }
+  .t4 .preview { background: #F4F7FA; }
+  .t4 .card { background: #FFFFFF; border: 1px solid #DCE5F0; }
+  .t4 .card-title { color: #1E293B; }
+  .t4 .confidence { background: #DCFCE7; color: #166534; }
+  .t4 .price-label { color: #94A3B8; }
+  .t4 .price-value { color: #1E293B; }
+  .t4 .margin-value { color: #22C55E; }
+  .t4 .margin-pct { color: #22C55E; }
+  .t4 .card-meta { color: #94A3B8; }
+  .t4 .cta { background: #3B82F6; color: #fff; }
+  .t4 .src-dot.ok { background: #22C55E; }
+  .t4 .src-dot.warn { background: #EAB308; }
+  .t4 .tabs { background: #FFFFFF; border: 1px solid #DCE5F0; }
+  .t4 .tab { color: #94A3B8; }
+  .t4 .tab.active { color: #3B82F6; }
+
+  /* ============================================================
+     Theme 5 – "Clay Studio" – Créatif & doux, tons terre
+     bg: #FAF8F5, surface: #FFFFFF, text: #3D3228,
+     text-secondary: #9E8A7A, accent: #B45309, success: #15803D,
+     warning: #CA8A04, critical: #B91C1C
+  ============================================================ */
+  .t5 .theme-header { background: #F0EBE3; color: #3D3228; }
+  .t5 .theme-header small { color: #9E8A7A; }
+  .t5 .token.text { background: #3D3228; color: #fff; }
+  .t5 .token.text-sec { background: #9E8A7A; color: #fff; }
+  .t5 .token.bg { background: #E8E0D6; color: #3D3228; }
+  .t5 .token.surface { background: #E0D6CB; color: #3D3228; }
+  .t5 .token.accent { background: #B45309; color: #fff; }
+  .t5 .token.success { background: #15803D; color: #fff; }
+  .t5 .token.warning { background: #CA8A04; color: #fff; }
+  .t5 .token.critical { background: #B91C1C; color: #fff; }
+  .t5 .preview { background: #FAF8F5; }
+  .t5 .card { background: #FFFFFF; border: 1px solid #E8E0D6; }
+  .t5 .card-title { color: #3D3228; }
+  .t5 .confidence { background: #DCFCE7; color: #166534; }
+  .t5 .price-label { color: #9E8A7A; }
+  .t5 .price-value { color: #3D3228; }
+  .t5 .margin-value { color: #15803D; }
+  .t5 .margin-pct { color: #15803D; }
+  .t5 .card-meta { color: #9E8A7A; }
+  .t5 .cta { background: #B45309; color: #fff; }
+  .t5 .src-dot.ok { background: #15803D; }
+  .t5 .src-dot.warn { background: #CA8A04; }
+  .t5 .tabs { background: #FFFFFF; border: 1px solid #E8E0D6; }
+  .t5 .tab { color: #9E8A7A; }
+  .t5 .tab.active { color: #B45309; }
+
+  /* ============================================================
+     Theme 6 – "Coral Punch" – Énergique & expressif
+     bg: #FFF8F6, surface: #FFFFFF, text: #2B1815,
+     text-secondary: #A87E77, accent: #E85D3A, success: #059669,
+     warning: #F59E0B, critical: #DC2626
+  ============================================================ */
+  .t6 .theme-header { background: #FFE8E2; color: #2B1815; }
+  .t6 .theme-header small { color: #A87E77; }
+  .t6 .token.text { background: #2B1815; color: #fff; }
+  .t6 .token.text-sec { background: #A87E77; color: #fff; }
+  .t6 .token.bg { background: #FDDAD2; color: #2B1815; }
+  .t6 .token.surface { background: #F5CFC5; color: #2B1815; }
+  .t6 .token.accent { background: #E85D3A; color: #fff; }
+  .t6 .token.success { background: #059669; color: #fff; }
+  .t6 .token.warning { background: #F59E0B; color: #2B1815; }
+  .t6 .token.critical { background: #DC2626; color: #fff; }
+  .t6 .preview { background: #FFF8F6; }
+  .t6 .card { background: #FFFFFF; border: 1px solid #FDDAD2; }
+  .t6 .card-title { color: #2B1815; }
+  .t6 .confidence { background: #D1FAE5; color: #065F46; }
+  .t6 .price-label { color: #A87E77; }
+  .t6 .price-value { color: #2B1815; }
+  .t6 .margin-value { color: #059669; }
+  .t6 .margin-pct { color: #059669; }
+  .t6 .card-meta { color: #A87E77; }
+  .t6 .cta { background: #E85D3A; color: #fff; }
+  .t6 .src-dot.ok { background: #059669; }
+  .t6 .src-dot.warn { background: #F59E0B; }
+  .t6 .tabs { background: #FFFFFF; border: 1px solid #FDDAD2; }
+  .t6 .tab { color: #A87E77; }
+  .t6 .tab.active { color: #E85D3A; }
+</style>
+</head>
+<body>
+
+<h1>🎨 Poke-Radar — 6 Thèmes Light</h1>
+
+<div class="themes">
+
+  <!-- Theme 1 -->
+  <div class="theme t1">
+    <div class="theme-header">🔵 Blue Note <small>Calme & professionnel — confiance discrète, lisibilité prioritaire</small></div>
+    <div class="tokens">
+      <span class="token text">#1B1F3B</span>
+      <span class="token text-sec">#6B7280</span>
+      <span class="token bg">#F5F7FB</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#4361EE</span>
+      <span class="token success">#10B981</span>
+      <span class="token warning">#F59E0B</span>
+      <span class="token critical">#EF4444</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+  <!-- Theme 2 -->
+  <div class="theme t2">
+    <div class="theme-header">🟢 Market Green <small>Finance & trading — familiarité Bloomberg/IBKR, signaux verts = argent</small></div>
+    <div class="tokens">
+      <span class="token text">#0F2B1D</span>
+      <span class="token text-sec">#5A7D6A</span>
+      <span class="token bg">#F8FCF9</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#059669</span>
+      <span class="token success">#16A34A</span>
+      <span class="token warning">#D97706</span>
+      <span class="token critical">#DC2626</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+  <!-- Theme 3 -->
+  <div class="theme t3">
+    <div class="theme-header">🟠 Amber Warmth <small>Chaleureux & accessible — tons papier, confort longue session</small></div>
+    <div class="tokens">
+      <span class="token text">#2D2412</span>
+      <span class="token text-sec">#92805A</span>
+      <span class="token bg">#FFFDF7</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#D97706</span>
+      <span class="token success">#16A34A</span>
+      <span class="token warning">#F59E0B</span>
+      <span class="token critical">#DC2626</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+  <!-- Theme 4 -->
+  <div class="theme t4">
+    <div class="theme-header">🩵 Sky Slate <small>Moderne & aérien — tech startup, propre sans être froid</small></div>
+    <div class="tokens">
+      <span class="token text">#1E293B</span>
+      <span class="token text-sec">#94A3B8</span>
+      <span class="token bg">#F4F7FA</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#3B82F6</span>
+      <span class="token success">#22C55E</span>
+      <span class="token warning">#EAB308</span>
+      <span class="token critical">#EF4444</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+  <!-- Theme 5 -->
+  <div class="theme t5">
+    <div class="theme-header">🟤 Clay Studio <small>Créatif & doux — tons terre, ambiance atelier/craft</small></div>
+    <div class="tokens">
+      <span class="token text">#3D3228</span>
+      <span class="token text-sec">#9E8A7A</span>
+      <span class="token bg">#FAF8F5</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#B45309</span>
+      <span class="token success">#15803D</span>
+      <span class="token warning">#CA8A04</span>
+      <span class="token critical">#B91C1C</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+  <!-- Theme 6 -->
+  <div class="theme t6">
+    <div class="theme-header">🪸 Coral Punch <small>Énergique & expressif — impact visuel, décisions rapides</small></div>
+    <div class="tokens">
+      <span class="token text">#2B1815</span>
+      <span class="token text-sec">#A87E77</span>
+      <span class="token bg">#FFF8F6</span>
+      <span class="token surface">#FFFFFF</span>
+      <span class="token accent">#E85D3A</span>
+      <span class="token success">#059669</span>
+      <span class="token warning">#F59E0B</span>
+      <span class="token critical">#DC2626</span>
+    </div>
+    <div class="preview">
+      <div class="card">
+        <div class="card-header">
+          <span class="card-title">🔥 Dracaufeu VMAX</span>
+          <span class="confidence">★★★ Élevée</span>
+        </div>
+        <div class="card-prices">
+          <div class="price-row"><div class="price-label">Achat</div><div class="price-value">89,00 €</div></div>
+          <div class="price-row"><div class="price-label">Revente est.</div><div class="price-value">135,00 €</div></div>
+        </div>
+        <div class="margin-row">
+          <span class="margin-label">Marge nette</span>
+          <span class="margin-value">28,50 €</span>
+          <span class="margin-pct">(21%)</span>
+        </div>
+        <div class="card-meta">
+          <span>📦 Cardmarket</span>
+          <span>⏱ il y a 2 min</span>
+        </div>
+        <a class="cta">Ouvrir la source</a>
+      </div>
+      <div class="source-health">
+        <div class="src-dot ok"></div> Cardmarket · OK · 14:32
+        <div class="src-dot warn"></div> eBay · Lent · 14:28
+      </div>
+      <div class="tabs"><div class="tab active">🎯 Radar</div><div class="tab">🔍 Détail</div><div class="tab">⚙️ Réglages</div><div class="tab">📡 Sources</div></div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
