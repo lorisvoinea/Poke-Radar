@@ -20,23 +20,24 @@ inputDocuments:
   - _bmad-output/brainstorming/brainstorming-session-2025-02-05.md
 workflowType: 'prd'
 projectClassification: 'brownfield'
-projectType: 'Application desktop de market intelligence (revendeurs Pokémon)'
+projectType: 'Application web auto-hébergée de market intelligence (revendeurs Pokémon)'
 domainComplexity: 'medium'
 documentCounts:
   briefCount: 1
   researchCount: 1
   brainstormingCount: 1
   projectDocsCount: 0
-lastUpdated: '2026-02-19'
+lastUpdated: '2026-07-21'
 ---
 
 # Product Requirements Document - Poke-Radar
 
 **Auteur :** Loris  
-**Date :** 2026-02-19
+**Date :** 2026-02-19  
+**Dernière mise à jour :** 2026-07-21 — ajout exposition web
 
 ## Executive Summary
-Poke-Radar est une application desktop qui transforme une veille Pokémon manuelle et lente en décisions d’achat rapides, traçables et rentables. Le produit combine surveillance de disponibilité, estimation de valeur marché et filtrage par marge nette afin d’émettre des alertes réellement exploitables.
+Poke-Radar est une application web auto-hébergée qui transforme une veille Pokémon manuelle et lente en décisions d'achat rapides, traçables et rentables. Accessible depuis tout navigateur (desktop, tablette, mobile), l'application tourne sur un VPS et s'utilise de n'importe où. Le produit combine surveillance de disponibilité, estimation de valeur marché et filtrage par marge nette afin d'émettre des alertes réellement exploitables.
 
 ### Ce qui différencie Poke-Radar
 - **Signal orienté décision** : priorité aux opportunités filtrées par profit net, pas à la simple détection de stock.
@@ -45,9 +46,9 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 
 ## Contexte et classification projet
 - **Contexte** : brownfield piloté à partir d’un product brief, d’une recherche domaine et d’un brainstorming consolidés.
-- **Type produit** : application desktop locale (architecture Tauri + Rust + React visée).
+- **Type produit** : application web auto-hébergée sur VPS (backend HTTP Rust + frontend React SPA + SQLite locale).
 - **Cible principale** : revendeurs Pokémon indépendants (France/Suisse en priorité).
-- **Complexité** : moyenne (multi-sources, calcul économique, robustesse données, alerting).
+- **Complexité** : moyenne (multi-sources, calcul économique, robustesse données, alerting, exposition web sécurisée).
 
 ## Objectifs et métriques de succès
 
@@ -89,12 +90,14 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 ## Scope produit
 
 ### MVP (Phase 1)
-1. **Catalogue ciblé** : gestion d’une liste de produits/cartes surveillés.
+1. **Catalogue ciblé** : gestion d'une liste de produits/cartes surveillés.
 2. **Collecte prix/disponibilité** : 1–2 sources stables au départ.
-3. **Calcul d’opportunité** : marge nette avec frais configurables.
+3. **Calcul d'opportunité** : marge nette avec frais configurables.
 4. **Alerting** : un canal prioritaire (Telegram) pour time-to-market.
-5. **UI minimale** : tableau principal (tri, statut, dernière mise à jour).
+5. **UI web responsive** : tableau principal (tri, statut, dernière mise à jour), accessible depuis desktop et mobile.
 6. **Fallback manuel** : saisie / import simple pour conserver la continuité de service.
+7. **Exposition web** : application servie via HTTP(S) sur un nom de domaine, avec reverse proxy et certificats TLS.
+8. **Déploiement VPS** : démarrage automatique (systemd), build reproductible, isolation des secrets.
 
 ### Hors scope MVP
 - Auto-buy / exécution automatique d’achat.
@@ -107,7 +110,9 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 - Extension multi-sources API-first.
 - Favoris / cartes possédées.
 - Export Excel.
-- Extension à d’autres univers (autres TCG, collectibles).
+- Extension à d'autres univers (autres TCG, collectibles).
+- Client desktop Tauri (si besoin offline ou natif).
+- Multi-utilisateur avec rôles.
 
 ## Exigences fonctionnelles
 
@@ -136,11 +141,23 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 ### FR-06 Tableau de bord opérationnel
 - Vue unique avec état des sources, dernières opportunités, erreurs et actions recommandées.
 - Historique consultable pour analyser la qualité des alertes et ajuster les seuils.
+- Le dashboard se met à jour en temps réel sans rafraîchissement manuel (Server-Sent Events).
 
 ### FR-07 Résilience opérationnelle
 - Journalisation des erreurs de collecte et de calcul.
 - Mécanisme de retry/backoff sur les sources instables.
 - Continuité minimale du service via saisie/import manuel.
+
+### FR-08 Exposition web
+- L'application est accessible via un navigateur web standard (Chrome, Safari, Firefox) sur desktop, tablette et mobile.
+- Le backend expose une API HTTP RPC (`POST /api/*`) et sert le frontend comme une SPA.
+- L'accès se fait via un nom de domaine configuré, avec HTTPS (TLS) obligatoire.
+- L'interface est responsive et utilisable sur écrans mobiles (320 px minimum).
+
+### FR-09 Authentification et accès
+- L'accès à l'application est protégé par une authentification single-user (token ou mot de passe).
+- Aucune gestion multi-comptes ni rôles multiples : un seul utilisateur, une seule session.
+- Les secrets (token d'authentification, clés API tierces) sont stockés hors du dépôt et injectés via variables d'environnement ou fichier de configuration protégé.
 
 ## Exigences non fonctionnelles
 
@@ -155,7 +172,10 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 ### NFR-03 Sécurité & conformité
 - Respect RGPD/nLPD pour les données utilisateur.
 - Respect des CGU, robots.txt et pratiques anti-abus pour la collecte.
-- Secret management local pour tokens/API keys.
+- Authentification single-user obligatoire pour l'accès web ; pas d'accès anonyme.
+- HTTPS obligatoire en production (TLS 1.2+).
+- Secret management : tokens, API keys et mot de passe d'accès stockés hors du dépôt (variables d'environnement ou fichier protégé).
+- Protection contre les attaques web courantes : XSS, injection SQL (via requêtes paramétrées), rate limiting.
 
 ### NFR-04 Maintenabilité
 - Pipeline modulaire (ingestion → normalisation → scoring → notification).
@@ -163,19 +183,38 @@ Poke-Radar est une application desktop qui transforme une veille Pokémon manuel
 
 ### NFR-05 UX
 - Interface orientée décision (priorité à lisibilité, tri et filtres essentiels).
-- Réduction de la complexité (éviter surcharge d’écrans/options au MVP).
+- Réduction de la complexité (éviter surcharge d'écrans/options au MVP).
+- Design responsive : utilisable de 320 px (mobile) à 1920 px (desktop).
+- Cibles tactiles d'au moins 44 px pour l'usage mobile.
+
+### NFR-06 Déploiement et exploitation
+- L'application tourne comme un service systemd ou équivalent, avec redémarrage automatique en cas d'arrêt.
+- Un reverse proxy (nginx/Caddy) termine le TLS et route les requêtes vers le backend.
+- Le build est reproductible : une commande unique produit l'artefact déployable.
+- Les logs applicatifs sont accessibles via journald ou un fichier.
+- Mise à jour possible sans perte de données (migrations SQLite versionnées conservées).
+
+### NFR-07 Qualité et tests
+- Les règles de calcul métier (marge, scoring, normalisation, déduplication) sont couvertes par des tests unitaires.
+- Le pipeline complet (ingestion → normalisation → scoring → alerting) est testé en intégration sur des données mockées.
+- Les composants UI partagés sont testés pour leurs états (default, loading, error, success).
+- Les 4 parcours utilisateur critiques (alerte→décision, recalibrage, source indisponible, saisie manuelle) sont testés de bout en bout (E2E).
 
 ## Risques principaux et mitigations
 - **Fragilité de collecte** → stratégie API-first + retries + fallback manuel.
 - **Bruit d’alertes** → seuils par défaut robustes + calibration continue.
 - **Contrainte légale sur les sources** → prioriser flux autorisés/partenariats.
 - **Complexité excessive trop tôt** → scope MVP strict, extensions en phases.
+- **Exposition web non sécurisée** → HTTPS obligatoire, auth single-user, reverse proxy, pas d'ouverture de ports inutiles.
+- **Régression desktop** → la couche domaine/services reste identique ; le changement de transport (Tauri → HTTP) est isolé.
 
 ## Validation et rollout
-1. Lancer un pilote utilisateur sur périmètre réduit (sources et produits limités).
-2. Mesurer métriques clés (latence, actionnabilité, temps de décision, marge nette).
-3. Ajuster règles de scoring et UX avant élargissement.
-4. Étendre progressivement la couverture sources/canaux.
+1. Déployer la version web sur le VPS avec accès HTTPS via le nom de domaine.
+2. Valider l'accès depuis desktop et mobile (iPhone/Safari, Android/Chrome).
+3. Lancer un pilote utilisateur sur périmètre réduit (sources et produits limités).
+4. Mesurer métriques clés (latence, actionnabilité, temps de décision, marge nette).
+5. Ajuster règles de scoring et UX avant élargissement.
+6. Étendre progressivement la couverture sources/canaux.
 
 ## Conclusion
 Ce PRD positionne Poke-Radar comme un **outil de décision rentable** plutôt qu’un simple tracker de stock. La stratégie retenue privilégie un MVP minimal, robuste et actionnable, ancré dans les artefacts actuels (brief/research/brainstorming) et prêt pour une montée en puissance progressive.

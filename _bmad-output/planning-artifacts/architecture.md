@@ -1,3 +1,5 @@
+> ⚠️ **SUPERSEDED** — This architecture document (Feb 2026, Tauri desktop) has been replaced by the [Architecture Spine — Poke-Radar (2026-07-22)](./architecture/architecture-Poke-Radar-2026-07-22/ARCHITECTURE-SPINE.md). The project pivoted from Tauri v2 desktop to a web application (Axum + React SPA) deployed on VPS. All new work should reference the current spine.
+
 ---
 stepsCompleted: [1, 2, 3, 4, 5, 6, 7, 8]
 inputDocuments:
