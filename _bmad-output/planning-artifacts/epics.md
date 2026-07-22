@@ -12,6 +12,7 @@ inputDocuments:
   - _bmad-output/planning-artifacts/implementation-readiness-report-2026-07-22.md
 changelog:
   - "2026-07-22: Restructuré selon le readiness report — Epic 2 splitté (collecte vs fondations web), tests intégrés aux stories feature, Dashboard SSE splitté en 3 stories, 5 epics total"
+  - "2026-07-22: Readiness report v2 — Epic 5 split en E5 (3 stories alerting/SSE) + E6 (9 stories UI), Epic 3 renommé, StrategyPage ajoutée (story 6.6), 6 epics total"
 ---
 
 # Poke-Radar - Epic Breakdown
@@ -113,38 +114,38 @@ FR-07: Epic 4 - Transformer les signaux en opportunités rentables
 FR-08: Epic 4 - Transformer les signaux en opportunités rentables
 FR-09: Epic 4 - Transformer les signaux en opportunités rentables
 FR-10: Epic 4 - Transformer les signaux en opportunités rentables
-FR-11: Epic 5 - Alerter, piloter & UX décisionnelle
-FR-12: Epic 5 - Alerter, piloter & UX décisionnelle
-FR-13: Epic 5 - Alerter, piloter & UX décisionnelle
-FR-14: Epic 5 - Alerter, piloter & UX décisionnelle
+FR-11: Epic 5 - Alerter & notifier en temps réel
+FR-12: Epic 5 - Alerter & notifier en temps réel
+FR-13: Epic 6 - Construire l'interface décisionnelle
+FR-14: Epic 6 - Construire l'interface décisionnelle
 FR-15: Epic 2 - Orchestrer la collecte fiable multi-sources
 FR-16: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-17: Epic 5 - Alerter, piloter & UX décisionnelle
-FR-18: Epic 3 - Poser les fondations web sécurisées
-FR-19: Epic 3 - Poser les fondations web sécurisées
+FR-17: Epic 6 - Construire l'interface décisionnelle
+FR-18: Epic 3 - Protéger l'accès à mon radar
+FR-19: Epic 3 - Protéger l'accès à mon radar
 
 ## UX-DR Coverage Map
 
-UX-DR1: Epic 5 - Story 5.4 (Design tokens)
-UX-DR2: Epic 5 - Story 5.5 (SignalBadge)
-UX-DR3: Epic 5 - Story 5.5 (Button)
-UX-DR4: Epic 5 - Story 5.5 (Card)
-UX-DR5: Epic 5 - Story 5.5 (Toast)
-UX-DR6: Epic 5 - Story 5.5 (EmptyState)
-UX-DR7: Epic 5 - Story 5.5 (BottomSheet)
-UX-DR8: Epic 5 - Story 5.5 (Panel)
-UX-DR9: Epic 5 - Story 5.5 (FormField)
-UX-DR10: Epic 5 - Story 5.5 (StatusPill)
-UX-DR11: Epic 5 - Story 5.5 (CollapsibleSection)
-UX-DR12: Epic 5 - Story 5.5 (Feedback)
-UX-DR13: Epic 5 - Story 5.6 (RadarPage)
-UX-DR14: Epic 5 - Story 5.7 (DetailPage)
-UX-DR15: Epic 5 - Story 5.8 (SourcesPage)
+UX-DR1: Epic 6 - Story 6.1 (Design tokens)
+UX-DR2: Epic 6 - Story 6.2 (SignalBadge)
+UX-DR3: Epic 6 - Story 6.2 (Button)
+UX-DR4: Epic 6 - Story 6.2 (Card)
+UX-DR5: Epic 6 - Story 6.2 (Toast)
+UX-DR6: Epic 6 - Story 6.2 (EmptyState)
+UX-DR7: Epic 6 - Story 6.2 (BottomSheet)
+UX-DR8: Epic 6 - Story 6.2 (Panel)
+UX-DR9: Epic 6 - Story 6.2 (FormField)
+UX-DR10: Epic 6 - Story 6.2 (StatusPill)
+UX-DR11: Epic 6 - Story 6.2 (CollapsibleSection)
+UX-DR12: Epic 6 - Story 6.2 (Feedback)
+UX-DR13: Epic 6 - Story 6.3 (RadarPage)
+UX-DR14: Epic 6 - Story 6.4 (DetailPage)
+UX-DR15: Epic 6 - Story 6.5 (SourcesPage)
 UX-DR16: Epic 3 - Story 3.1 (LoginPage dans auth)
-UX-DR17: Epic 5 - Story 5.10 (Responsive)
-UX-DR18: Epic 5 - Story 5.10 (Accessibilité)
-UX-DR19: Epic 5 - Story 5.9 (Hooks)
-UX-DR20: Epic 5 - Story 5.10 (Animations via reduced-motion)
+UX-DR17: Epic 6 - Story 6.8 (Responsive)
+UX-DR18: Epic 6 - Story 6.8 (Accessibilité)
+UX-DR19: Epic 6 - Story 6.7 (Hooks)
+UX-DR20: Epic 6 - Story 6.8 (Animations via reduced-motion)
 
 ## Epic List
 
@@ -157,7 +158,7 @@ Permettre à l'utilisateur de cadrer son univers de suivi (produits, référenti
 Fournir un runtime robuste de collecte qui récupère, horodate et sécurise les signaux tout en restant résilient aux pannes partielles.
 **FRs covered:** FR-03, FR-04, FR-05, FR-15, FR-16.
 
-### Epic 3: Poser les fondations web sécurisées
+### Epic 3: Protéger l'accès à mon radar
 Protéger l'accès à l'application, durcir l'API HTTP exposée, et structurer les logs pour un diagnostic rapide en production.
 **FRs covered:** FR-18, FR-19.
 
@@ -165,9 +166,13 @@ Protéger l'accès à l'application, durcir l'API HTTP exposée, et structurer l
 Convertir les données collectées en opportunités explicables via estimation marché, calcul de marge nette et scoring configurable.
 **FRs covered:** FR-06, FR-07, FR-08, FR-09, FR-10.
 
-### Epic 5: Alerter, piloter & UX décisionnelle
-Distribuer des alertes exploitables, offrir un dashboard web temps réel avec SSE, implémenter le design system UX complet (composants, pages, responsive, accessibilité), et couvrir les tests E2E.
-**FRs covered:** FR-11, FR-12, FR-13, FR-14, FR-17.
+### Epic 5: Alerter & notifier en temps réel
+Distribuer des alertes exploitables via Telegram et poser l'infrastructure SSE pour le dashboard temps réel. Tous les tests sont intégrés dans les AC de leur story respective.
+**FRs covered:** FR-11, FR-12.
+
+### Epic 6: Construire l'interface décisionnelle
+Implémenter le design system UX complet (tokens, composants, pages, hooks, responsive, accessibilité), la saisie manuelle d'opportunité, et les tests E2E. Tous les tests sont intégrés dans les AC de leur story respective.
+**FRs covered:** FR-13, FR-14, FR-17.
 
 ---
 
@@ -278,7 +283,7 @@ So that je conserve une continuité de détection sans intervention constante.
 
 ---
 
-## Epic 3: Poser les fondations web sécurisées
+## Epic 3: Protéger l'accès à mon radar
 
 Protéger l'accès à l'application, durcir l'API HTTP exposée, et structurer les logs pour un diagnostic rapide en production. Les tests sont intégrés directement dans les AC de chaque story.
 
@@ -418,11 +423,13 @@ So that je traite d'abord les opportunités à meilleure valeur.
 
 ---
 
-## Epic 5: Alerter, piloter & UX décisionnelle
+## Epic 5: Alerter & notifier en temps réel
 
-Distribuer des alertes exploitables, offrir un dashboard web temps réel avec SSE, implémenter le design system UX complet (composants, pages, responsive, accessibilité), et couvrir les tests E2E. Tous les tests sont intégrés dans les AC de leur story respective — aucune story de test standalone.
+Distribuer des alertes exploitables via Telegram et poser l'infrastructure SSE pour le dashboard temps réel. Tous les tests sont intégrés dans les AC de leur story respective.
 
-**FRs covered:** FR-11, FR-12, FR-13, FR-14, FR-17
+**FRs covered:** FR-11, FR-12
+
+**Stories:** 5.1, 5.2, 5.3
 
 ### Story 5.1: Envoyer des alertes Telegram exploitables et asynchrones
 
@@ -483,7 +490,17 @@ So that le dashboard reçoit les événements en temps réel sans polling.
 **And** une déconnexion suivie d'une reconnexion automatique est testée
 **And** la fermeture du flux côté serveur est gérée sans erreur.
 
-### Story 5.4: Implémenter les design tokens CSS et le thème dark "Amber Warmth"
+---
+
+## Epic 6: Construire l'interface décisionnelle
+
+Implémenter le design system UX complet (tokens, composants, pages, hooks, responsive, accessibilité), la saisie manuelle d'opportunité, et les tests E2E. Tous les tests sont intégrés dans les AC de leur story respective.
+
+**FRs covered:** FR-13, FR-14, FR-17
+
+**Stories:** 6.1-6.9
+
+### Story 6.1: Implémenter les design tokens CSS et le thème dark "Amber Warmth"
 
 As a frontend dev,
 I want des variables CSS centralisées pour le thème dark,
@@ -504,7 +521,7 @@ So that tous les composants partagent une cohérence visuelle sans duplication.
 **Then** chaque token CSS est vérifié comme défini et utilisé
 **And** le contraste AA est respecté sur le texte standard, AAA sur les KPI critiques (marge, ROI).
 
-### Story 5.5: Créer les composants UI partagés du design system
+### Story 6.2: Créer les composants UI partagés du design system
 
 As a frontend dev,
 I want des composants réutilisables couvrant tous les cas d'usage,
@@ -536,7 +553,7 @@ So that les pages peuvent être assemblées rapidement et de façon cohérente.
 
 **And** tous les tests composants utilisent Vitest + React Testing Library, résident dans `frontend/tests/components/`, et couvrent ≥ 80% des lignes.
 
-### Story 5.6: Construire la page Radar (tableau priorisé, scroll infini, swipe, temps réel)
+### Story 6.3: Construire la page Radar (tableau priorisé, scroll infini, swipe, temps réel)
 
 As a revendeur,
 I want une vue principale temps réel de toutes mes opportunités classées par pertinence,
@@ -562,7 +579,7 @@ So that je peux scanner rapidement et agir.
 **Then** le rendu avec des données mockées est testé (opportunités, états loading, empty, error)
 **And** la pagination par lot de 20 est testée.
 
-### Story 5.7: Construire la page Détail (décomposition marge, sparkline, historique)
+### Story 6.4: Construire la page Détail (décomposition marge, sparkline, historique)
 
 As a revendeur,
 I want voir le détail complet d'une opportunité avec la décomposition de sa marge,
@@ -586,7 +603,7 @@ So that je décide en toute confiance d'acheter ou non.
 **Then** le rendu avec une opportunité mockée complète est testé
 **And** l'expansion/réduction des sections pilables est testée.
 
-### Story 5.8: Construire la page Sources (état, scan manuel, gestion)
+### Story 6.5: Construire la page Sources (état, scan manuel, gestion)
 
 As a revendeur,
 I want voir l'état de chaque source et pouvoir lancer un scan manuel,
@@ -609,7 +626,55 @@ So that je garde le contrôle sur la collecte de données.
 **Then** le rendu avec sources mockées (OK, dégradé, bloqué) est testé
 **And** l'ouverture/fermeture du BottomSheet est testée.
 
-### Story 5.9: Développer les hooks personnalisés (infiniteScroll, swipe, collapsible)
+### Story 6.6: Construire la page Stratégie (sliders, presets, toggles, référentiels)
+
+As a revendeur,
+I want un écran central de stratégie pour ajuster mes paramètres de trading,
+So that je peux affiner ma stratégie sans naviguer dans des écrans séparés.
+
+**Acceptance Criteria:**
+
+**Given** l'écran Stratégie & Réglages
+**When** je l'ouvre depuis la navigation principale
+**Then** je vois les sections suivantes :
+
+**Section Scoring & Marges :**
+- Slider marge minimale cible (%) avec valeur affichée en € estimé
+- Slider ROI minimum cible (%) avec valeur affichée en € estimé
+- Toggle « Alertes uniquement si ROI > seuil »
+- Toggle « Ignorer les opportunités sous le prix plancher »
+
+**Section Presets de Stratégie :**
+- Sélecteur de preset : Conservateur / Équilibré / Agressif
+- Chaque preset pré-remplit les sliders avec des valeurs prédéfinies
+- Bouton « Sauvegarder comme preset personnalisé » avec nom
+
+**Section Notifications :**
+- Toggle « Activer les alertes Telegram »
+- Toggle « Résumé quotidien » (actif/inactif)
+- Slider « Fréquence minimale entre alertes » (minutes)
+- Statut de connexion Telegram (connecté/déconnecté)
+
+**Section Référentiels :**
+- Liste des sets/éditions suivis avec badges de statut
+- Bouton « Ajouter un référentiel » ouvrant un BottomSheet de sélection
+- Recherche textuelle dans les référentiels disponibles
+- Badge « Non normalisé » sur les produits saisis manuellement sans référentiel
+
+**And** tous les sliders ont un pas défini (marge : 1%, ROI : 5%, fréquence : 5 min)
+**And** les modifications sont sauvegardées automatiquement avec debounce 500ms
+**And** un toast de confirmation apparaît à chaque sauvegarde
+**And** l'écran est intégralement utilisable de 320 px jusqu'au desktop, sans débordement horizontal
+
+**Given** la page Stratégie
+**When** les tests composants sont exécutés (Vitest + RTL, MSW)
+**Then** le rendu complet avec les 4 sections est testé
+**And** le changement de preset met à jour les sliders
+**And** le toggle de notification Telegram est testé (activé/désactivé)
+**And** l'ajout d'un référentiel via BottomSheet est testé
+**And** la sauvegarde automatique avec debounce est testée (pas d'appel API pendant le debounce, appel après)
+
+### Story 6.7: Développer les hooks personnalisés (infiniteScroll, swipe, collapsible)
 
 As a frontend dev,
 I want des hooks réutilisables pour les patterns d'interaction courants,
@@ -642,7 +707,7 @@ So that les pages partagent une expérience utilisateur cohérente.
 **And** `useSwipe` est testé pour : swipe gauche franchit le seuil, swipe droite ne franchit pas le seuil
 **And** `useCollapsible` est testé pour : toggle, état initial fermé, double-toggle.
 
-### Story 5.10: Implémenter le responsive mobile-first et l'accessibilité
+### Story 6.8: Implémenter le responsive mobile-first et l'accessibilité
 
 As a utilisateur mobile,
 I want que l'application soit pleinement utilisable sur mon téléphone,
@@ -674,7 +739,7 @@ So that je peux scanner les opportunités en déplacement.
 **Then** les tests d'accessibilité automatisés (axe-core) ne rapportent aucune violation critique
 **And** les composants sont testés avec `prefers-reduced-motion: reduce`.
 
-### Story 5.11: Implémenter la saisie manuelle d'opportunité et les tests E2E
+### Story 6.9: Implémenter la saisie manuelle d'opportunité et les tests E2E
 
 As a revendeur,
 I want ajouter manuellement une opportunité quand les sources sont indisponibles,
