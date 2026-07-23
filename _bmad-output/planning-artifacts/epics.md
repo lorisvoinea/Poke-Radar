@@ -6,13 +6,14 @@ stepsCompleted:
   - step-04-final-validation
 inputDocuments:
   - _bmad-output/planning-artifacts/prd.md
-  - _bmad-output/planning-artifacts/architecture/architecture-Poke-Radar-2026-07-22/ARCHITECTURE-SPINE.md
+  - _bmad-output/planning-artifacts/architecture.md
   - _bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md
   - _bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md
   - _bmad-output/planning-artifacts/implementation-readiness-report-2026-07-22.md
 changelog:
   - "2026-07-22: Restructuré selon le readiness report — Epic 2 splitté (collecte vs fondations web), tests intégrés aux stories feature, Dashboard SSE splitté en 3 stories, 5 epics total"
   - "2026-07-22: Readiness report v2 — Epic 5 split en E5 (3 stories alerting/SSE) + E6 (9 stories UI), Epic 3 renommé, StrategyPage ajoutée (story 6.6), 6 epics total"
+  - "2026-07-23: Delta review — FRs recalés sur PRD v2026-07-21 (19→9 consolidées), NFRs recalés (8→7), archi mise à jour (v2026-07-23). Aucun changement de contenu stories."
 ---
 
 # Poke-Radar - Epic Breakdown
@@ -29,34 +30,23 @@ Ce document transforme le PRD, l'architecture et la spécification UX en epics e
 
 FR-01: L'utilisateur peut créer/éditer des profils de surveillance (produits, seuils, frais, priorités).
 FR-02: Le système supporte des référentiels préenregistrés (sets/éditions) pour limiter les erreurs de saisie.
-FR-03: Le moteur récupère périodiquement disponibilité et prix des sources activées.
-FR-04: Chaque donnée est horodatée et associée à sa source.
-FR-05: En cas d'échec source, le système marque l'état et bascule en mode dégradé.
-FR-06: Le système calcule une estimation de revente à partir des données disponibles.
-FR-07: L'interface affiche le niveau de confiance (valeur directe vs estimée).
-FR-08: Le système calcule marge brute et nette (achat, frais, commissions, port, coûts transactionnels).
-FR-09: Les règles de scoring sont configurables par utilisateur.
-FR-10: Les opportunités sont triables par rentabilité et urgence.
-FR-11: Le système envoie une notification quand une opportunité dépasse les seuils définis.
-FR-12: La notification inclut produit, prix d'achat, estimation revente, marge nette, source, timestamp.
-FR-13: Vue unique avec état des sources, dernières opportunités, erreurs et actions recommandées.
-FR-14: Historique consultable pour analyser la qualité des alertes et ajuster les seuils.
-FR-15: Journalisation des erreurs de collecte et de calcul.
-FR-16: Mécanisme de retry/backoff sur les sources instables.
-FR-17: Continuité minimale du service via saisie/import manuel.
-FR-18: L'application est accessible via navigateur web (desktop, tablette, mobile) sur HTTPS, via API HTTP RPC + SPA.
-FR-19: L'accès est protégé par authentification single-user (token Bearer), sans gestion multi-comptes.
+FR-03: Le moteur récupère périodiquement disponibilité et prix des sources activées (collecte, horodatage, résilience : retry/backoff, journalisation).
+FR-04: Scoring d'opportunité : estimation revente, marge brute/nette, règles configurables, tri par rentabilité/urgence, niveau de confiance.
+FR-05: Notification quand une opportunité dépasse les seuils (produit, prix achat, estimation revente, marge nette, source, timestamp).
+FR-06: Tableau de bord opérationnel : état des sources, dernières opportunités, erreurs, temps réel (SSE), historique consultable.
+FR-07: Résilience opérationnelle : journalisation des erreurs, retry/backoff, continuité via saisie/import manuel.
+FR-08: Exposition web : application accessible via navigateur standard (Chrome, Safari, Firefox) sur desktop/tablette/mobile, HTTPS, API HTTP RPC + SPA, responsive 320px+.
+FR-09: Authentification single-user (token ou mot de passe). Secrets stockés hors dépôt, injectés via variables d'environnement.
 
 ### NonFunctional Requirements
 
-NFR-01: Latence détection → notification < 60 secondes sur sources prioritaires.
-NFR-02: Uptime monitoring > 95 % sur plages actives.
-NFR-03: Dégradation progressive sans arrêt global.
-NFR-04: Respect RGPD/nLPD, secret management, HTTPS obligatoire, protection XSS/SQLi/rate limiting/CORS/CSP.
-NFR-05: Pipeline modulaire maintenable et extensible.
-NFR-06: UX orientée décision, responsive mobile-first (320px–1920px), cibles tactiles 44px, animations respectueuses.
-NFR-07: Déploiement reproductible : systemd, Caddy, TLS Let's Encrypt, logs journald, migrations SQLite versionnées.
-NFR-08: Tests : unitaires métier Rust, intégration pipeline, composants UI (Vitest+RTL), E2E Playwright (4 journeys critiques).
+NFR-01: Performance — rafraîchissement source configurable, évaluation temps quasi réel, latence détection→notification < 60s.
+NFR-02: Fiabilité — dégradation progressive sans arrêt global, cohérence des données avant alerte, uptime > 95%.
+NFR-03: Sécurité — respect RGPD/nLPD, CGU/robots.txt, auth single-user obligatoire, HTTPS (TLS 1.2+), secret management hors dépôt, XSS/SQLi/rate limiting/CORS/CSP.
+NFR-04: Maintenabilité — pipeline modulaire (ingestion→normalisation→scoring→notification), configuration externalisée.
+NFR-05: UX — interface orientée décision (lisibilité, tri, filtres), responsive 320px–1920px, cibles tactiles ≥ 44px, animations respectueuses.
+NFR-06: Déploiement — service systemd, reverse proxy Caddy TLS Let's Encrypt, build reproductible, logs journald, migrations SQLite versionnées, mise à jour sans perte de données.
+NFR-07: Qualité — tests unitaires métier Rust, intégration pipeline, composants UI (Vitest+RTL), E2E Playwright (4 parcours critiques).
 
 ### Additional Requirements
 
@@ -107,22 +97,14 @@ UX-DR20: Animations — transitions 150-200ms, pulse nouvelle alerte, animation 
 FR-01: Epic 1 - Configurer le cockpit de surveillance
 FR-02: Epic 1 - Configurer le cockpit de surveillance
 FR-03: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-04: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-05: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-06: Epic 4 - Transformer les signaux en opportunités rentables
-FR-07: Epic 4 - Transformer les signaux en opportunités rentables
-FR-08: Epic 4 - Transformer les signaux en opportunités rentables
-FR-09: Epic 4 - Transformer les signaux en opportunités rentables
-FR-10: Epic 4 - Transformer les signaux en opportunités rentables
-FR-11: Epic 5 - Alerter & notifier en temps réel
-FR-12: Epic 5 - Alerter & notifier en temps réel
-FR-13: Epic 6 - Construire l'interface décisionnelle
-FR-14: Epic 6 - Construire l'interface décisionnelle
-FR-15: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-16: Epic 2 - Orchestrer la collecte fiable multi-sources
-FR-17: Epic 6 - Construire l'interface décisionnelle
-FR-18: Epic 3 - Protéger l'accès à mon radar
-FR-19: Epic 3 - Protéger l'accès à mon radar
+FR-04: Epic 4 - Transformer les signaux en opportunités rentables
+FR-05: Epic 5 - Alerter & notifier en temps réel
+FR-06: Epic 6 - Construire l'interface décisionnelle
+FR-07: Epic 2 (résilience backend) + Epic 6 (fallback manuel UI)
+FR-08: Epic 3 - Protéger l'accès à mon radar
+FR-09: Epic 3 - Protéger l'accès à mon radar
+
+**Couverture :** 9/9 FRs ✅
 
 ## UX-DR Coverage Map
 
@@ -151,28 +133,28 @@ UX-DR20: Epic 6 - Story 6.8 (Animations via reduced-motion)
 
 ### Epic 1: Configurer le cockpit de surveillance ✅ (COMPLÉTÉ)
 Permettre à l'utilisateur de cadrer son univers de suivi (produits, référentiels, seuils, frais) pour lancer un monitoring pertinent dès le premier cycle.
-**FRs covered:** FR-01, FR-02.
+**FRs covered:** FR-01, FR-02
 **Stories:** 1.1 ✅, 1.2 ✅, 1.3 ✅
 
 ### Epic 2: Orchestrer la collecte fiable multi-sources
 Fournir un runtime robuste de collecte qui récupère, horodate et sécurise les signaux tout en restant résilient aux pannes partielles.
-**FRs covered:** FR-03, FR-04, FR-05, FR-15, FR-16.
+**FRs covered:** FR-03, FR-07 (partiel : résilience backend, retry/backoff, journalisation)
 
 ### Epic 3: Protéger l'accès à mon radar
 Protéger l'accès à l'application, durcir l'API HTTP exposée, et structurer les logs pour un diagnostic rapide en production.
-**FRs covered:** FR-18, FR-19.
+**FRs covered:** FR-08, FR-09
 
 ### Epic 4: Transformer les signaux en opportunités rentables
 Convertir les données collectées en opportunités explicables via estimation marché, calcul de marge nette et scoring configurable.
-**FRs covered:** FR-06, FR-07, FR-08, FR-09, FR-10.
+**FRs covered:** FR-04
 
 ### Epic 5: Alerter & notifier en temps réel
 Distribuer des alertes exploitables via Telegram et poser l'infrastructure SSE pour le dashboard temps réel. Tous les tests sont intégrés dans les AC de leur story respective.
-**FRs covered:** FR-11, FR-12.
+**FRs covered:** FR-05
 
 ### Epic 6: Construire l'interface décisionnelle
 Implémenter le design system UX complet (tokens, composants, pages, hooks, responsive, accessibilité), la saisie manuelle d'opportunité, et les tests E2E. Tous les tests sont intégrés dans les AC de leur story respective.
-**FRs covered:** FR-13, FR-14, FR-17.
+**FRs covered:** FR-06, FR-07 (partiel : fallback manuel UI)
 
 ---
 
@@ -226,7 +208,7 @@ So that je réduis les erreurs de saisie et les ambiguïtés produit.
 
 Fournir un runtime robuste de collecte qui récupère, horodate et sécurise les signaux tout en restant résilient aux pannes partielles. Les tests unitaires sont intégrés directement dans les acceptance criteria de chaque story — pas de story de test standalone.
 
-**FRs covered:** FR-03, FR-04, FR-05, FR-15, FR-16
+**FRs covered:** FR-03, FR-07 (partiel : résilience backend, retry/backoff, journalisation)
 
 ### Story 2.1: Planifier et exécuter les cycles de collecte multi-sources
 
@@ -287,7 +269,7 @@ So that je conserve une continuité de détection sans intervention constante.
 
 Protéger l'accès à l'application, durcir l'API HTTP exposée, et structurer les logs pour un diagnostic rapide en production. Les tests sont intégrés directement dans les AC de chaque story.
 
-**FRs covered:** FR-18, FR-19
+**FRs covered:** FR-08, FR-09
 
 ### Story 3.1: Protéger l'accès à l'application par token Bearer
 
@@ -361,7 +343,7 @@ So that je peux diagnostiquer rapidement les problèmes en production.
 
 Convertir les données collectées en opportunités explicables via estimation marché, calcul de marge nette et scoring configurable. Les tests unitaires et d'intégration sont intégrés directement dans les AC de chaque story.
 
-**FRs covered:** FR-06, FR-07, FR-08, FR-09, FR-10
+**FRs covered:** FR-04
 
 ### Story 4.1: Enrichir les signaux avec des références de marché secondaire
 
@@ -427,7 +409,7 @@ So that je traite d'abord les opportunités à meilleure valeur.
 
 Distribuer des alertes exploitables via Telegram et poser l'infrastructure SSE pour le dashboard temps réel. Tous les tests sont intégrés dans les AC de leur story respective.
 
-**FRs covered:** FR-11, FR-12
+**FRs covered:** FR-05
 
 **Stories:** 5.1, 5.2, 5.3
 
@@ -496,7 +478,7 @@ So that le dashboard reçoit les événements en temps réel sans polling.
 
 Implémenter le design system UX complet (tokens, composants, pages, hooks, responsive, accessibilité), la saisie manuelle d'opportunité, et les tests E2E. Tous les tests sont intégrés dans les AC de leur story respective.
 
-**FRs covered:** FR-13, FR-14, FR-17
+**FRs covered:** FR-06, FR-07 (partiel : fallback manuel UI)
 
 **Stories:** 6.1-6.9
 
