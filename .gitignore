@@ -2,6 +2,9 @@ ui/node_modules/
 ui/test-results/
 src-tauri/target/
 src-tauri/gen/
+backend/target/
+frontend/node_modules/
+frontend/dist/
 
 _bmad/config.user.toml
 

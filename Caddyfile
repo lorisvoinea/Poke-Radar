@@ -1,0 +1,12 @@
+# Poke-Radar Caddyfile
+# Reverse proxy with automatic TLS via Let's Encrypt
+
+:443 {
+    reverse_proxy localhost:3000
+    encode gzip
+}
+
+# Redirect HTTP to HTTPS
+:80 {
+    redir https://{host}{uri}
+}
