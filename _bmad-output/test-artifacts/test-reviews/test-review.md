@@ -24,7 +24,8 @@ epic: 1
 | Métrique | Valeur |
 |----------|--------|
 | **Score Global** | **75 / 100** |
-| **Grade** | **C** |
+| **Grade** | **B** |
+| **Règle de grade projet** | A+ 90-100, A 80-89, B 70-79, C 60-69, F <60 (checklist TEA `test-review`) |
 | **Évaluation** | Acceptable — des corrections ciblées sont nécessaires avant le gate |
 
 ### Scores par Dimension
@@ -134,17 +135,183 @@ Toutes concentrées dans `ui/src/__tests__/strategy-page.test.tsx` :
 
 ---
 
+## 🧾 Évaluation Complète par Critère de Checklist
+
+| Critère checklist | Statut | Preuve observée | Violations | Référence KB | Action gate-grade |
+|---|---|---|---:|---|---|
+| Fichiers de test identifiés et lisibles | PASS | 8 fichiers inventoriés, 829 lignes, 38 tests | 0 | `test-quality.md` | Conserver l’inventaire dans le rapport de gate |
+| Framework et configuration détectés | PASS | Stack fullstack : Rust, Vitest/RTL, Playwright | 0 | `test-quality.md`, `test-levels-framework.md` | Associer chaque finding au niveau de test concerné |
+| Knowledge base chargée | PASS | Fragments TEA utilisés et listés ci-dessous | 0 | `tea-index.csv` | Maintenir la liste de fragments consultés dans chaque re-review |
+| Given/When/Then / lisibilité comportementale | WARN | Les noms couvrent les comportements, mais `strategy-page.test.tsx` reste dense et sans sous-structure | 1 MEDIUM | `test-quality.md` | Ajouter des sous-`describe` et commentaires de contexte |
+| Test IDs / sélecteurs robustes | WARN | Plusieurs sélecteurs CSS structurels ou stylistiques | 5 MEDIUM | `selector-resilience.md` | Privilégier rôle/label/texte accessible, puis `data-testid` stable si nécessaire |
+| Priority markers | WARN | Priorités non visibles dans l’inventaire actuel | 1 LOW | `test-priorities-matrix.md` | Ajouter P0/P1/P2 sur scénarios critiques avant CI gate stricte |
+| Hard waits | PASS | Aucun `waitForTimeout`, sleep, ou délai arbitraire détecté | 0 | `timing-debugging.md` | Préserver les waits événementiels |
+| Déterminisme | FAIL | Compteurs mutables dans les mocks `invoke` sous React Strict Mode | 3 HIGH | `test-quality.md`, `timing-debugging.md` | Bloquant : remplacer par mocks séquencés ou files de réponses locales au test |
+| Isolation | PASS | `tempdir()` Rust, cleanup Vitest, contexte Playwright frais | 1 MEDIUM | `fixture-architecture.md` | Remplacer l’injection globale de style par mock CSS/module scoped |
+| Fixture patterns | WARN | Helpers partiels, mais duplication de mocks `invoke` | 1 HIGH | `fixture-architecture.md` | Extraire `createMockInvoke(config)` après correction déterminisme |
+| Data factories | WARN | Données principalement inline, acceptable pour Epic 1 mais peu extensible | 1 LOW | `data-factories.md` | Introduire factories quand le même profil/produit apparaît 3+ fois |
+| Network-first | PASS | Scope actuel majoritairement Tauri mocké / jsdom ; Playwright sans race réseau notable | 0 | `network-first.md` | Garder intercepts avant navigation pour les futurs flux réseau |
+| Assertions explicites | PASS | Tests RTL et Rust contiennent assertions fonctionnelles observables | 0 | `test-quality.md` | Maintenir assertions orientées utilisateur |
+| Longueur / taille des tests | FAIL | `strategy-page.test.tsx` 345 lignes ; `strategy-form.test.tsx` 151 lignes | 2 HIGH | `fixture-architecture.md`, `test-quality.md` | Diviser par domaine et extraire helpers |
+| Durée / performance | PASS | Aucune attente dure ; parallélisme préservé ; score performance 96/100 | 0 | `ci-burn-in.md`, `timing-debugging.md` | Ajouter burn-in CI après P0 pour mesurer stabilité |
+| Patterns de flakiness | FAIL | État mutable partagé dans mocks, selectors CSS fragiles | 3 HIGH + 5 MEDIUM | `test-healing-patterns.md`, `selector-resilience.md` | Re-review obligatoire après corrections P0 |
+
+---
+
+## 📚 Références Knowledge Base et Documentation
+
+### Fragments TEA consultés
+
+| Fragment | Utilisation dans ce rapport |
+|---|---|
+| `test-quality.md` | Définition de Done test : déterminisme, isolation, assertions, absence de flakiness |
+| `fixture-architecture.md` | Recommandation helper/fixture `createMockInvoke(config)` et séparation des responsabilités |
+| `selector-resilience.md` | Remplacement des sélecteurs CSS fragiles par queries utilisateur ou `data-testid` stable |
+| `timing-debugging.md` | Validation absence de hard waits et préférence pour attentes événementielles |
+| `risk-governance.md` | Décision de gate, seuils de mitigation et statut conditionnel |
+| `test-priorities-matrix.md` | Recommandation d’ajouter des marqueurs P0/P1/P2 sur scénarios critiques |
+| `data-factories.md` | Évolution future des données inline vers factories quand la duplication augmente |
+| `network-first.md` | Garde-fou futur pour intercepter avant navigation en E2E réseau |
+| `ci-burn-in.md` | Recommandation burn-in CI après correction des P0 |
+
+### Documentation officielle croisée
+
+- Vitest documente `mockReturnValueOnce()` comme mécanisme de séquençage de valeurs de mocks, avec fallback vers l’implémentation par défaut lorsque la séquence est épuisée. Source officielle : <https://vitest.dev/api/mock.html>.
+- Testing Library recommande de choisir les queries selon la façon dont l’utilisateur trouve les éléments, avec priorité aux queries sémantiques/accessibles. Source officielle : <https://testing-library.com/docs/queries/about/>.
+- Playwright documente les locators, l’auto-waiting/retry-ability, et `getByTestId()` comme option stable lorsque l’application expose un attribut de test. Sources officielles : <https://playwright.dev/docs/api/class-locator> et <https://playwright.dev/docs/locators>.
+
+---
+
+## 🧪 Exemples Before / After
+
+### 1. Remplacer les compteurs mutables par une séquence de mock locale
+
+**Before — fragile sous Strict Mode**
+
+```ts
+let productReads = 0;
+vi.mocked(invoke).mockImplementation(async (command) => {
+  if (command === 'list_products') {
+    productReads += 1;
+    return productReads === 1 ? initialProducts : refreshedProducts;
+  }
+});
+```
+
+**After — séquence explicite et lisible**
+
+```ts
+const listProducts = vi
+  .fn()
+  .mockResolvedValueOnce(initialProducts)
+  .mockResolvedValueOnce(refreshedProducts)
+  .mockResolvedValue(refreshedProducts);
+
+vi.mocked(invoke).mockImplementation(async (command) => {
+  if (command === 'list_products') return listProducts();
+  throw new Error(`Unexpected command: ${command}`);
+});
+```
+
+### 2. Remplacer un sélecteur CSS fragile par une query orientée utilisateur
+
+**Before — dépend de la structure CSS**
+
+```ts
+expect(container.querySelector('.status-pill')).toHaveTextContent('Ready');
+```
+
+**After — préfère sémantique/accessibilité**
+
+```ts
+expect(screen.getByRole('status', { name: /strategy status/i })).toHaveTextContent('Ready');
+```
+
+**Alternative si aucun rôle accessible naturel n’existe**
+
+```tsx
+<span data-testid="strategy-status" className="status-pill">Ready</span>
+```
+
+```ts
+expect(screen.getByTestId('strategy-status')).toHaveTextContent('Ready');
+```
+
+### 3. Extraire un helper de mock Tauri pour réduire la duplication
+
+**Before — chaque test réimplémente le routage `invoke`**
+
+```ts
+vi.mocked(invoke).mockImplementation(async (command, args) => {
+  if (command === 'app_ready') return null;
+  if (command === 'list_products') return products;
+  if (command === 'save_strategy') return { id: 'strategy-1', ...args };
+  throw new Error(`Unexpected command: ${command}`);
+});
+```
+
+**After — helper configurable, une seule source de vérité**
+
+```ts
+function createMockInvoke(config: {
+  products?: Product[];
+  savedStrategy?: Strategy;
+}) {
+  return vi.fn(async (command, args) => {
+    switch (command) {
+      case 'app_ready':
+        return null;
+      case 'list_products':
+        return config.products ?? [];
+      case 'save_strategy':
+        return config.savedStrategy ?? { id: 'strategy-1', ...args };
+      default:
+        throw new Error(`Unexpected command: ${command}`);
+    }
+  });
+}
+
+vi.mocked(invoke).mockImplementation(createMockInvoke({ products }));
+```
+
+### 4. Extraire une promesse différée réutilisable
+
+**Before — pattern recopié dans plusieurs tests**
+
+```ts
+let resolveSubmission: (value: SaveResult) => void;
+const submission = new Promise<SaveResult>((resolve) => {
+  resolveSubmission = resolve;
+});
+```
+
+**After — helper typé, lisible et sûr**
+
+```ts
+function deferred<T>() {
+  let resolve!: (value: T) => void;
+  const promise = new Promise<T>((res) => {
+    resolve = res;
+  });
+  return { promise, resolve };
+}
+
+const submission = deferred<SaveResult>();
+```
+
+---
+
 ## 🎯 Décision de Gate
 
 | Critère | Statut |
 |---------|--------|
-| Score global ≥ 70 | ✅ 75/100 |
+| Score global ≥ 70 | ✅ 75/100 — grade **B** selon la règle projet |
 | Aucun HIGH en isolation | ✅ 0 HIGH |
 | Aucun HIGH en performance | ✅ 0 HIGH |
 | Déterminisme ≥ 70 | ❌ 56/100 (F) |
 | Maintenabilité ≥ 70 | ❌ 63/100 (D) |
 
-**Verdict** : ⚠️ **GATE CONDITIONNEL** — Le score global atteint le seuil minimum (75 ≥ 70), mais deux dimensions sont en échec. La correction des 3 violations HIGH de déterminisme (compteurs mutés) est **bloquante** avant le passage en production. Les problèmes de maintenabilité peuvent être traités en parallèle du développement d'Epic 2.
+**Verdict** : ⚠️ **GATE CONDITIONNEL / CONCERNS** — Le score global atteint le seuil minimum (75 ≥ 70, grade B), mais deux dimensions sont en échec. La correction des 3 violations HIGH de déterminisme (compteurs mutés) est **bloquante** avant le passage en production. Les problèmes de maintenabilité peuvent être traités en parallèle du développement d'Epic 2, sauf s’ils empêchent la correction déterministe.
 
 ---
 
