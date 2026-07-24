@@ -1,6 +1,6 @@
 {
   "schema_version": "0.1.0",
-  "evaluated_at": "2026-07-23T17:54:00Z",
+  "evaluated_at": "2026-07-24T09:36:27Z",
   "repo": "Poke-Radar",
   "target": {
     "type": "epic",
@@ -9,12 +9,12 @@
   },
   "collection_status": "COLLECTED",
   "gate_basis": "priority_thresholds",
-  "gate_status": "FAIL",
-  "rationale": "P0 coverage is 50% (required: 100%). 1 critical requirement uncovered: 1.2-AC2 (Paramètres réutilisés automatiquement au prochain cycle de monitoring).",
-  "p0_status": "NOT_MET",
+  "gate_status": "PASS",
+  "rationale": "P0 coverage is 100%, P1 coverage is 100% (target: 90%), and overall coverage is 100% (minimum: 80%). Story 1.2 AC2 is now covered by active E2E/component evidence. Prior suite-quality findings remain advisory release concerns, not coverage-threshold blockers.",
+  "p0_status": "MET",
   "p1_status": "MET",
   "overall_status": "MET",
-  "critical_open": 1,
+  "critical_open": 0,
   "links": {
     "trace_report_path": "_bmad-output/test-artifacts/traceability/traceability-matrix.md",
     "trace_report_url": "",
