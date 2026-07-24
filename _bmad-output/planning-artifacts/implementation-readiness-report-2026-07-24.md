@@ -93,9 +93,6 @@ supportingArtifacts:
 - Design UX : `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md`
 - Expérience UX : `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md`
 
-## Confirmation en attente
-
-Continuer uniquement après confirmation par l’utilisateur des documents canoniques proposés ou fourniture de remplacements.
 
 ## Analyse du PRD
 
