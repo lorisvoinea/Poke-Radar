@@ -20,390 +20,390 @@ supportingArtifacts:
   - _bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md
 ---
 
-# Implementation Readiness Assessment Report
+# Rapport d’évaluation de préparation à l’implémentation
 
-**Date:** 2026-07-24
-**Project:** Poke-Radar
+**Date :** 2026-07-24
+**Projet :** Poke-Radar
 
-## Document Discovery Inventory
+## Inventaire de découverte documentaire
 
-### PRD Files Found
+### Fichiers PRD trouvés
 
-**Whole Documents:**
+**Documents complets :**
 
-- `_bmad-output/planning-artifacts/prd.md` — 11,819 bytes, modified `2026-07-24T09:22:19`
-- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` — 2,088 bytes, modified `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/prd.md` — 11 819 octets, modifié le `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` — 2 088 octets, modifié le `2026-07-24T09:22:19`
 
-**Sharded Documents:**
+**Documents fragmentés :**
 
-- None found.
+- Aucun trouvé.
 
-### Architecture Files Found
+### Fichiers d’architecture trouvés
 
-**Whole Documents:**
+**Documents complets :**
 
-- `_bmad-output/planning-artifacts/architecture.md` — 25,650 bytes, modified `2026-07-24T09:22:19`
-- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` — 2,088 bytes, modified `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/architecture.md` — 25 650 octets, modifié le `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` — 2 088 octets, modifié le `2026-07-24T09:22:19`
 
-**Sharded Documents:**
+**Documents fragmentés :**
 
-- None found.
+- Aucun trouvé.
 
-### Epics & Stories Files Found
+### Fichiers epics & stories trouvés
 
-**Whole Documents:**
+**Documents complets :**
 
-- `_bmad-output/planning-artifacts/epics.md` — 38,743 bytes, modified `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/epics.md` — 38 743 octets, modifié le `2026-07-24T09:22:19`
 
-**Sharded Documents:**
+**Documents fragmentés :**
 
-- None found.
+- Aucun trouvé.
 
-### UX Design Files Found
+### Fichiers de design UX trouvés
 
-**Whole Documents / UX Artifacts:**
+**Documents / artefacts UX complets :**
 
-- `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md` — 21,003 bytes, modified `2026-07-24T09:22:19`
-- `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md` — 9,787 bytes, modified `2026-07-24T09:22:19`
-- `_bmad-output/planning-artifacts/ux-designs/_archive/ux-design-specification-2026-02-19.md` — 9,787 bytes, modified `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md` — 21 003 octets, modifié le `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md` — 9 787 octets, modifié le `2026-07-24T09:22:19`
+- `_bmad-output/planning-artifacts/ux-designs/_archive/ux-design-specification-2026-02-19.md` — 9 787 octets, modifié le `2026-07-24T09:22:19`
 
-**Sharded Documents:**
+**Documents fragmentés :**
 
-- Folder: `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/`
+- Dossier : `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/`
   - `DESIGN.md`
   - `EXPERIENCE.md`
 
-## Issues Found
+## Problèmes identifiés
 
-### Potential Duplicate / Cross-Category Match
+### Correspondance potentiellement ambiguë / multi-catégorie
 
-- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` matched both PRD and Architecture discovery patterns because its filename contains both `prd` and `architecture`.
-- Treat this as a supporting crosscheck artifact unless the user explicitly selects it as canonical.
+- `_bmad-output/planning-artifacts/prd-architecture-crosscheck-2026-07-22.md` correspond à la fois aux motifs de découverte PRD et Architecture, car son nom contient `prd` et `architecture`.
+- Ce fichier doit être traité comme un artefact de support de cross-check, sauf si l’utilisateur le sélectionne explicitement comme document canonique.
 
-### UX Discovery Correction
+### Correction de découverte UX
 
-- UX files do exist under `_bmad-output/planning-artifacts/ux-designs/`.
-- The initial strict UX search missed `DESIGN.md` and `EXPERIENCE.md` because their filenames do not contain `ux`, although their parent directory does.
+- Des fichiers UX existent bien sous `_bmad-output/planning-artifacts/ux-designs/`.
+- La recherche UX initiale, trop stricte, a manqué `DESIGN.md` et `EXPERIENCE.md`, car leurs noms de fichiers ne contiennent pas `ux`, même si leur dossier parent le contient.
 
-## Proposed Canonical Documents for Assessment
+## Documents canoniques proposés pour l’évaluation
 
-- PRD: `_bmad-output/planning-artifacts/prd.md`
-- Architecture: `_bmad-output/planning-artifacts/architecture.md`
-- Epics & Stories: `_bmad-output/planning-artifacts/epics.md`
-- UX Design: `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md`
-- UX Experience: `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md`
+- PRD : `_bmad-output/planning-artifacts/prd.md`
+- Architecture : `_bmad-output/planning-artifacts/architecture.md`
+- Epics & Stories : `_bmad-output/planning-artifacts/epics.md`
+- Design UX : `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md`
+- Expérience UX : `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md`
 
-## Pending Confirmation
+## Confirmation en attente
 
-Continue only after the user confirms the proposed canonical documents or supplies replacements.
+Continuer uniquement après confirmation par l’utilisateur des documents canoniques proposés ou fourniture de remplacements.
 
-## PRD Analysis
+## Analyse du PRD
 
-### Functional Requirements
+### Exigences fonctionnelles
 
-FR-01 Configuration & référentiels:
+FR-01 Configuration & référentiels :
 - L’utilisateur peut créer/éditer des profils de surveillance (produits, seuils, frais, priorités).
 - Le système supporte des référentiels préenregistrés (sets/éditions) pour limiter les erreurs de saisie.
 
-FR-02 Collecte de données:
+FR-02 Collecte de données :
 - Le moteur récupère périodiquement disponibilité et prix des sources activées.
 - Chaque donnée est horodatée et associée à sa source.
 - En cas d’échec source, le système marque l’état et bascule en mode dégradé.
 
-FR-03 Estimation marché:
+FR-03 Estimation marché :
 - Le système calcule une estimation de revente à partir des données disponibles.
 - L’interface affiche le niveau de confiance (valeur directe vs estimée).
 
-FR-04 Scoring d’opportunité:
+FR-04 Scoring d’opportunité :
 - Le système calcule marge brute et nette (achat, frais, commissions, port, coûts transactionnels).
 - Les règles de scoring sont configurables par utilisateur.
 - Les opportunités sont triables par rentabilité et urgence.
 
-FR-05 Notification:
+FR-05 Notification :
 - Le système envoie une notification quand une opportunité dépasse les seuils définis.
 - La notification inclut : produit, prix d’achat, estimation revente, marge nette, source, timestamp.
 
-FR-06 Tableau de bord opérationnel:
+FR-06 Tableau de bord opérationnel :
 - Vue unique avec état des sources, dernières opportunités, erreurs et actions recommandées.
 - Historique consultable pour analyser la qualité des alertes et ajuster les seuils.
 - Le dashboard se met à jour en temps réel sans rafraîchissement manuel (Server-Sent Events).
 
-FR-07 Résilience opérationnelle:
+FR-07 Résilience opérationnelle :
 - Journalisation des erreurs de collecte et de calcul.
 - Mécanisme de retry/backoff sur les sources instables.
 - Continuité minimale du service via saisie/import manuel.
 
-FR-08 Exposition web:
-- L'application est accessible via un navigateur web standard (Chrome, Safari, Firefox) sur desktop, tablette et mobile.
+FR-08 Exposition web :
+- L’application est accessible via un navigateur web standard (Chrome, Safari, Firefox) sur desktop, tablette et mobile.
 - Le backend expose une API HTTP RPC (`POST /api/*`) et sert le frontend comme une SPA.
-- L'accès se fait via un nom de domaine configuré, avec HTTPS (TLS) obligatoire.
-- L'interface est responsive et utilisable sur écrans mobiles (320 px minimum).
+- L’accès se fait via un nom de domaine configuré, avec HTTPS (TLS) obligatoire.
+- L’interface est responsive et utilisable sur écrans mobiles (320 px minimum).
 
-FR-09 Authentification et accès:
-- L'accès à l'application est protégé par une authentification single-user (token ou mot de passe).
+FR-09 Authentification et accès :
+- L’accès à l’application est protégé par une authentification single-user (token ou mot de passe).
 - Aucune gestion multi-comptes ni rôles multiples : un seul utilisateur, une seule session.
-- Les secrets (token d'authentification, clés API tierces) sont stockés hors du dépôt et injectés via variables d'environnement ou fichier de configuration protégé.
+- Les secrets (token d’authentification, clés API tierces) sont stockés hors du dépôt et injectés via variables d’environnement ou fichier de configuration protégé.
 
-Total FRs: 9
+Total FR : 9
 
-### Non-Functional Requirements
+### Exigences non fonctionnelles
 
-NFR-01 Performance:
+NFR-01 Performance :
 - Rafraîchissement source selon cadence configurable.
 - Temps d’évaluation d’une opportunité compatible usage temps quasi réel.
 
-NFR-02 Fiabilité:
+NFR-02 Fiabilité :
 - Dégradation progressive plutôt qu’arrêt global en cas de source indisponible.
 - Vérification de cohérence des données avant génération d’alerte.
 
-NFR-03 Sécurité & conformité:
+NFR-03 Sécurité & conformité :
 - Respect RGPD/nLPD pour les données utilisateur.
 - Respect des CGU, robots.txt et pratiques anti-abus pour la collecte.
-- Authentification single-user obligatoire pour l'accès web ; pas d'accès anonyme.
+- Authentification single-user obligatoire pour l’accès web ; pas d’accès anonyme.
 - HTTPS obligatoire en production (TLS 1.2+).
-- Secret management : tokens, API keys et mot de passe d'accès stockés hors du dépôt (variables d'environnement ou fichier protégé).
+- Gestion des secrets : tokens, API keys et mot de passe d’accès stockés hors du dépôt (variables d’environnement ou fichier protégé).
 - Protection contre les attaques web courantes : XSS, injection SQL (via requêtes paramétrées), rate limiting.
 
-NFR-04 Maintenabilité:
+NFR-04 Maintenabilité :
 - Pipeline modulaire (ingestion → normalisation → scoring → notification).
 - Configuration externalisée pour faciliter ajout de sources/canaux.
 
-NFR-05 UX:
+NFR-05 UX :
 - Interface orientée décision (priorité à lisibilité, tri et filtres essentiels).
-- Réduction de la complexité (éviter surcharge d'écrans/options au MVP).
+- Réduction de la complexité (éviter surcharge d’écrans/options au MVP).
 - Design responsive : utilisable de 320 px (mobile) à 1920 px (desktop).
-- Cibles tactiles d'au moins 44 px pour l'usage mobile.
+- Cibles tactiles d’au moins 44 px pour l’usage mobile.
 
-NFR-06 Déploiement et exploitation:
-- L'application tourne comme un service systemd ou équivalent, avec redémarrage automatique en cas d'arrêt.
+NFR-06 Déploiement et exploitation :
+- L’application tourne comme un service systemd ou équivalent, avec redémarrage automatique en cas d’arrêt.
 - Un reverse proxy (nginx/Caddy) termine le TLS et route les requêtes vers le backend.
-- Le build est reproductible : une commande unique produit l'artefact déployable.
+- Le build est reproductible : une commande unique produit l’artefact déployable.
 - Les logs applicatifs sont accessibles via journald ou un fichier.
 - Mise à jour possible sans perte de données (migrations SQLite versionnées conservées).
 
-NFR-07 Qualité et tests:
+NFR-07 Qualité et tests :
 - Les règles de calcul métier (marge, scoring, normalisation, déduplication) sont couvertes par des tests unitaires.
 - Le pipeline complet (ingestion → normalisation → scoring → alerting) est testé en intégration sur des données mockées.
 - Les composants UI partagés sont testés pour leurs états (default, loading, error, success).
 - Les 4 parcours utilisateur critiques (alerte→décision, recalibrage, source indisponible, saisie manuelle) sont testés de bout en bout (E2E).
 
-Total NFRs: 7
+Total NFR : 7
 
-### Additional Requirements
+### Exigences complémentaires
 
-- MVP includes catalogue management, 1–2 stable sources, net-margin opportunity calculation, Telegram alerting, responsive web UI, manual fallback, HTTPS/domain exposure, and VPS deployment with systemd, reproducible build, and isolated secrets.
-- Out of scope for MVP: auto-buy, complete multi-channel notifications, exhaustive global retailer coverage, and community/crowdsourcing features.
-- Post-MVP candidates: notification channel abstraction, API-first multi-source expansion, favorites/owned cards, Excel export, possible Tauri desktop client, and multi-user roles.
-- Principal mitigations include API-first collection, retries, manual fallback, robust default thresholds, legal-source prioritization, strict MVP scope, HTTPS/auth/reverse proxy, and transport isolation to avoid desktop regressions.
-- Rollout requires HTTPS VPS deployment, desktop/mobile validation, limited pilot, measurement of latency/actionability/decision time/net margin, scoring and UX adjustments, then progressive expansion.
+- Le MVP inclut la gestion du catalogue, 1 à 2 sources stables, le calcul d’opportunité en marge nette, l’alerting Telegram, une UI web responsive, un fallback manuel, l’exposition HTTPS/domaine et un déploiement VPS avec systemd, build reproductible et secrets isolés.
+- Hors scope MVP : auto-buy, notifications multi-canaux complètes, couverture mondiale exhaustive des retailers et fonctionnalités communautaires/crowdsourcing.
+- Candidats post-MVP : abstraction des canaux de notification, extension multi-sources API-first, favoris/cartes possédées, export Excel, possible client desktop Tauri et rôles multi-utilisateur.
+- Les mitigations principales incluent collecte API-first, retries, fallback manuel, seuils par défaut robustes, priorisation des sources légales, scope MVP strict, HTTPS/auth/reverse proxy et isolation du changement de transport pour éviter les régressions desktop.
+- Le rollout nécessite déploiement VPS HTTPS, validation desktop/mobile, pilote limité, mesure de la latence/actionnabilité/temps de décision/marge nette, ajustements scoring et UX, puis extension progressive.
 
-### PRD Completeness Assessment
+### Évaluation de complétude du PRD
 
-- The PRD is sufficiently structured for traceability: it contains explicit FR and NFR sections with stable numbering, plus MVP scope, exclusions, post-MVP scope, risks, mitigations, and rollout guidance.
-- Assessment risk: some NFRs are qualitative rather than measurable, especially opportunity evaluation timing, reliability thresholds, source failure limits, and rate limiting specifics.
-- Assessment risk: some implementation constraints are present in scope and risk sections rather than the numbered requirements, so epic validation must trace both numbered requirements and additional constraints.
+- Le PRD est suffisamment structuré pour la traçabilité : il contient des sections FR et NFR explicites avec une numérotation stable, ainsi que le scope MVP, les exclusions, le post-MVP, les risques, les mitigations et le rollout.
+- Risque d’évaluation : certaines NFR sont qualitatives plutôt que mesurables, notamment le temps d’évaluation d’une opportunité, les seuils de fiabilité, les limites d’échec source et les détails de rate limiting.
+- Risque d’évaluation : certaines contraintes d’implémentation apparaissent dans les sections scope et risques plutôt que dans les exigences numérotées ; la validation des epics doit donc tracer à la fois les exigences numérotées et les contraintes complémentaires.
 
-## Epic Coverage Validation
+## Validation de couverture des epics
 
-### Coverage Matrix
+### Matrice de couverture
 
-| PRD FR Number | PRD Requirement | Epic Coverage | Status |
+| Numéro FR PRD | Exigence PRD | Couverture Epic | Statut |
 | --- | --- | --- | --- |
-| FR-01 | Configuration & référentiels: create/edit monitoring profiles and support pre-recorded references. | Epic 1: Configurer le cockpit de surveillance; Stories 1.2 and 1.3. | ✓ Covered |
-| FR-02 | Collecte de données: periodic availability/price collection, timestamp/source association, degraded mode on source failure. | Epic 2: Orchestrer la collecte fiable multi-sources; Stories 2.1, 2.2, 2.3. | ✓ Covered |
-| FR-03 | Estimation marché: calculate resale estimate and display confidence level. | Epic 4: Transformer les signaux en opportunités rentables; Story 4.1 and confidence portions of Story 4.3. | ✓ Covered |
-| FR-04 | Scoring d’opportunité: gross/net margin, configurable scoring rules, sorting by profitability and urgency. | Epic 4: Stories 4.2 and 4.3. | ✓ Covered |
-| FR-05 | Notification: send threshold-based notification containing product, purchase price, resale estimate, net margin, source, timestamp. | Epic 5: Alerter & notifier en temps réel; Stories 5.1 and 5.2. | ✓ Covered |
-| FR-06 | Tableau de bord opérationnel: source status, latest opportunities, errors, recommended actions, history, SSE realtime updates. | Epic 6: Construire l'interface décisionnelle; Stories 6.3, 6.4, 6.5; SSE infrastructure in Story 5.3. | ✓ Covered |
-| FR-07 | Résilience opérationnelle: error logging, retry/backoff, minimal continuity via manual entry/import. | Epic 2 covers backend resilience; Epic 6 covers manual fallback; Stories 2.2, 2.3, 6.9. | ✓ Covered |
-| FR-08 | Exposition web: browser access, HTTP RPC API + SPA, domain, mandatory HTTPS, responsive 320px+. | Epic 3 covers protected exposed API; Epic 6 covers responsive frontend; Stories 3.1, 3.2, 6.8. | ✓ Covered |
-| FR-09 | Authentification et accès: single-user auth, no multi-account roles, secrets outside repo and injected by env/protected config. | Epic 3: Protéger l'accès à mon radar; Stories 3.1, 3.2, 3.3. | ✓ Covered |
+| FR-01 | Configuration & référentiels : créer/éditer des profils de surveillance et supporter des référentiels préenregistrés. | Epic 1 : Configurer le cockpit de surveillance ; Stories 1.2 et 1.3. | ✓ Couvert |
+| FR-02 | Collecte de données : collecte périodique disponibilité/prix, association timestamp/source, mode dégradé en cas d’échec source. | Epic 2 : Orchestrer la collecte fiable multi-sources ; Stories 2.1, 2.2, 2.3. | ✓ Couvert |
+| FR-03 | Estimation marché : calculer une estimation de revente et afficher le niveau de confiance. | Epic 4 : Transformer les signaux en opportunités rentables ; Story 4.1 et parties confiance de la Story 4.3. | ✓ Couvert |
+| FR-04 | Scoring d’opportunité : marge brute/nette, règles configurables, tri par rentabilité et urgence. | Epic 4 : Stories 4.2 et 4.3. | ✓ Couvert |
+| FR-05 | Notification : envoyer une notification au-dessus du seuil avec produit, prix d’achat, estimation revente, marge nette, source, timestamp. | Epic 5 : Alerter & notifier en temps réel ; Stories 5.1 et 5.2. | ✓ Couvert |
+| FR-06 | Tableau de bord opérationnel : état source, dernières opportunités, erreurs, actions recommandées, historique, mises à jour temps réel SSE. | Epic 6 : Construire l’interface décisionnelle ; Stories 6.3, 6.4, 6.5 ; infrastructure SSE en Story 5.3. | ✓ Couvert |
+| FR-07 | Résilience opérationnelle : journalisation, retry/backoff, continuité minimale via saisie/import manuel. | Epic 2 couvre la résilience backend ; Epic 6 couvre le fallback manuel ; Stories 2.2, 2.3, 6.9. | ✓ Couvert |
+| FR-08 | Exposition web : accès navigateur, API HTTP RPC + SPA, domaine, HTTPS obligatoire, responsive 320 px+. | Epic 3 couvre l’API exposée protégée ; Epic 6 couvre le frontend responsive ; Stories 3.1, 3.2, 6.8. | ✓ Couvert |
+| FR-09 | Authentification et accès : auth single-user, pas de rôles multi-comptes, secrets hors dépôt injectés par env/config protégée. | Epic 3 : Protéger l’accès à mon radar ; Stories 3.1, 3.2, 3.3. | ✓ Couvert |
 
-### Missing Requirements
+### Exigences manquantes
 
-No PRD Functional Requirements are semantically missing from the epics.
+Aucune exigence fonctionnelle du PRD n’est sémantiquement absente des epics.
 
-### Coverage Statistics
+### Statistiques de couverture
 
-- Total PRD FRs: 9
-- FRs covered in epics: 9
-- Coverage percentage: 100%
+- Total FR PRD : 9
+- FR couvertes dans les epics : 9
+- Pourcentage de couverture : 100 %
 
-### Coverage Notes
+### Notes de couverture
 
-- The epics document claims `9/9 FRs` covered, and semantic validation agrees.
-- Numbering is not perfectly aligned between the PRD and epics inventory: the epics document splits PRD `FR-01 Configuration & référentiels` into separate epics-inventory `FR-01` and `FR-02`, which shifts subsequent labels. Future traceability should prefer canonical PRD numbering or explicitly record the renumbering map.
+- Le document epics annonce `9/9 FRs` couvertes, et la validation sémantique confirme ce résultat.
+- La numérotation n’est pas parfaitement alignée entre le PRD et l’inventaire des epics : le document epics scinde le `FR-01 Configuration & référentiels` du PRD en deux entrées d’inventaire (`FR-01` et `FR-02`), ce qui décale les libellés suivants. La traçabilité future doit privilégier la numérotation canonique du PRD ou documenter explicitement la table de renumérotation.
 
-## UX Alignment Assessment
+## Évaluation d’alignement UX
 
-### UX Document Status
+### Statut des documents UX
 
-Found. Active UX documents are:
+Trouvés. Les documents UX actifs sont :
 
 - `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md`
 - `_bmad-output/planning-artifacts/ux-designs/ux-Poke-Radar-2026-07-21/EXPERIENCE.md`
 
-An archived UX design specification also exists under `_bmad-output/planning-artifacts/ux-designs/_archive/` and should be treated as historical unless explicitly re-selected.
+Une spécification UX archivée existe également sous `_bmad-output/planning-artifacts/ux-designs/_archive/` et doit être traitée comme historique, sauf sélection explicite.
 
-### UX ↔ PRD Alignment
+### Alignement UX ↔ PRD
 
-- The UX goal of fast, reliable, traceable purchase decisions aligns with the PRD executive summary and success metric of decision time under five minutes after a priority alert.
-- UX mobile-first/responsive expectations align with PRD FR-08 and NFR-05, including browser access and minimum 320 px mobile usability.
-- UX decision surfaces align with PRD FR-06: Radar view, detail view, sources view, history, source state, errors, and realtime dashboard behavior.
-- UX resilience and manual-entry flows align with PRD FR-07: degraded mode, manual fallback, and continuity during source unavailability.
-- UX authentication flow aligns with PRD FR-09 through the LoginPage/token pattern.
+- L’objectif UX de décisions d’achat rapides, fiables et traçables s’aligne avec l’executive summary du PRD et la métrique de succès de décision en moins de cinq minutes après une alerte prioritaire.
+- Les attentes UX mobile-first/responsive s’alignent avec PRD FR-08 et NFR-05, notamment l’accès navigateur et l’utilisabilité mobile à partir de 320 px.
+- Les surfaces décisionnelles UX s’alignent avec PRD FR-06 : vue Radar, vue détail, vue sources, historique, état source, erreurs et comportement temps réel du dashboard.
+- Les flux UX de résilience et de saisie manuelle s’alignent avec PRD FR-07 : mode dégradé, fallback manuel et continuité pendant l’indisponibilité d’une source.
+- Le flux UX d’authentification s’aligne avec PRD FR-09 via le pattern LoginPage/token.
 
-### UX ↔ Architecture Alignment
+### Alignement UX ↔ Architecture
 
-- Architecture explicitly includes the active UX documents as inputs.
-- Architecture supports UX realtime needs through AD-10 Server-Sent Events and maps FR-06 to `frontend/src/pages/RadarPage.tsx` plus `GET /api/events`.
-- Architecture supports UX component quality through AD-15 frontend component testing and includes frontend structure for LoginPage, RadarPage, DetailPage, StrategyPage, SourcesPage, shared components, hooks, and stores.
-- Architecture maps NFR-05 UX to the design system, frontend component tests, and SSE.
-- Architecture supports responsive web exposure through Caddy/TLS, backend-served SPA, and browser/mobile access decisions.
+- L’architecture inclut explicitement les documents UX actifs comme entrées.
+- L’architecture supporte les besoins UX temps réel via AD-10 Server-Sent Events et mappe FR-06 vers `frontend/src/pages/RadarPage.tsx` plus `GET /api/events`.
+- L’architecture supporte la qualité des composants UX via AD-15 tests frontend et inclut la structure frontend pour LoginPage, RadarPage, DetailPage, StrategyPage, SourcesPage, composants partagés, hooks et stores.
+- L’architecture mappe NFR-05 UX vers le design system, les tests de composants frontend et SSE.
+- L’architecture supporte l’exposition web responsive via Caddy/TLS, SPA servie par le backend et décisions d’accès navigateur/mobile.
 
-### Alignment Issues
+### Problèmes d’alignement
 
-- No blocking UX alignment issue found.
-- Minor traceability issue: UX requirements are well represented in the epics document as `UX-DR1` through `UX-DR20`, but the PRD only captures UX at a higher level under FR-06, FR-08, and NFR-05. This is acceptable for MVP readiness if epics remain the detailed UX traceability source.
-- Minor architecture documentation issue: Architecture maps FR-07 resilience primarily to backend connector runtime, while the PRD also requires continuity through manual entry/import. Epics cover that UI fallback in Story 6.9, but the architecture capability map could make the frontend/manual-entry path explicit.
+- Aucun problème bloquant d’alignement UX n’a été trouvé.
+- Problème mineur de traçabilité : les exigences UX sont bien représentées dans le document epics sous `UX-DR1` à `UX-DR20`, mais le PRD ne capture l’UX qu’à un niveau plus macro via FR-06, FR-08 et NFR-05. C’est acceptable pour la préparation MVP si les epics restent la source détaillée de traçabilité UX.
+- Problème mineur de documentation d’architecture : l’architecture mappe principalement la résilience FR-07 au runtime backend des connecteurs, alors que le PRD exige aussi la continuité via saisie/import manuel. Les epics couvrent ce fallback UI en Story 6.9, mais la capability map d’architecture devrait expliciter le chemin frontend/saisie manuelle.
 
-### Warnings
+### Avertissements
 
-- Keep `_archive/ux-design-specification-2026-02-19.md` out of canonical validation unless the team deliberately wants historical comparison.
-- Before implementation, confirm that UX test expectations for reduced motion, accessibility, swipe, infinite scroll, and bottom sheets are represented in story-level acceptance criteria; most are already present in Epic 6.
+- Garder `_archive/ux-design-specification-2026-02-19.md` hors validation canonique, sauf volonté explicite de comparaison historique.
+- Avant implémentation, confirmer que les attentes de tests UX pour reduced motion, accessibilité, swipe, infinite scroll et bottom sheets sont représentées dans les critères d’acceptation story-level ; la plupart sont déjà présentes dans l’Epic 6.
 
-## Epic Quality Review
+## Revue qualité des epics
 
-### Overall Result
+### Résultat global
 
-The epics are broadly implementation-ready and traceable, but the review finds several quality issues that should be addressed before treating the plan as fully ready.
+Les epics sont globalement traçables et proches d’un état prêt pour l’implémentation, mais la revue identifie plusieurs problèmes qualité à résoudre avant de les considérer comme une base d’implémentation propre.
 
-### Epic Structure Validation
+### Validation de structure des epics
 
-| Epic | User Value Focus | Independence | Assessment |
+| Epic | Focalisation valeur utilisateur | Indépendance | Évaluation |
 | --- | --- | --- | --- |
-| Epic 1 — Configurer le cockpit de surveillance | Strong: enables user configuration of products, thresholds, fees, and references. | Strong: provides foundational persisted configuration. | Pass |
-| Epic 2 — Orchestrer la collecte fiable multi-sources | Moderate: user value is reduced manual monitoring, but wording is backend-oriented. | Depends on Epic 1 configuration, which is acceptable. | Pass with minor concern |
-| Epic 3 — Protéger l'accès à mon radar | Borderline: security/auth is necessary user value for web exposure, but title is user-centric enough. | Can be built after or alongside early backend API exposure. | Pass |
-| Epic 4 — Transformer les signaux en opportunités rentables | Strong: directly enables profitability decisions. | Depends on collected signals from Epic 2, which is acceptable sequencing. | Pass |
-| Epic 5 — Alerter & notifier en temps réel | Strong: enables timely action. | Depends on scored opportunities from Epic 4, acceptable sequencing. | Pass |
-| Epic 6 — Construire l'interface décisionnelle | Strong user value but very large scope. | Depends on backend capabilities and SSE; acceptable as later epic, but large. | Pass with major sizing concern |
+| Epic 1 — Configurer le cockpit de surveillance | Forte : permet à l’utilisateur de configurer produits, seuils, frais et référentiels. | Forte : fournit une configuration persistée fondationnelle. | Réussi |
+| Epic 2 — Orchestrer la collecte fiable multi-sources | Moyenne : la valeur utilisateur est la réduction de veille manuelle, mais le libellé reste orienté backend. | Dépend de la configuration d’Epic 1, ce qui est acceptable. | Réussi avec réserve mineure |
+| Epic 3 — Protéger l’accès à mon radar | Limite mais acceptable : sécurité/auth est une valeur nécessaire pour l’exposition web, et le titre reste centré utilisateur. | Peut être construit après ou en parallèle de la première exposition API backend. | Réussi |
+| Epic 4 — Transformer les signaux en opportunités rentables | Forte : permet directement les décisions de rentabilité. | Dépend des signaux collectés par Epic 2, séquence acceptable. | Réussi |
+| Epic 5 — Alerter & notifier en temps réel | Forte : permet une action rapide. | Dépend des opportunités scorées par Epic 4, séquence acceptable. | Réussi |
+| Epic 6 — Construire l’interface décisionnelle | Forte valeur utilisateur, mais scope très large. | Dépend des capacités backend et SSE ; acceptable en epic tardif, mais volumineux. | Réussi avec réserve majeure de sizing |
 
-### Story Quality Assessment
+### Évaluation qualité des stories
 
-#### Strengths
+#### Forces
 
-- Stories use user-facing `As a / I want / So that` structure consistently.
-- Most acceptance criteria are testable and include both product behavior and test expectations.
-- Story-level test expectations are embedded directly in feature stories, reducing standalone test-story drift.
-- FR traceability is explicit at epic level and supported by a coverage map.
+- Les stories utilisent de manière cohérente la structure utilisateur `As a / I want / So that`.
+- La plupart des critères d’acceptation sont testables et incluent à la fois comportement produit et attentes de test.
+- Les attentes de test story-level sont intégrées directement aux stories fonctionnelles, ce qui réduit la dérive des stories de test autonomes.
+- La traçabilité FR est explicite au niveau epic et soutenue par une matrice de couverture.
 
-#### 🔴 Critical Violations
+#### 🔴 Violations critiques
 
-None found.
+Aucune trouvée.
 
-#### 🟠 Major Issues
+#### 🟠 Problèmes majeurs
 
-1. **Epic 6 may be too large for predictable execution.**
-   - Evidence: Epic 6 contains design tokens, full design system components, Radar page, Detail page, Sources page, Strategy page, hooks, responsive/accessibility, manual entry, and E2E tests.
-   - Impact: This increases risk of partial completion, hidden dependencies, and review fatigue.
-   - Recommendation: Consider splitting Epic 6 into two implementation epics: one for design-system/foundational UI components and one for decision workflows/pages, or keep Epic 6 but enforce small story-level delivery slices.
+1. **Epic 6 est probablement trop volumineux pour une exécution prévisible.**
+   - Preuve : Epic 6 contient design tokens, design system complet, page Radar, page Détail, page Sources, page Stratégie, hooks, responsive/accessibilité, saisie manuelle et tests E2E.
+   - Impact : risque de complétion partielle, dépendances cachées et fatigue de review.
+   - Recommandation : envisager de scinder Epic 6 en deux epics d’implémentation — fondations UI/design system et workflows/pages décisionnels — ou conserver Epic 6 avec des tranches story-level petites et strictes.
 
-2. **Story 6.2 is likely oversized.**
-   - Evidence: Story 6.2 requires eleven shared components, multiple variants/states, and broad test coverage.
-   - Impact: A single story could become an epic-sized implementation unit.
-   - Recommendation: Split into smaller component batches, for example primitives (`Button`, `FormField`, `Panel`, `Feedback`), cards/badges, overlays/toasts, and interaction components.
+2. **Story 6.2 est probablement surdimensionnée.**
+   - Preuve : Story 6.2 exige onze composants partagés, plusieurs variantes/états et une couverture de tests large.
+   - Impact : une story unique peut devenir une unité d’implémentation de taille epic.
+   - Recommandation : scinder en lots de composants plus petits, par exemple primitives (`Button`, `FormField`, `Panel`, `Feedback`), cartes/badges, overlays/toasts et composants d’interaction.
 
-3. **Story 6.9 mixes feature delivery with full E2E journey implementation.**
-   - Evidence: Manual opportunity entry and all four Playwright critical journeys are bundled in one story.
-   - Impact: Manual-entry completion could be blocked by unrelated end-to-end journey maturity.
-   - Recommendation: Keep manual-entry implementation in Story 6.9 and either distribute each E2E journey into the story that owns that journey or create explicit QA automation tasks tied to release readiness.
+3. **Story 6.9 mélange livraison fonctionnelle et E2E complet.**
+   - Preuve : la saisie manuelle d’opportunité et les quatre parcours critiques Playwright sont groupés dans une seule story.
+   - Impact : la livraison de la saisie manuelle peut être bloquée par une maturité E2E release-level sans rapport direct.
+   - Recommandation : garder l’implémentation de saisie manuelle dans Story 6.9 et distribuer chaque parcours E2E dans la story propriétaire du parcours, ou créer des tâches QA explicites liées à la préparation release.
 
-#### 🟡 Minor Concerns
+#### 🟡 Réserves mineures
 
-1. **Epic 2 title and goal are somewhat technical.**
-   - It still maps to user value, but could be phrased closer to the user's outcome: “Collecter automatiquement les signaux sans perdre le contrôle en cas de panne.”
+1. **Le titre et l’objectif de l’Epic 2 restent assez techniques.**
+   - Il mappe tout de même une valeur utilisateur, mais pourrait être formulé plus près du résultat utilisateur : « Collecter automatiquement les signaux sans perdre le contrôle en cas de panne. »
 
-2. **FR numbering drift between PRD and epics inventory could confuse traceability.**
-   - The epics inventory splits PRD FR-01 into two entries, then shifts subsequent numbering.
-   - Recommendation: Add an explicit PRD-to-epics FR numbering map or normalize the epics inventory to PRD numbering.
+2. **La dérive de numérotation FR entre PRD et inventaire epics peut perturber la traçabilité.**
+   - L’inventaire epics scinde le FR-01 du PRD en deux entrées, puis décale la numérotation suivante.
+   - Recommandation : ajouter une table explicite PRD-FR ↔ Epics-FR ou normaliser l’inventaire epics sur la numérotation PRD.
 
-3. **Architecture capability map under-represents UI manual fallback for FR-07.**
-   - Epics cover this through Story 6.9, but architecture maps FR-07 mainly to backend connector runtime.
-   - Recommendation: Add `frontend/src/pages/SourcesPage.tsx` or manual-entry flow to the FR-07 architecture map.
+3. **La capability map d’architecture sous-représente le fallback manuel UI pour FR-07.**
+   - Les epics le couvrent via Story 6.9, mais l’architecture mappe surtout FR-07 au runtime backend des connecteurs.
+   - Recommandation : ajouter `frontend/src/pages/SourcesPage.tsx` ou le flux de saisie manuelle à la capability map FR-07.
 
-4. **Some acceptance criteria use broad coverage targets that may need local test strategy detail.**
-   - Example: component coverage ≥80%, branch coverage 100% for margin calculation, axe-core no critical violations.
-   - Recommendation: Ensure test tooling and thresholds are configured before story execution, not discovered late.
+4. **Certains critères d’acceptation utilisent des cibles de couverture larges nécessitant une stratégie de test locale.**
+   - Exemple : couverture composants ≥ 80 %, couverture de branches 100 % pour le calcul de marge, aucune violation critique axe-core.
+   - Recommandation : s’assurer que l’outillage et les seuils de test sont configurés avant l’exécution des stories, pas découverts tardivement.
 
-### Dependency Analysis
+### Analyse des dépendances
 
-- No forward dependency requiring Epic N+1 for Epic N completion was found.
-- Epic sequencing is coherent: configuration → collection → web protection → scoring → alerting/realtime → decision UI.
-- Story dependencies generally flow backward or within the same epic in acceptable order.
-- Database/entity timing appears acceptable: stories introduce persistence needs as they arise rather than mandating all tables upfront in a purely technical setup story.
+- Aucune dépendance prospective exigeant Epic N+1 pour compléter Epic N n’a été trouvée.
+- La séquence des epics est cohérente : configuration → collecte → protection web → scoring → alerting/temps réel → UI décisionnelle.
+- Les dépendances de stories remontent généralement vers l’arrière ou restent dans le même epic avec un ordre acceptable.
+- Le timing base de données/entités semble acceptable : les stories introduisent les besoins de persistance au fil de l’eau plutôt que d’imposer toutes les tables upfront dans une story purement technique.
 
-### Best Practices Compliance Checklist
+### Checklist de conformité aux bonnes pratiques
 
-| Check | Result |
+| Vérification | Résultat |
 | --- | --- |
-| Epics deliver user value | Pass, with minor wording concern for Epic 2 |
-| Epics can function independently in sequence | Pass |
-| Stories appropriately sized | Partial: Story 6.2 and 6.9 are oversized |
-| No forward dependencies | Pass |
-| Database tables created when needed | Pass based on available story text |
-| Clear acceptance criteria | Pass with minor threshold-configuration concerns |
-| Traceability to FRs maintained | Pass semantically, but numbering drift should be fixed |
+| Les epics livrent une valeur utilisateur | Réussi, avec réserve mineure sur le libellé de l’Epic 2 |
+| Les epics peuvent fonctionner indépendamment en séquence | Réussi |
+| Les stories sont correctement dimensionnées | Partiel : Story 6.2 et 6.9 sont surdimensionnées |
+| Pas de dépendances prospectives | Réussi |
+| Tables créées au moment du besoin | Réussi sur la base du texte disponible |
+| Critères d’acceptation clairs | Réussi avec réserves mineures sur la configuration des seuils |
+| Traçabilité FR maintenue | Réussi sémantiquement, mais la dérive de numérotation doit être corrigée |
 
-### Recommendations
+### Recommandations
 
-1. Normalize FR numbering between PRD and epics before final sign-off.
-2. Split or tightly timebox Story 6.2.
-3. Separate manual-entry feature delivery from the full E2E automation burden in Story 6.9.
-4. Update architecture FR-07 mapping to include manual-entry UI fallback.
-5. Confirm test tooling thresholds before implementation begins.
+1. Normaliser la numérotation FR entre PRD et epics avant validation finale.
+2. Scinder ou timeboxer strictement Story 6.2.
+3. Séparer la livraison fonctionnelle de saisie manuelle de la charge d’automatisation E2E complète dans Story 6.9.
+4. Mettre à jour la cartographie architecture FR-07 pour inclure le fallback manuel UI.
+5. Confirmer les seuils et l’outillage de tests avant le début de l’implémentation.
 
-## Summary and Recommendations
+## Synthèse et recommandations
 
-### Overall Readiness Status
+### Statut global de préparation
 
-NEEDS WORK.
+TRAVAIL NÉCESSAIRE.
 
-The project is close to implementation-ready: required PRD, Architecture, Epics, and active UX documents exist; PRD functional requirements are semantically covered by epics; UX is materially aligned with PRD and Architecture. However, several planning-quality issues should be fixed before using this as a clean implementation baseline.
+Le projet est proche d’un état prêt pour l’implémentation : les documents PRD, Architecture, Epics et UX actifs existent ; les exigences fonctionnelles du PRD sont sémantiquement couvertes par les epics ; l’UX est matériellement alignée avec le PRD et l’architecture. Cependant, plusieurs problèmes de qualité de planification doivent être corrigés avant d’utiliser ce rapport comme baseline d’implémentation propre.
 
-### Critical Issues Requiring Immediate Action
+### Problèmes critiques nécessitant une action immédiate
 
-No critical blockers were found.
+Aucun bloqueur critique n’a été trouvé.
 
-### Major Issues Requiring Action Before Final Sign-off
+### Problèmes majeurs à traiter avant validation finale
 
-1. **FR numbering drift between PRD and epics.**
-   - The epics inventory splits PRD FR-01 into two requirements and shifts subsequent numbering.
-   - This does not create semantic missing coverage, but it can cause implementation and review traceability errors.
+1. **Dérive de numérotation FR entre PRD et epics.**
+   - L’inventaire epics scinde le FR-01 du PRD en deux exigences et décale la numérotation suivante.
+   - Cela ne crée pas d’absence de couverture sémantique, mais peut provoquer des erreurs de traçabilité en implémentation et review.
 
-2. **Epic 6 / Story 6.2 sizing risk.**
-   - Epic 6 carries a large UI/design-system/page/E2E scope.
-   - Story 6.2 alone includes eleven shared components with variants, states, and tests.
+2. **Risque de sizing Epic 6 / Story 6.2.**
+   - Epic 6 porte un scope large UI/design system/pages/E2E.
+   - Story 6.2 contient à elle seule onze composants partagés avec variantes, états et tests.
 
-3. **Story 6.9 scope mixing.**
-   - Manual-entry implementation and all four Playwright E2E journeys are bundled together.
-   - This may block manual-entry delivery on broad release-level QA automation.
+3. **Mélange de scope dans Story 6.9.**
+   - L’implémentation de la saisie manuelle et les quatre parcours E2E Playwright sont groupés.
+   - Cela peut bloquer la livraison de la saisie manuelle sur une automatisation QA de niveau release.
 
-4. **Architecture FR-07 mapping is incomplete.**
-   - Architecture maps FR-07 mainly to backend connector runtime, while the PRD and epics also require manual-entry/import continuity through the UI.
+4. **Cartographie architecture FR-07 incomplète.**
+   - L’architecture mappe principalement FR-07 au runtime backend des connecteurs, alors que le PRD et les epics exigent aussi la continuité via saisie/import manuel côté UI.
 
-### Recommended Next Steps
+### Prochaines étapes recommandées
 
-1. Normalize the epics Requirements Inventory and FR Coverage Map to canonical PRD numbering, or add an explicit PRD-FR ↔ Epics-FR translation table.
-2. Split Story 6.2 into smaller component batches or define a strict delivery checklist that allows partial review without losing traceability.
-3. Split Story 6.9 into manual-entry implementation and E2E journey automation, or distribute the E2E journeys into the owning feature stories.
-4. Update `architecture.md` FR-07 capability mapping to include the manual-entry UI path, likely `frontend/src/pages/SourcesPage.tsx` and the manual connector flow.
-5. Confirm automated test thresholds and tooling configuration before implementation starts: Vitest/RTL coverage, axe-core checks, Playwright setup, Rust unit/integration coverage expectations.
-6. Treat active UX documents as `ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md` and `EXPERIENCE.md`; keep `_archive/ux-design-specification-2026-02-19.md` historical unless deliberately selected.
+1. Normaliser l’inventaire d’exigences et la carte de couverture FR des epics sur la numérotation canonique du PRD, ou ajouter une table explicite PRD-FR ↔ Epics-FR.
+2. Scinder Story 6.2 en lots de composants plus petits ou définir une checklist de livraison stricte permettant des reviews partielles sans perte de traçabilité.
+3. Scinder Story 6.9 entre implémentation de saisie manuelle et automatisation des parcours E2E, ou distribuer les parcours E2E dans les stories propriétaires.
+4. Mettre à jour `architecture.md` pour que la cartographie FR-07 inclue le chemin UI de saisie manuelle, probablement `frontend/src/pages/SourcesPage.tsx` et le flux connecteur manuel.
+5. Confirmer les seuils et la configuration des tests automatisés avant l’implémentation : couverture Vitest/RTL, contrôles axe-core, setup Playwright, attentes de couverture Rust unitaires/intégration.
+6. Traiter les documents UX actifs comme `ux-designs/ux-Poke-Radar-2026-07-21/DESIGN.md` et `EXPERIENCE.md` ; garder `_archive/ux-design-specification-2026-02-19.md` historique sauf sélection explicite.
 
-### Final Note
+### Note finale
 
-This assessment identified 0 critical blockers, 4 major issues, and 5 minor concerns across document discovery, PRD traceability, UX alignment, architecture mapping, and epic/story quality. Address the major issues before final implementation sign-off. If the team accepts the risks, implementation can proceed with explicit tracking of the recommended corrections.
+Cette évaluation identifie 0 bloqueur critique, 4 problèmes majeurs et 5 réserves mineures sur la découverte documentaire, la traçabilité PRD, l’alignement UX, la cartographie architecture et la qualité epics/stories. Corriger les problèmes majeurs avant la validation finale d’implémentation. Si l’équipe accepte les risques, l’implémentation peut démarrer avec un suivi explicite des corrections recommandées.
 
-**Assessor:** Winston — System Architect / Implementation Readiness facilitator
-**Assessment completed:** 2026-07-24
+**Évaluateur :** Winston — Architecte système / facilitateur Implementation Readiness
+**Évaluation terminée :** 2026-07-24

@@ -11,6 +11,6 @@ project_knowledge: "{project-root}/docs"
 # Core Configuration Values
 user_name: Ubuntu
 project_name: Poke-Radar
-communication_language: English
-document_output_language: English
+communication_language: French
+document_output_language: French
 output_folder: _bmad-output
