@@ -363,8 +363,9 @@ mod tests {
     };
 
     use super::{
-        create_monitor_profile, create_product, list_monitor_profiles, list_product_references,
-        list_products, ConfigRepositoryError,
+        create_monitor_profile, create_product, execute_product_insert,
+        list_monitor_profiles, list_product_references, list_products,
+        ConfigRepositoryError,
     };
 
     #[test]
