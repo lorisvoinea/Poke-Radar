@@ -76,7 +76,8 @@ fn classify_product_insert_error(error: SqlError) -> ConfigRepositoryError {
             ConfigRepositoryError::DuplicateSku
         }
         SqlError::SqliteFailure(failure, _message)
-            if failure.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_TRIGGER =>
+            if failure.code == ErrorCode::ConstraintViolation
+                && failure.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_TRIGGER =>
         {
             ConfigRepositoryError::NormalizationViolation
         }

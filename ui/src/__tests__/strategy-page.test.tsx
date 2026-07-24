@@ -74,8 +74,9 @@ describe("StrategyPage", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeEnabled());
     fireEvent.click(screen.getByRole("button", { name: "Ajouter le produit" }));
 
-    expect(await screen.findByText(/référentiel indisponible/)).toBeInTheDocument();
+    expect(await screen.findByText(/Référence en cache/)).toBeInTheDocument();
     expect(screen.getByRole("option", { name: /Carte conservée/ })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeEnabled();
   });
 
   it("crée via Tauri puis relit le même identifiant de référence", async () => {
