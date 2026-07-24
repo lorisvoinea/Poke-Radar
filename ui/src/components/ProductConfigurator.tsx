@@ -58,6 +58,7 @@ export function ProductConfigurator({ references, referenceAvailability, existin
   }
 
   const selected = availableReferences.find((item) => item.id === referenceId);
+  const usesCachedReference = mode === "reference" && availability === "unavailable" && Boolean(selected);
   const valid = mode === "reference" ? Boolean(selected) : Boolean(sku.trim() && title.trim());
 
   async function submit(event: FormEvent<HTMLFormElement>) {
@@ -121,7 +122,11 @@ export function ProductConfigurator({ references, referenceAvailability, existin
             <p className="feedback feedback--hint" role="status">Aucune référence n'est disponible. La saisie libre reste possible.</p>
           ) : null}
           {availability === "unavailable" ? (
-            <p className="feedback feedback--hint" role="status">Le référentiel est indisponible. La saisie libre reste possible.</p>
+            <p className="feedback feedback--hint" role="status">
+              {usesCachedReference
+                ? "Référence en cache — le référentiel live est indisponible; vérifiez avant de créer."
+                : "Le référentiel est indisponible. La saisie libre reste possible."}
+            </p>
           ) : null}
           {references.length > 0 && availableReferences.length === 0 ? (
             <p className="feedback feedback--hint" role="status">Toutes les références disponibles sont déjà suivies.</p>
