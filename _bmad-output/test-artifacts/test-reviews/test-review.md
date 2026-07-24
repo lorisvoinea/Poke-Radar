@@ -77,6 +77,8 @@ Weighted final score: **51/100 (F)**.
 
 E2E and component tests repeatedly inline Tauri `invoke` dispatch branches and large product/reference/profile object literals. Every behavior change now requires editing many mock blocks, increasing false positives and stale fixture risk.
 
+For Vitest component tests, centralize the bridge mock with `vi.fn` so assertions can inspect calls:
+
 ```ts
 const installTauriMock = (handlers: Record<string, unknown>) => {
   const invoke = vi.fn(async (command: string, args?: Record<string, unknown>) => {
@@ -88,6 +90,21 @@ const installTauriMock = (handlers: Record<string, unknown>) => {
   window.__TAURI_INTERNALS__ = { invoke };
   return invoke;
 };
+```
+
+For Playwright E2E tests that install the mock through `page.addInitScript`, do not reference Vitest globals. Use a plain async function inside the browser context instead:
+
+```ts
+await page.addInitScript((handlers) => {
+  window.__TAURI_INTERNALS__ = {
+    invoke: async (command, args) => {
+      const handler = handlers[command];
+      if (typeof handler === "function") return handler(args);
+      if (handler !== undefined) return handler;
+      throw new Error(`Unexpected Tauri command: ${command}`);
+    },
+  };
+}, handlers);
 ```
 
 ### 2. Replace brittle selectors with semantic locators or stable test ids
