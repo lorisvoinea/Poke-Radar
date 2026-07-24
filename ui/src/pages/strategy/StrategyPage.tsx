@@ -87,32 +87,16 @@ export function StrategyPage(): JSX.Element {
       throw new Error("Impossible de recharger les produits ou les profils.");
     }
 
+    setProducts(productResult.value);
+    setProfiles(profileResult.value);
+
     if (referenceResult.status === "fulfilled") {
       setReferences(referenceResult.value);
       setReferenceAvailability(referenceResult.value.length > 0 ? "available" : "empty");
+      setStatus("Configuration rechargée automatiquement.");
     } else {
       setReferenceAvailability("unavailable");
-    }
-
-    if (productResult.status === "fulfilled") {
-      setProducts(productResult.value);
-    }
-    if (profileResult.status === "fulfilled") {
-      setProfiles(profileResult.value);
-    }
-
-    const partial = [
-      productResult.status === "rejected" && "produits",
-      profileResult.status === "rejected" && "profils",
-      referenceResult.status === "rejected" && "référentiel"
-    ].filter(Boolean);
-
-    if (partial.length > 0) {
-      setStatus(`Configuration partielle chargée; ${partial.join("/")} indisponible(s).`);
-    } else {
-      setStatus(referenceResult.status === "rejected"
-        ? "Configuration chargée; référentiel indisponible. La saisie libre reste possible."
-        : "Configuration rechargée automatiquement.");
+      setStatus("Produits et profils chargés; référentiel indisponible. La saisie libre reste possible.");
     }
     return true;
   }

@@ -50,7 +50,32 @@ describe("StrategyPage", () => {
 
     expect(await screen.findByText("Historique")).toBeInTheDocument();
     expect(await screen.findByText("Profil conservé")).toBeInTheDocument();
-    expect(screen.getByText(/Configuration partielle chargée.*référentiel indisponible/, { selector: ".status-pill" })).toBeInTheDocument();
+    expect(screen.getByText("Produits et profils chargés; référentiel indisponible. La saisie libre reste possible.", { selector: ".status-pill" })).toBeInTheDocument();
+  });
+
+  it("n'efface pas le dernier référentiel connu quand sa lecture échoue", async () => {
+    const reference = { id: "ref-1", code: "REF-001", name: "Carte conservée", setName: "Set", edition: "Standard", rarity: "Rare", language: "fr" };
+    let refreshCount = 0;
+    const invoke = vi.fn(async (command: string) => {
+      if (command === "app_ready") return "ok";
+      if (command === "list_products_command") return [{ id: 7, sku: "HIST-1", title: "Historique", normalizationStatus: "free_text", reference: null }];
+      if (command === "list_monitor_profiles_command") return [];
+      if (command === "list_product_references_command") {
+        if (refreshCount++ === 0) return [reference];
+        throw new Error("catalogue absent");
+      }
+      if (command === "create_product_command") return {};
+      return undefined;
+    });
+    (window as Window & { __TAURI_INTERNALS__?: unknown }).__TAURI_INTERNALS__ = { invoke };
+
+    render(<StrategyPage />);
+    expect(await screen.findByRole("option", { name: /Carte conservée/ })).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole("button", { name: "Ajouter le produit" })).toBeEnabled());
+    fireEvent.click(screen.getByRole("button", { name: "Ajouter le produit" }));
+
+    expect(await screen.findByText(/référentiel indisponible/)).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /Carte conservée/ })).toBeInTheDocument();
   });
 
   it("crée via Tauri puis relit le même identifiant de référence", async () => {

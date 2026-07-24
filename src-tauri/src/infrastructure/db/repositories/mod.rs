@@ -47,13 +47,7 @@ pub fn create_product(
             ) {
                 Ok(0) => return Err(ConfigRepositoryError::ReservedReferenceCode),
                 Ok(_) => {}
-                Err(SqlError::SqliteFailure(error, _message))
-                    if error.code == ErrorCode::ConstraintViolation
-                        && error.extended_code == 2067 =>
-                {
-                    return Err(ConfigRepositoryError::DuplicateSku);
-                }
-                Err(error) => return Err(error.into()),
+                Err(error) => return Err(classify_product_insert_error(error)),
             }
         }
     }
@@ -68,20 +62,25 @@ fn execute_product_insert<P: rusqlite::Params>(
     sql: &str,
     params: P,
 ) -> Result<(), ConfigRepositoryError> {
-    match tx.execute(sql, params) {
-        Ok(_) => Ok(()),
-        Err(SqlError::SqliteFailure(error, _message))
-            if error.code == ErrorCode::ConstraintViolation
-                && error.extended_code == 2067 =>
+    tx.execute(sql, params)
+        .map(|_| ())
+        .map_err(classify_product_insert_error)
+}
+
+fn classify_product_insert_error(error: SqlError) -> ConfigRepositoryError {
+    match error {
+        SqlError::SqliteFailure(failure, _message)
+            if failure.code == ErrorCode::ConstraintViolation
+                && failure.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_UNIQUE =>
         {
-            Err(ConfigRepositoryError::DuplicateSku)
+            ConfigRepositoryError::DuplicateSku
         }
-        Err(SqlError::SqliteFailure(error, _message))
-            if error.extended_code == 4 =>
+        SqlError::SqliteFailure(failure, _message)
+            if failure.extended_code == rusqlite::ffi::SQLITE_CONSTRAINT_TRIGGER =>
         {
-            Err(ConfigRepositoryError::NormalizationViolation)
+            ConfigRepositoryError::NormalizationViolation
         }
-        Err(error) => Err(error.into()),
+        other => other.into(),
     }
 }
 
@@ -501,6 +500,32 @@ mod tests {
 
         assert!(matches!(error, ConfigRepositoryError::DuplicateSku));
         assert_eq!(error.to_string(), "Un produit avec ce code existe déjà.");
+    }
+
+    #[test]
+    fn maps_normalization_trigger_abort_to_actionable_error() {
+        let dir = tempdir().expect("tempdir");
+        let db_path = dir.path().join("normalization-trigger.db");
+        initialize_database(&db_path).expect("db init");
+        let mut connection = open_connection(&db_path).expect("db open");
+        let tx = connection.transaction().expect("transaction");
+
+        let error = execute_product_insert(
+            &tx,
+            "INSERT INTO products(sku, title, reference_id, normalization_status)
+             VALUES('BAD-NORM', 'Produit incohérent', NULL, 'normalized')",
+            [],
+        )
+        .expect_err("normalization trigger must abort");
+
+        assert!(matches!(
+            error,
+            ConfigRepositoryError::NormalizationViolation
+        ));
+        assert_eq!(
+            error.to_string(),
+            "L'opération a été annulée en raison d'une violation d'intégrité des données."
+        );
     }
 
     #[test]
