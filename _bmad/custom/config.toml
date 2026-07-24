@@ -5,3 +5,7 @@
 #
 # [agents.bmad-agent-pm]
 # description = "Prefers short, bulleted PRDs over narrative drafts."
+
+[core]
+document_output_language = "French"
+communication_language = "French"
